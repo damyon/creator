@@ -3,6 +3,8 @@ use wasm_bindgen::JsCast;
 use web_sys::{WebGlRenderingContext, WebGlShader, WebGlProgram};
 extern crate js_sys;
 
+mod graphics;
+
 pub fn init_webgl_context(canvas_id: &str) -> Result<WebGlRenderingContext, JsValue> {
     let document = web_sys::window().unwrap().document().unwrap();
     let canvas = document.get_element_by_id(canvas_id).unwrap();
@@ -127,34 +129,33 @@ pub fn setup_vertices(gl: &WebGlRenderingContext, vertices: &[f32], shader_progr
 pub fn draw_grid(
     canvas_id: &str,
 ) -> Result<WebGlRenderingContext, JsValue> {
-    let gl: WebGlRenderingContext = init_webgl_context(canvas_id).unwrap();
-    let shader_program: WebGlProgram = setup_shaders(&gl).unwrap();
-    let vertices: [f32; 18] = [
-        0.3, 1.0, 0.0, // top
-        -1.0, -1.0, 0.0, // bottom left
-        1.0, -1.0, 0.0, // bottom right
-        -1.0, 1.0, 0.0, // top
-        -1.0, -1.0, 0.0, // bottom left
-        1.0, -1.0, 0.0, // bottom right
+    let context: crate::graphics::graphics::Context = crate::graphics::graphics::build_context(canvas_id).unwrap();
+    let shader_program: WebGlProgram = setup_shaders(&context.gl).unwrap();
+    let vertices: [f32; 15] = [
+        -0.9, 0.9, 0.9, // top left
+        -0.9, -0.9, 0.9, // bottom left
+        0.9, -0.9, 0.9, // bottom right
+        0.9, 0.9, 0.9, // top right
+        -0.9, 0.9, 0.9, // top left
     ];
 
-    setup_vertices(&gl, &vertices, &shader_program);
+    setup_vertices(&context.gl, &vertices, &shader_program);
 
     let color = vec![1.0, 1.0, 1.0, 1.0];
-    let color_location = gl
+    let color_location = context.gl
         .get_uniform_location(&shader_program, "fragColor")
         .unwrap();
-    gl.uniform4fv_with_f32_array(Some(&color_location), &color);
+    context.gl.uniform4fv_with_f32_array(Some(&color_location), &color);
 
-    gl.clear_color(0.2, 0.0, 0.0, 1.0);
-    gl.clear(WebGlRenderingContext::DEPTH_BUFFER_BIT | WebGlRenderingContext::COLOR_BUFFER_BIT);
+    context.gl.clear_color(0.4, 0.4, 0.7, 1.0);
+    context.gl.clear(WebGlRenderingContext::DEPTH_BUFFER_BIT | WebGlRenderingContext::COLOR_BUFFER_BIT);
 
-    gl.line_width(5.0);
-    gl.draw_arrays(
-        WebGlRenderingContext::LINE_LOOP,
+    context.gl.line_width(2.0);
+    context.gl.draw_arrays(
+        WebGlRenderingContext::LINE_STRIP,
         0,
         (vertices.len() / 3) as i32,
     );
 
-    Ok(gl)
+    Ok(context.gl)
 }
