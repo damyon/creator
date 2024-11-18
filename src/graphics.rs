@@ -9,20 +9,106 @@ pub mod graphics {
         pub gl: WebGlRenderingContext,
     }
 
-    pub fn build_context(canvas_id: &str) -> Result<Context, JsValue> {
-        let document = web_sys::window().unwrap().document().unwrap();
-        let canvas_element = document.get_element_by_id(canvas_id).unwrap();
-        let canvas: web_sys::HtmlCanvasElement = canvas_element.dyn_into::<web_sys::HtmlCanvasElement>()?;
-        let gl = canvas
-        .get_context("webgl")?
-        .unwrap()
-        .dyn_into::<WebGlRenderingContext>()
-        .unwrap();
+    impl Context {
+
+        pub fn new(canvas_id: &str) -> Context {
+            let document = web_sys::window().unwrap().document().unwrap();
+            let canvas_element = document.get_element_by_id(canvas_id).unwrap();
+            let canvas: web_sys::HtmlCanvasElement = match canvas_element.dyn_into::<web_sys::HtmlCanvasElement>() {
+                Ok(canvas) => {
+                    canvas
+                }
+                Err(_) => {
+                    panic!("Could not find the canvas element");
+                }
+            };
+
+            let gl_element = canvas.get_context("webgl").unwrap();
+            let gl: WebGlRenderingContext = match gl_element.expect("Found webgl").dyn_into::<WebGlRenderingContext>() {
+                Ok(gl) => {
+                    gl
+                }
+                Err(_) => {
+                    panic!("Could not get webgl from canvas");
+                }
+            };
+            
+            Context { gl: gl }
+        }
+
+        pub fn create_shader(
+            &self,
+            shader_type: u32,
+            source: &str,
+        ) -> Result<WebGlShader, JsValue> {
+            let shader = self.gl
+                .create_shader(shader_type)
+                .ok_or_else(|| JsValue::from_str("Unable to create shader object"))?;
         
-        Ok(Context {
-            gl: gl
-        })
+            self.gl.shader_source(&shader, source);
+            self.gl.compile_shader(&shader);
+        
+            if self.gl
+                .get_shader_parameter(&shader, WebGlRenderingContext::COMPILE_STATUS)
+                .as_bool()
+                .unwrap_or(false)
+            {
+                Ok(shader)
+            } else {
+                Err(JsValue::from_str(
+                    &(self.gl).get_shader_info_log(&shader)
+                        .unwrap_or_else(|| "Unknown error creating shader".into()),
+                ))
+            }
+        }
+
+        pub fn create_program(&self, vertex_shader: &WebGlShader, fragment_shader: &WebGlShader) -> WebGlProgram {
+            let shader_program = self.gl.create_program().unwrap();
+            self.gl.attach_shader(&shader_program, &vertex_shader);
+            self.gl.attach_shader(&shader_program, &fragment_shader);
+            self.gl.link_program(&shader_program);
+    
+            if self.gl
+                .get_program_parameter(&shader_program, WebGlRenderingContext::LINK_STATUS)
+                .as_bool()
+                .unwrap_or(false)
+            {
+                self.gl.use_program(Some(&shader_program));
+                shader_program
+            } else {
+                panic!("Could not compile shaders.")
+            }
+        }
+
+        pub fn setup_shaders(&self) -> WebGlProgram {
+            let vertex_shader_source = "
+                attribute vec3 vertexPosition;
+                void main(void) {
+                    gl_Position = vec4(vertexPosition, 1.0);
+                }
+                ";
+        
+            let fragment_shader_source = "
+                precision mediump float;
+                uniform vec4 fragColor;
+                void main(void) {
+                    gl_FragColor = fragColor;
+                }
+                ";
+        
+            let vertex_shader = self.create_shader(
+                WebGlRenderingContext::VERTEX_SHADER,
+                vertex_shader_source,
+            )
+            .unwrap();
+            let fragment_shader = self.create_shader(
+                WebGlRenderingContext::FRAGMENT_SHADER,
+                fragment_shader_source,
+            )
+            .unwrap();
+        
+            self.create_program(&vertex_shader, &fragment_shader)
+        }
     }
-
-
+    
 }
