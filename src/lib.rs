@@ -2,9 +2,14 @@ use wasm_bindgen::prelude::*;
 use web_sys::{WebGlRenderingContext, WebGlProgram};
 extern crate js_sys;
 
+mod drawable;
 mod graphics;
+mod grid;
 
+
+use crate::drawable::drawable::Drawable;
 use crate::graphics::graphics::Context;
+use crate::grid::grid::Grid;
 
 pub fn setup_vertices(gl: &WebGlRenderingContext, vertices: &[f32], shader_program: &WebGlProgram) {
     let vertices_array = unsafe { js_sys::Float32Array::view(&vertices) };
@@ -37,6 +42,11 @@ pub fn draw_grid(
 ) -> Result<WebGlRenderingContext, JsValue> {
     let context: Context = Context::new(canvas_id);
     let shader_program: WebGlProgram = context.setup_shaders();
+
+    let mut grid = Grid{ scale: 4, ..Default::default() };
+
+    grid.init();
+
     let vertices: [f32; 15] = [
         -0.9, 0.9, 0.9, // top left
         -0.9, -0.9, 0.9, // bottom left
