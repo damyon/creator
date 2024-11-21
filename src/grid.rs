@@ -28,7 +28,7 @@ pub mod grid {
     impl Drawable for Grid {
         fn init(&mut self) {
             for index in 0..14 {
-                self.vertices[index] *= self.scale as f32;
+                self.vertices[index] /= self.scale as f32;
             }
         }
 

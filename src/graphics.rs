@@ -80,6 +80,31 @@ pub mod graphics {
             }
         }
 
+        pub fn setup_vertices(&self, vertices: &[f32], shader_program: &WebGlProgram) {
+            let vertices_array = unsafe { js_sys::Float32Array::view(&vertices) };
+            let vertex_buffer = self.gl.create_buffer().unwrap();
+        
+            self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&vertex_buffer));
+            self.gl.buffer_data_with_array_buffer_view(
+                WebGlRenderingContext::ARRAY_BUFFER,
+                &vertices_array,
+                WebGlRenderingContext::STATIC_DRAW,
+            );
+        
+            let vertex_position = self.gl.get_attrib_location(&shader_program, "vertexPosition");
+        
+            self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&vertex_buffer));
+            self.gl.vertex_attrib_pointer_with_i32(
+                vertex_position as u32,
+                3,
+                WebGlRenderingContext::FLOAT,
+                false,
+                0,
+                0,
+            );
+            self.gl.enable_vertex_attrib_array(vertex_position as u32);
+        }
+
         pub fn setup_shaders(&self) -> WebGlProgram {
             let vertex_shader_source = "
                 attribute vec3 vertexPosition;

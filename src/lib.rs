@@ -43,19 +43,21 @@ pub fn draw_grid(
     let context: Context = Context::new(canvas_id);
     let shader_program: WebGlProgram = context.setup_shaders();
 
-    let mut grid = Grid{ scale: 4, ..Default::default() };
+    let mut grid = Grid{ scale: 2, ..Default::default() };
 
     grid.init();
 
-    let vertices: [f32; 15] = [
+   /*  let vertices: [f32; 15] = [
         -0.9, 0.9, 0.9, // top left
         -0.9, -0.9, 0.9, // bottom left
         0.9, -0.9, 0.9, // bottom right
         0.9, 0.9, 0.9, // top right
         -0.9, 0.9, 0.9, // top left
-    ];
+    ];*/
 
-    setup_vertices(&context.gl, &vertices, &shader_program);
+  //  setup_vertices(&context.gl, &vertices, &shader_program);
+
+    context.setup_vertices(&grid.vertices, &shader_program);
 
     let color = vec![1.0, 1.0, 1.0, 1.0];
     let color_location = context.gl
@@ -70,7 +72,7 @@ pub fn draw_grid(
     context.gl.draw_arrays(
         WebGlRenderingContext::LINE_STRIP,
         0,
-        (vertices.len() / 3) as i32,
+        (grid.vertices.len() / 3) as i32,
     );
 
     Ok(context.gl)
