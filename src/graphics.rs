@@ -4,6 +4,8 @@ pub mod graphics {
     use wasm_bindgen::JsCast;
     use web_sys::{WebGlRenderingContext, WebGlShader, WebGlProgram};
 
+    use crate::drawable::drawable::Drawable;
+
     extern crate js_sys;
     pub struct Context {
         pub gl: WebGlRenderingContext,
@@ -63,7 +65,7 @@ pub mod graphics {
         }
 
         pub fn create_program(&self, vertex_shader: &WebGlShader, fragment_shader: &WebGlShader) -> WebGlProgram {
-            let shader_program = self.gl.create_program().unwrap();
+            let shader_program: WebGlProgram = self.gl.create_program().unwrap();
             self.gl.attach_shader(&shader_program, &vertex_shader);
             self.gl.attach_shader(&shader_program, &fragment_shader);
             self.gl.link_program(&shader_program);
@@ -133,6 +135,28 @@ pub mod graphics {
             .unwrap();
         
             self.create_program(&vertex_shader, &fragment_shader)
+        }
+
+        pub fn clear(&self) {
+            self.gl.clear_color(0.4, 0.4, 0.7, 1.0);
+            self.gl.clear(WebGlRenderingContext::DEPTH_BUFFER_BIT | WebGlRenderingContext::COLOR_BUFFER_BIT);
+        }
+
+        pub fn draw(&self, drawable: impl Drawable, shader_program: &WebGlProgram) {
+            let color = vec![1.0, 1.0, 1.0, 1.0];
+            let color_location = self.gl
+                .get_uniform_location(&shader_program, "fragColor")
+                .unwrap();
+            self.gl.uniform4fv_with_f32_array(Some(&color_location), &color);
+        
+            self.gl.line_width(2.0);
+            
+            self.gl.draw_arrays(
+                WebGlRenderingContext::LINES,
+                0,
+                (drawable.count_vertices()) as i32,
+            );
+            log::info!("We are drawing {} vertices", drawable.count_vertices());
         }
     }
     
