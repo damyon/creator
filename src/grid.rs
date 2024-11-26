@@ -6,7 +6,7 @@ pub mod grid {
         pub scale: u8,
         pub square_count: u8,
         pub vertices_count: u8,
-        pub vertices: [f32; 1500],
+        pub vertices: Vec<f32>,
         pub max_scale: u8
     }
 
@@ -18,10 +18,8 @@ pub mod grid {
             Grid {
                 scale: 1,
                 square_count: 1,
-                vertices_count: 15,
-                vertices: [
-                    0.0; 1500
-                ],
+                vertices_count: 8,
+                vertices: Vec::new(),
                 max_scale: 10
             }
         }
@@ -29,29 +27,43 @@ pub mod grid {
 
     impl Drawable for Grid {
         fn init(&mut self) {
-            let square = [
-                -0.9, 0.9, 0.9, // top left
-                -0.9, -0.9, 0.9, // bottom left
-                0.9, -0.9, 0.9, // bottom right
-                0.9, 0.9, 0.9, // top right
-                -0.9, 0.9, 0.9, // top left
+            let row_vertices: [f32; 6] = [
+                -0.9, 0.9, 0.0, // top left
+                0.9, 0.9, 0.0, // top right
+            ];
+            let col_vertices: [f32; 6] = [
+                -0.9, 0.9, 0.0, // top left
+                -0.9, -0.9, 0.0, // bottom left
             ];
 
             if self.scale > self.max_scale {
                 panic!("Scale for grid is out of bounds");
             }
-            for row in 0..self.max_scale {
-                for col in 0..self.max_scale {
-                    for index in 0..15 {
-                       let global_index: usize = (row * 15 + col * 15 + index) as usize;
 
-                       self.vertices[global_index] = (square[index as usize] / self.scale as f32 + (row as f32/ self.scale as f32) + (col as f32/ self.scale as f32)) / self.max_scale as f32;
-                    }
-                }
+            // We want one pair of vertices for each row +1 and one for each column + 1
+
+
+
+            for row in 0..=self.scale {
+                self.vertices.push(row_vertices[0]);
+                self.vertices.push((row as f32) / self.scale as f32 * 1.8 - 0.9);
+                self.vertices.push(row_vertices[2]);
+                self.vertices.push(row_vertices[3]);
+                self.vertices.push((row as f32) / self.scale as f32 * 1.8 - 0.9);
+                self.vertices.push(row_vertices[5]);
+            }
+
+            for col in 0..=self.scale {
+                self.vertices.push((col as f32) / self.scale as f32 * 1.8 - 0.9);
+                self.vertices.push(col_vertices[1]);
+                self.vertices.push(col_vertices[2]);
+                self.vertices.push((col as f32) / self.scale as f32 * 1.8 - 0.9);
+                self.vertices.push(col_vertices[4]);
+                self.vertices.push(col_vertices[5]);
             }
             log::info!("Our vertices look like this: {:?}", self.vertices);
             self.square_count = self.scale * self.scale;
-            self.vertices_count = self.square_count * 15;
+            self.vertices_count = 2 * (self.scale + 1 + self.scale  + 1);
         }
 
         fn count_vertices(&self) -> u8 {
