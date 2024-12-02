@@ -6,6 +6,8 @@ pub mod graphics {
 
     use crate::drawable::drawable::Drawable;
 
+    extern crate nalgebra_glm as glm;
+
     extern crate js_sys;
     pub struct Context {
         pub gl: WebGlRenderingContext,
@@ -24,7 +26,6 @@ pub mod graphics {
                     panic!("Could not find the canvas element");
                 }
             };
-
             let gl_element = canvas.get_context("webgl").unwrap();
             let gl: WebGlRenderingContext = match gl_element.expect("Found webgl").dyn_into::<WebGlRenderingContext>() {
                 Ok(gl) => {
@@ -93,33 +94,38 @@ pub mod graphics {
                 WebGlRenderingContext::STATIC_DRAW,
             );
         
-            let vertex_position = self.gl.get_attrib_location(&shader_program, "vertexPosition");
+            let a_position = self.gl.get_attrib_location(&shader_program, "a_position");
         
             self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&vertex_buffer));
             self.gl.vertex_attrib_pointer_with_i32(
-                vertex_position as u32,
+                a_position as u32,
                 3,
                 WebGlRenderingContext::FLOAT,
                 false,
                 0,
                 0,
             );
-            self.gl.enable_vertex_attrib_array(vertex_position as u32);
+            self.gl.enable_vertex_attrib_array(a_position as u32);
+
+
         }
 
         pub fn setup_shaders(&self) -> WebGlProgram {
             let vertex_shader_source = "
-                attribute vec3 vertexPosition;
+                attribute vec4 a_position;
+                uniform mat4 u_matrix;
+
                 void main(void) {
-                    gl_Position = vec4(vertexPosition, 1.0);
+                    // Multiply the position by the matrix.
+                    gl_Position = u_matrix * a_position;
                 }
                 ";
         
             let fragment_shader_source = "
                 precision mediump float;
-                uniform vec4 fragColor;
+                uniform vec4 u_color;
                 void main(void) {
-                    gl_FragColor = fragColor;
+                    gl_FragColor = u_color;
                 }
                 ";
         
@@ -143,12 +149,33 @@ pub mod graphics {
         }
 
         pub fn draw(&self, drawable: impl Drawable, shader_program: &WebGlProgram) {
-            let color = vec![1.0, 1.0, 1.0, 1.0];
+            let color: Vec<f32> = vec![1.0, 1.0, 1.0, 1.0];
             let color_location = self.gl
-                .get_uniform_location(&shader_program, "fragColor")
+                .get_uniform_location(&shader_program, "u_color")
                 .unwrap();
             self.gl.uniform4fv_with_f32_array(Some(&color_location), &color);
         
+            //let translation: Vec<f32> = vec![0.0, 0.0, -10.0];
+
+            let translation = glm::Vec3::new(40.0, 0.0, -10.0);
+            let rotation = glm::Vec3::new(40.0, 0.0, 0.0);
+            let scale= glm::Vec3::new(1.0, 1.0, 1.0);
+
+
+            // We want a model / view / projection matrix
+            // Compute the matrices
+            let matrix = glm::perspective_fov_lh(3.14 / 4.0, 10.0, 10.0, 1.0, 10.0);
+            let modelt = glm::translate(matrix, translation);
+    var matrix = m4.projection(gl.canvas.clientWidth, gl.canvas.clientHeight, 400);
+    matrix = m4.translate(matrix, translation[0], translation[1], translation[2]);
+    matrix = m4.xRotate(matrix, rotation[0]);
+    matrix = m4.yRotate(matrix, rotation[1]);
+    matrix = m4.zRotate(matrix, rotation[2]);
+    matrix = m4.scale(matrix, scale[0], scale[1], scale[2]);
+
+    // Set the matrix.
+    gl.uniformMatrix4fv(matrixLocation, false, matrix);
+
             self.gl.line_width(2.0);
             
             self.gl.draw_arrays(

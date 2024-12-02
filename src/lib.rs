@@ -20,7 +20,7 @@ pub fn draw_grid(
     let context: Context = Context::new(canvas_id);
     let shader_program: WebGlProgram = context.setup_shaders();
 
-    let mut grid = Grid{ scale: 3, ..Default::default() };
+    let mut grid = Grid{ scale: 7, ..Default::default() };
     
     log::info!("Some info");
 
