@@ -52,21 +52,21 @@ pub mod grid {
 
             let scale_f = self.scale as f32;
             for row in 0..=self.scale {
-                self.vertices.push(row_vertices[0]);
-                self.vertices.push((row as f32) / scale_f * 2.0 - 1.0);
-                self.vertices.push(row_vertices[2]);
-                self.vertices.push(row_vertices[3]);
-                self.vertices.push((row as f32) / scale_f * 2.0 - 1.0);
-                self.vertices.push(row_vertices[5]);
+                self.vertices.push((row_vertices[0]) * scale_f);
+                self.vertices.push(((row as f32) / scale_f * 2.0 - 1.0) * scale_f);
+                self.vertices.push((row_vertices[2]) * scale_f);
+                self.vertices.push((row_vertices[3]) * scale_f);
+                self.vertices.push(((row as f32) / scale_f * 2.0 - 1.0) * scale_f);
+                self.vertices.push((row_vertices[5]) * scale_f);
             }
 
             for col in 0..=self.scale {
-                self.vertices.push((col as f32) / scale_f * 2.0 - 1.0);
-                self.vertices.push(col_vertices[1]);
-                self.vertices.push(col_vertices[2]);
-                self.vertices.push((col as f32) / scale_f * 2.0 - 1.0);
-                self.vertices.push(col_vertices[4]);
-                self.vertices.push(col_vertices[5]);
+                self.vertices.push(((col as f32) / scale_f * 2.0 - 1.0) * scale_f);
+                self.vertices.push((col_vertices[1]) * scale_f);
+                self.vertices.push((col_vertices[2]) * scale_f);
+                self.vertices.push(((col as f32) / scale_f * 2.0 - 1.0) * scale_f);
+                self.vertices.push((col_vertices[4]) * scale_f);
+                self.vertices.push((col_vertices[5]) * scale_f);
             }
             log::info!("Our vertices look like this: {:?}", self.vertices);
             self.square_count = self.scale * self.scale;

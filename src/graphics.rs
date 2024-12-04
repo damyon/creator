@@ -165,8 +165,8 @@ pub mod graphics {
             // Compute the matrices
             // Our camera looks toward the point (0.0, 0.0, 0.0).
             // It is located at (2.0, 2.0, 2.0).
-            let eye    = Point3::new(3.0, 2.7, 3.0);
-            let target = Point3::new(0.0, 0.0, 0.0);
+            let eye    = Point3::new(3.8, 1.0, 7.0);
+            let target = Point3::new(1.0, 0.0, 0.0);
             let view   = Isometry3::look_at_rh(&eye, &target, &Vector3::y());
 
             // This is translation, rotation
