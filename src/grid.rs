@@ -50,20 +50,21 @@ pub mod grid {
 
             // We want one pair of vertices for each row +1 and one for each column + 1
 
+            let scale_f = self.scale as f32;
             for row in 0..=self.scale {
                 self.vertices.push(row_vertices[0]);
-                self.vertices.push((row as f32) / self.scale as f32 * 2.0 - 1.0);
+                self.vertices.push((row as f32) / scale_f * 2.0 - 1.0);
                 self.vertices.push(row_vertices[2]);
                 self.vertices.push(row_vertices[3]);
-                self.vertices.push((row as f32) / self.scale as f32 * 2.0 - 1.0);
+                self.vertices.push((row as f32) / scale_f * 2.0 - 1.0);
                 self.vertices.push(row_vertices[5]);
             }
 
             for col in 0..=self.scale {
-                self.vertices.push((col as f32) / self.scale as f32 * 2.0 - 1.0);
+                self.vertices.push((col as f32) / scale_f * 2.0 - 1.0);
                 self.vertices.push(col_vertices[1]);
                 self.vertices.push(col_vertices[2]);
-                self.vertices.push((col as f32) / self.scale as f32 * 2.0 - 1.0);
+                self.vertices.push((col as f32) / scale_f * 2.0 - 1.0);
                 self.vertices.push(col_vertices[4]);
                 self.vertices.push(col_vertices[5]);
             }
