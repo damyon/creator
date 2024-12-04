@@ -36,12 +36,12 @@ pub mod grid {
     impl Drawable for Grid {
         fn init(&mut self) {
             let row_vertices: [f32; 6] = [
-                -0.9, 0.9, 0.0, // top left
-                0.9, 0.9, 0.0, // top right
+                -1.0, 1.0, 0.0, // top left
+                1.0, 1.0, 0.0, // top right
             ];
             let col_vertices: [f32; 6] = [
-                -0.9, 0.9, 0.0, // top left
-                -0.9, -0.9, 0.0, // bottom left
+                -1.0, 1.0, 0.0, // top left
+                -1.0, -1.0, 0.0, // bottom left
             ];
 
             if self.scale > self.max_scale {
@@ -52,18 +52,18 @@ pub mod grid {
 
             for row in 0..=self.scale {
                 self.vertices.push(row_vertices[0]);
-                self.vertices.push((row as f32) / self.scale as f32 * 1.8 - 0.9);
+                self.vertices.push((row as f32) / self.scale as f32 * 2.0 - 1.0);
                 self.vertices.push(row_vertices[2]);
                 self.vertices.push(row_vertices[3]);
-                self.vertices.push((row as f32) / self.scale as f32 * 1.8 - 0.9);
+                self.vertices.push((row as f32) / self.scale as f32 * 2.0 - 1.0);
                 self.vertices.push(row_vertices[5]);
             }
 
             for col in 0..=self.scale {
-                self.vertices.push((col as f32) / self.scale as f32 * 1.8 - 0.9);
+                self.vertices.push((col as f32) / self.scale as f32 * 2.0 - 1.0);
                 self.vertices.push(col_vertices[1]);
                 self.vertices.push(col_vertices[2]);
-                self.vertices.push((col as f32) / self.scale as f32 * 1.8 - 0.9);
+                self.vertices.push((col as f32) / self.scale as f32 * 2.0 - 1.0);
                 self.vertices.push(col_vertices[4]);
                 self.vertices.push(col_vertices[5]);
             }

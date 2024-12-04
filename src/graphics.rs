@@ -165,14 +165,14 @@ pub mod graphics {
             // Compute the matrices
             // Our camera looks toward the point (0.0, 0.0, 0.0).
             // It is located at (2.0, 2.0, 2.0).
-            let eye    = Point3::new(1.0, 0.7, 2.0);
+            let eye    = Point3::new(3.0, 2.7, 3.0);
             let target = Point3::new(0.0, 0.0, 0.0);
             let view   = Isometry3::look_at_rh(&eye, &target, &Vector3::y());
 
             // This is translation, rotation
             let model      = Isometry3::new(drawable.translation(), drawable.rotation());
             
-            let projection = Perspective3::new(16.0 / 9.0, 3.14 / 2.0, 1.0, 1000.0);
+            let projection = Perspective3::new(16.0 / 9.0, 3.14 / 2.0, 0.0, 1000.0);
             let model_view_projection = projection.into_inner() * (view * model).to_homogeneous();
 
             let u_matrix_location = self.gl
