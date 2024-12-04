@@ -7,6 +7,9 @@ pub mod graphics {
     use crate::drawable::drawable::Drawable;
 
     extern crate nalgebra_glm as glm;
+    extern crate nalgebra as na;
+
+    use na::{Point3, Vector3, Isometry3, Perspective3};
 
     extern crate js_sys;
     pub struct Context {
@@ -154,27 +157,24 @@ pub mod graphics {
                 .get_uniform_location(&shader_program, "u_color")
                 .unwrap();
             self.gl.uniform4fv_with_f32_array(Some(&color_location), &color);
-        
-            //let translation: Vec<f32> = vec![0.0, 0.0, -10.0];
-
-            let translation = glm::Vec3::new(40.0, 0.0, -10.0);
-            let rotation = glm::Vec3::new(40.0, 0.0, 0.0);
-            let scale= glm::Vec3::new(1.0, 1.0, 1.0);
-
 
             // We want a model / view / projection matrix
             // Compute the matrices
-            let matrix = glm::perspective_fov_lh(3.14 / 4.0, 10.0, 10.0, 1.0, 10.0);
-            let modelt = glm::translate(matrix, translation);
-    var matrix = m4.projection(gl.canvas.clientWidth, gl.canvas.clientHeight, 400);
-    matrix = m4.translate(matrix, translation[0], translation[1], translation[2]);
-    matrix = m4.xRotate(matrix, rotation[0]);
-    matrix = m4.yRotate(matrix, rotation[1]);
-    matrix = m4.zRotate(matrix, rotation[2]);
-    matrix = m4.scale(matrix, scale[0], scale[1], scale[2]);
+            // Our camera looks toward the point (1.0, 0.0, 0.0).
+            // It is located at (0.0, 0.0, 1.0).
+            let eye    = Point3::new(0.0, 0.0, 1.0);
+            let target = Point3::new(1.0, 0.0, 0.0);
+            let view   = Isometry3::look_at_rh(&eye, &target, &Vector3::y());
 
-    // Set the matrix.
-    gl.uniformMatrix4fv(matrixLocation, false, matrix);
+            let model      = Isometry3::new(Vector3::x(), na::zero());
+            let projection = Perspective3::new(16.0 / 9.0, 3.14 / 2.0, 1.0, 1000.0);
+            let model_view_projection = projection.into_inner() * (view * model).to_homogeneous();
+
+            let u_matrix_location = self.gl
+                .get_uniform_location(&shader_program, "u_matrix")
+                .unwrap();
+
+            self.gl.uniform_matrix4fv_with_f32_array(Some(&u_matrix_location), false, model_view_projection.as_slice());
 
             self.gl.line_width(2.0);
             
