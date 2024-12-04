@@ -163,7 +163,7 @@ pub mod graphics {
             // Our camera looks toward the point (1.0, 0.0, 0.0).
             // It is located at (0.0, 0.0, 1.0).
             let eye    = Point3::new(0.0, 0.0, 1.0);
-            let target = Point3::new(1.0, 0.0, 0.0);
+            let target = Point3::new(0.5, 0.0, 0.0);
             let view   = Isometry3::look_at_rh(&eye, &target, &Vector3::y());
 
             let model      = Isometry3::new(Vector3::x(), na::zero());
