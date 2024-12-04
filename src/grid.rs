@@ -2,12 +2,18 @@
 
 
 pub mod grid {
+
+    extern crate nalgebra as na;
+    use na::Vector3;
+
     pub struct Grid {
         pub scale: u8,
         pub square_count: u8,
         pub vertices_count: u8,
         pub vertices: Vec<f32>,
-        pub max_scale: u8
+        pub max_scale: u8,
+        pub translation: Vector3<f32>,
+        pub rotation: Vector3<f32>
     }
 
 
@@ -20,7 +26,9 @@ pub mod grid {
                 square_count: 1,
                 vertices_count: 8,
                 vertices: Vec::new(),
-                max_scale: 10
+                max_scale: 10,
+                translation: Vector3::new(0.0, 0.0, 0.0),
+                rotation: Vector3::new(0.0, 0.0, 0.0)
             }
         }
     }
@@ -42,8 +50,6 @@ pub mod grid {
 
             // We want one pair of vertices for each row +1 and one for each column + 1
 
-
-
             for row in 0..=self.scale {
                 self.vertices.push(row_vertices[0]);
                 self.vertices.push((row as f32) / self.scale as f32 * 1.8 - 0.9);
@@ -64,10 +70,33 @@ pub mod grid {
             log::info!("Our vertices look like this: {:?}", self.vertices);
             self.square_count = self.scale * self.scale;
             self.vertices_count = 2 * (self.scale + 1 + self.scale  + 1);
+
+            self.translation = Vector3::new(0.0, 0.0, 0.0);
+            self.rotation = Vector3::new(0.0, 0.0, 0.0);
         }
 
         fn count_vertices(&self) -> u8 {
             self.vertices_count
+        }
+
+        fn translation(&self) -> Vector3<f32> {
+            self.translation
+        }
+
+        fn translate(&mut self, amount: Vector3<f32>) {
+            self.translation += amount;
+        }
+
+        fn rotate(&mut self, amount: Vector3<f32>) {
+            self.rotation += amount;
+        }
+
+        fn rotation(&self) -> Vector3<f32> {
+            self.rotation
+        }
+
+        fn vertices(&self) -> Vec<f32> {
+            self.vertices.clone()
         }
 
     }

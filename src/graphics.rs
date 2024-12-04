@@ -152,6 +152,9 @@ pub mod graphics {
         }
 
         pub fn draw(&self, drawable: impl Drawable, shader_program: &WebGlProgram) {
+
+            self.setup_vertices(&drawable.vertices(), shader_program);
+
             let color: Vec<f32> = vec![1.0, 1.0, 1.0, 1.0];
             let color_location = self.gl
                 .get_uniform_location(&shader_program, "u_color")
@@ -160,13 +163,15 @@ pub mod graphics {
 
             // We want a model / view / projection matrix
             // Compute the matrices
-            // Our camera looks toward the point (1.0, 0.0, 0.0).
-            // It is located at (0.0, 0.0, 1.0).
-            let eye    = Point3::new(0.0, 0.0, 1.0);
-            let target = Point3::new(0.5, 0.0, 0.0);
+            // Our camera looks toward the point (0.0, 0.0, 0.0).
+            // It is located at (2.0, 2.0, 2.0).
+            let eye    = Point3::new(1.0, 0.7, 2.0);
+            let target = Point3::new(0.0, 0.0, 0.0);
             let view   = Isometry3::look_at_rh(&eye, &target, &Vector3::y());
 
-            let model      = Isometry3::new(Vector3::x(), na::zero());
+            // This is translation, rotation
+            let model      = Isometry3::new(drawable.translation(), drawable.rotation());
+            
             let projection = Perspective3::new(16.0 / 9.0, 3.14 / 2.0, 1.0, 1000.0);
             let model_view_projection = projection.into_inner() * (view * model).to_homogeneous();
 
