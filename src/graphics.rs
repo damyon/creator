@@ -1,9 +1,9 @@
 pub mod graphics {
 
+    use gloo::events::EventListener;
     use wasm_bindgen::prelude::*;
     use wasm_bindgen::JsCast;
-    use web_sys::{WebGlRenderingContext, WebGlShader, WebGlProgram, MouseEvent};
-
+    use web_sys::{WebGlRenderingContext, WebGlShader, WebGlProgram};
     use crate::drawable::drawable::Drawable;
 
     extern crate nalgebra_glm as glm;
@@ -40,18 +40,17 @@ pub mod graphics {
                     panic!("Could not get webgl from canvas");
                 }
             };
-            let closure = Closure::<dyn FnMut(_)>::new(move |event: MouseEvent| {
+            let closure = EventListener::new(&canvas, "mousemove", move | event| {
+                let move_event = event.clone().dyn_into::<web_sys::MouseEvent>().unwrap();
+
                 // The contents of the closure are only run when the 
                 // closure is called by the JS event handler. 
                 // The code inside the closures is the only part of this 
                 // program that runs repeatedly.
                 self.eye = Point3::new(3.8, 1.0, 7.0);
-                log::info!("Mouse moved: {}, {}", event.offset_x(), event.offset_y());
+                log::info!("Mouse moved: {}, {}", move_event.offset_x(), move_event.offset_y());
             });
-            let _ = canvas.add_event_listener_with_callback("mousemove", closure.as_ref().unchecked_ref());
 
-            // We need the closure to be retained since we passed it to JS, 
-            // and JS doesn't know how to retain rust data.
             closure.forget();
             Context { 
                 gl: gl,
