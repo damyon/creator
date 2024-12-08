@@ -2,7 +2,7 @@ pub mod graphics {
 
     use wasm_bindgen::prelude::*;
     use wasm_bindgen::JsCast;
-    use web_sys::{WebGlRenderingContext, WebGlShader, WebGlProgram};
+    use web_sys::{WebGlRenderingContext, WebGlShader, WebGlProgram, MouseEvent};
 
     use crate::drawable::drawable::Drawable;
 
@@ -14,6 +14,8 @@ pub mod graphics {
     extern crate js_sys;
     pub struct Context {
         pub gl: WebGlRenderingContext,
+        pub eye: na::OPoint<f32, na::Const<3>>,
+        pub target: na::OPoint<f32, na::Const<3>>,
     }
 
     impl Context {
@@ -38,8 +40,24 @@ pub mod graphics {
                     panic!("Could not get webgl from canvas");
                 }
             };
-            
-            Context { gl: gl }
+            let closure = Closure::<dyn FnMut(_)>::new(move |event: MouseEvent| {
+                // The contents of the closure are only run when the 
+                // closure is called by the JS event handler. 
+                // The code inside the closures is the only part of this 
+                // program that runs repeatedly.
+                self.eye = Point3::new(3.8, 1.0, 7.0);
+                log::info!("Mouse moved: {}, {}", event.offset_x(), event.offset_y());
+            });
+            let _ = canvas.add_event_listener_with_callback("mousemove", closure.as_ref().unchecked_ref());
+
+            // We need the closure to be retained since we passed it to JS, 
+            // and JS doesn't know how to retain rust data.
+            closure.forget();
+            Context { 
+                gl: gl,
+                eye: Point3::new(3.8, 1.0, 7.0),
+                target: Point3::new(1.0, 0.0, 0.0),
+            }
         }
 
         pub fn create_shader(
@@ -165,9 +183,7 @@ pub mod graphics {
             // Compute the matrices
             // Our camera looks toward the point (0.0, 0.0, 0.0).
             // It is located at (2.0, 2.0, 2.0).
-            let eye    = Point3::new(3.8, 1.0, 7.0);
-            let target = Point3::new(1.0, 0.0, 0.0);
-            let view   = Isometry3::look_at_rh(&eye, &target, &Vector3::y());
+            let view   = Isometry3::look_at_rh(&self.eye, &self.target, &Vector3::y());
 
             // This is translation, rotation
             let model      = Isometry3::new(drawable.translation(), drawable.rotation());
