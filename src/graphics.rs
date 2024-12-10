@@ -47,7 +47,7 @@ pub mod graphics {
                 // closure is called by the JS event handler. 
                 // The code inside the closures is the only part of this 
                 // program that runs repeatedly.
-                self.eye = Point3::new(3.8, 1.0, 7.0);
+                //self.eye = Point3::new(3.8, 1.0, 7.0);
                 log::info!("Mouse moved: {}, {}", move_event.offset_x(), move_event.offset_y());
             });
 
@@ -168,7 +168,7 @@ pub mod graphics {
             self.gl.clear(WebGlRenderingContext::DEPTH_BUFFER_BIT | WebGlRenderingContext::COLOR_BUFFER_BIT);
         }
 
-        pub fn draw(&self, drawable: impl Drawable, shader_program: &WebGlProgram) {
+        pub fn draw(&self, drawable: impl Drawable, shader_program: &WebGlProgram, count: i32) {
 
             self.setup_vertices(&drawable.vertices(), shader_program);
 
@@ -182,7 +182,9 @@ pub mod graphics {
             // Compute the matrices
             // Our camera looks toward the point (0.0, 0.0, 0.0).
             // It is located at (2.0, 2.0, 2.0).
-            let view   = Isometry3::look_at_rh(&self.eye, &self.target, &Vector3::y());
+            let eye = Point3::new(f32::sin(count as f32), f32::cos(count as f32), 7.0);
+
+            let view   = Isometry3::look_at_rh(&eye, &self.target, &Vector3::y());
 
             // This is translation, rotation
             let model      = Isometry3::new(drawable.translation(), drawable.rotation());

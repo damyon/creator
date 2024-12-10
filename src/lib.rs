@@ -5,8 +5,9 @@ extern crate js_sys;
 mod drawable;
 mod graphics;
 mod grid;
+mod scene;
 
-
+use crate::scene::scene::Scene;
 use crate::drawable::drawable::Drawable;
 use crate::graphics::graphics::Context;
 use crate::grid::grid::Grid;
@@ -16,6 +17,7 @@ use na::Vector3;
 #[wasm_bindgen]
 pub fn draw_grid(
     canvas_id: &str,
+    other: &str,
 ) -> Result<WebGlRenderingContext, JsValue> {
     wasm_logger::init(wasm_logger::Config::default());
 
@@ -26,8 +28,13 @@ pub fn draw_grid(
     let mut grid_xy = Grid{ scale: 4, ..Default::default() };
     let mut grid_yz = Grid{ scale: 4, ..Default::default() };
     
-    log::info!("Some info");
 
+    Scene::print();
+    Scene::incr();
+    Scene::print();
+    log::info!("Some info");
+    log::error!("######################{}", other);
+    let other_count = other.parse::<i32>().unwrap();
     grid_xz.init();
     grid_xy.init();
     grid_yz.init();
@@ -37,9 +44,9 @@ pub fn draw_grid(
     
     context.clear();
     
-    context.draw(grid_xz, &shader_program);
-    context.draw(grid_xy, &shader_program);
-    context.draw(grid_yz, &shader_program);
+    context.draw(grid_xz, &shader_program, other_count);
+    context.draw(grid_xy, &shader_program, other_count);
+    context.draw(grid_yz, &shader_program, other_count);
 
     Ok(context.gl)
 }
