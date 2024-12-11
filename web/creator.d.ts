@@ -1,12 +1,12 @@
 /* tslint:disable */
 /* eslint-disable */
-export function draw_grid(canvas_id: string, other: string): WebGLRenderingContext;
+export function draw_grid(canvas_id: string): WebGLRenderingContext;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly draw_grid: (a: number, b: number, c: number, d: number) => [number, number, number];
+  readonly draw_grid: (a: number, b: number) => [number, number, number];
   readonly __wbindgen_exn_store: (a: number) => void;
   readonly __externref_table_alloc: () => number;
   readonly __wbindgen_export_2: WebAssembly.Table;

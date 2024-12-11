@@ -5,9 +5,8 @@ var other = 10;
 
 async function run() {
   await init();
-  var count_str = (other++) + "";
   
-  draw_grid(CANVAS_ID, count_str);
+  draw_grid(CANVAS_ID);
 
   setTimeout(run, 60);
 }

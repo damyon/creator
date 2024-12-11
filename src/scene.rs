@@ -2,26 +2,31 @@ pub mod scene {
 
     use std::sync::{Mutex, MutexGuard};
 
-    #[derive(Debug)]
-    pub struct Scene {
-        val: u32,
-    }
+    use crate::camera::camera::Camera;
 
+    extern crate nalgebra as na;
+
+    use na::Point3;
+
+    pub struct Scene {
+        camera: Camera
+    }
 
     impl Scene {
         fn access() -> MutexGuard<'static, Scene> {
-            static GLOBSTATE: Mutex<Scene> = Mutex::new(Scene { val:0 });
+            static GLOBSTATE: Mutex<Scene> = Mutex::new(Scene { camera: Camera::new() });
             GLOBSTATE.lock().unwrap()
         }
 
-        pub fn print() {
+        pub fn camera_eye() -> Point3<f32> {
             let scene = Self::access();
-            println!("{:?}", scene);
+            scene.camera.eye
         }
 
-        pub fn incr() {
+        pub fn set_camera_eye(eye: Point3<f32>) {
             let mut scene = Self::access();
-            scene.val += 1;
+
+            scene.camera.eye = eye;
         }
     }
 }

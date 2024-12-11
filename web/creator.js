@@ -219,15 +219,12 @@ function takeFromExternrefTable0(idx) {
 }
 /**
  * @param {string} canvas_id
- * @param {string} other
  * @returns {WebGLRenderingContext}
  */
-export function draw_grid(canvas_id, other) {
+export function draw_grid(canvas_id) {
     const ptr0 = passStringToWasm0(canvas_id, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
     const len0 = WASM_VECTOR_LEN;
-    const ptr1 = passStringToWasm0(other, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
-    const len1 = WASM_VECTOR_LEN;
-    const ret = wasm.draw_grid(ptr0, len0, ptr1, len1);
+    const ret = wasm.draw_grid(ptr0, len0);
     if (ret[2]) {
         throw takeFromExternrefTable0(ret[1]);
     }

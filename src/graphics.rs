@@ -9,6 +9,7 @@ pub mod graphics {
     extern crate nalgebra_glm as glm;
     extern crate nalgebra as na;
 
+    use crate::scene::scene::Scene;
     use na::{Point3, Vector3, Isometry3, Perspective3};
 
     extern crate js_sys;
@@ -48,7 +49,10 @@ pub mod graphics {
                 // The code inside the closures is the only part of this 
                 // program that runs repeatedly.
                 //self.eye = Point3::new(3.8, 1.0, 7.0);
+                Scene::set_camera_eye(Point3::new(3.8 + move_event.offset_x() as f32 / 50.0, 1.0 + move_event.offset_y() as f32 / 50.0, 7.0),);
                 log::info!("Mouse moved: {}, {}", move_event.offset_x(), move_event.offset_y());
+
+
             });
 
             closure.forget();
@@ -168,7 +172,7 @@ pub mod graphics {
             self.gl.clear(WebGlRenderingContext::DEPTH_BUFFER_BIT | WebGlRenderingContext::COLOR_BUFFER_BIT);
         }
 
-        pub fn draw(&self, drawable: impl Drawable, shader_program: &WebGlProgram, count: i32) {
+        pub fn draw(&self, drawable: impl Drawable, shader_program: &WebGlProgram) {
 
             self.setup_vertices(&drawable.vertices(), shader_program);
 
@@ -182,8 +186,8 @@ pub mod graphics {
             // Compute the matrices
             // Our camera looks toward the point (0.0, 0.0, 0.0).
             // It is located at (2.0, 2.0, 2.0).
-            let eye = Point3::new(f32::sin(count as f32), f32::cos(count as f32), 7.0);
-
+            let eye = Scene::camera_eye();
+            
             let view   = Isometry3::look_at_rh(&eye, &self.target, &Vector3::y());
 
             // This is translation, rotation
