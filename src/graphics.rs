@@ -63,7 +63,6 @@ pub mod graphics {
                 // closure is called by the JS event handler. 
                 // The code inside the closures is the only part of this 
                 // program that runs repeatedly.
-                //self.eye = Point3::new(3.8, 1.0, 7.0);
                 let current_position = Point2::new(move_event.offset_x(), move_event.offset_y());
                 if Scene::mouse_is_pressed() {
                     let position_diff = Scene::mouse_last_position_difference(current_position);
