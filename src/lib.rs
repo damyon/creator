@@ -7,8 +7,8 @@ mod graphics;
 mod grid;
 mod scene;
 mod camera;
+mod mouse;
 
-use crate::scene::scene::Scene;
 use crate::drawable::drawable::Drawable;
 use crate::graphics::graphics::Context;
 use crate::grid::grid::Grid;

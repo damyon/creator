@@ -10,14 +10,29 @@ pub mod graphics {
     extern crate nalgebra as na;
 
     use crate::scene::scene::Scene;
-    use na::{Point3, Vector3, Isometry3, Perspective3};
+    use na::{Point3, Point2, Vector3, Isometry3, Perspective3};
 
     extern crate js_sys;
     pub struct Context {
-        pub gl: WebGlRenderingContext,
-        pub eye: na::OPoint<f32, na::Const<3>>,
-        pub target: na::OPoint<f32, na::Const<3>>,
+        pub gl: WebGlRenderingContext
     }
+
+    fn rotate_2d(target: Point2<f32>, pivot: Point2<f32>, angle_radians: f32) -> Point2<f32> {
+
+        // Precalculate the cosine
+        let angle_sin = f32::sin(angle_radians);
+        let angle_cos = f32::cos(angle_radians);
+        
+
+        // Subtract the pivot from the target
+        let focused = target - pivot;
+        // Rotate
+        let rotated = Point2::new(focused.x * angle_cos - focused.y * angle_sin, focused.x * angle_sin + focused.y * angle_cos);
+
+        // Add the pivot back
+        Point2::new(rotated.x + pivot.x, rotated.y + pivot.y)
+    }
+
 
     impl Context {
 
@@ -41,7 +56,7 @@ pub mod graphics {
                     panic!("Could not get webgl from canvas");
                 }
             };
-            let closure = EventListener::new(&canvas, "mousemove", move | event| {
+            let mouse_move_closure = EventListener::new(&canvas, "mousemove", move | event| {
                 let move_event = event.clone().dyn_into::<web_sys::MouseEvent>().unwrap();
 
                 // The contents of the closure are only run when the 
@@ -49,20 +64,58 @@ pub mod graphics {
                 // The code inside the closures is the only part of this 
                 // program that runs repeatedly.
                 //self.eye = Point3::new(3.8, 1.0, 7.0);
-                Scene::set_camera_eye(Point3::new(3.8 + move_event.offset_x() as f32 / 50.0, 1.0 + move_event.offset_y() as f32 / 50.0, 7.0),);
+                let current_position = Point2::new(move_event.offset_x(), move_event.offset_y());
+                if Scene::mouse_is_pressed() {
+                    let position_diff = Scene::mouse_last_position_difference(current_position);
+                    let current_camera_eye = Scene::camera_eye();
+                    let current_camera_target = Scene::camera_target();
+                    let blunting = 100.0;
+                    let current_camera_eye_2d = Point2::new(current_camera_eye.x, current_camera_eye.z);
+                    let current_camera_target_2d = Point2::new(current_camera_target.x, current_camera_target.z);
+                    // rotate the eye around the target
+                    let adjusted = rotate_2d(current_camera_eye_2d, current_camera_target_2d,  position_diff.x as f32 / blunting);
+
+                    Scene::set_camera_eye(Point3::new(adjusted.x, current_camera_eye.y, adjusted.y));
+
+                    // now do the same thing for vertical axis
+                    let current_camera_eye = Scene::camera_eye();
+                    let current_camera_eye_2d = Point2::new(current_camera_eye.y, current_camera_eye.z);
+                    let current_camera_target_2d = Point2::new(current_camera_target.y, current_camera_target.z);
+                    // rotate the eye around the target
+                    let adjusted = rotate_2d(current_camera_eye_2d, current_camera_target_2d,  -position_diff.y as f32 / blunting);
+
+                    Scene::set_camera_eye(Point3::new(current_camera_eye.x, adjusted.x, adjusted.y));
+
+
+                }
+                Scene::set_mouse_last_position(current_position);
+
                 log::info!("Mouse moved: {}, {}", move_event.offset_x(), move_event.offset_y());
-
-
             });
 
-            closure.forget();
+            mouse_move_closure.forget();
+
+            let mouse_down_closure = EventListener::new(&canvas, "mousedown", move | _event| {
+                
+                Scene::set_mouse_is_pressed(true);
+            });
+
+            mouse_down_closure.forget();
+
+            let mouse_up_closure = EventListener::new(&canvas, "mouseup", move | _event| {
+                
+                Scene::set_mouse_is_pressed(false);
+            });
+
+            mouse_up_closure.forget();
+
+            
             Context { 
                 gl: gl,
-                eye: Point3::new(3.8, 1.0, 7.0),
-                target: Point3::new(1.0, 0.0, 0.0),
             }
         }
 
+        
         pub fn create_shader(
             &self,
             shader_type: u32,
@@ -187,8 +240,8 @@ pub mod graphics {
             // Our camera looks toward the point (0.0, 0.0, 0.0).
             // It is located at (2.0, 2.0, 2.0).
             let eye = Scene::camera_eye();
-            
-            let view   = Isometry3::look_at_rh(&eye, &self.target, &Vector3::y());
+            let target = Scene::camera_target();
+            let view   = Isometry3::look_at_rh(&eye, &target, &Vector3::y());
 
             // This is translation, rotation
             let model      = Isometry3::new(drawable.translation(), drawable.rotation());
