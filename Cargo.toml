@@ -26,5 +26,6 @@ features = [
   'WebGlShader', 
   'WebGlBuffer', 
   'WebGlUniformLocation',
-  'MouseEvent'
+  'MouseEvent',
+  'KeyboardEvent'
 ]

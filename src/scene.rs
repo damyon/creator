@@ -6,8 +6,9 @@ pub mod scene {
     use crate::mouse::mouse::Mouse;
 
     extern crate nalgebra as na;
+    extern crate nalgebra_glm as glm;
 
-    use na::{Point3, Point2};
+    use na::{Point2, Point3, Vector3};
 
     pub struct Scene {
         camera: Camera,
@@ -60,6 +61,45 @@ pub mod scene {
             let mut scene = Self::access();
 
             scene.camera.target = target;
+        }
+
+        pub fn handle_key_pressed(key: u32) {
+            let mut scene = Self::access();
+
+            // W or UP
+            if key == 87 || key == 38 {
+                // Move up
+                scene.camera.eye = Point3::new(scene.camera.eye.x, scene.camera.eye.y + 0.001 as f32, scene.camera.eye.z);
+                scene.camera.target = Point3::new(scene.camera.target.x, scene.camera.target.y + 0.001 as f32, scene.camera.target.z);
+            }
+            // S or X or DOWN
+            if key == 83 || key == 88 || key == 40 {
+                // Move down
+                scene.camera.eye = Point3::new(scene.camera.eye.x, scene.camera.eye.y - 0.001 as f32, scene.camera.eye.z);
+                scene.camera.target = Point3::new(scene.camera.target.x, scene.camera.target.y - 0.001 as f32, scene.camera.target.z);
+            }
+            // A or LEFT
+            if key == 65 || key == 37 {
+                log::info!("MOVE LEFT");
+                let diff = scene.camera.target - scene.camera.eye;
+                let blunting = 1000.0;
+                //To rotate a vector 90 degrees clockwise, you can change the coordinates from (x,y) to (y,−x).
+                let projection = Vector3::new(diff.z,  0.0, -diff.x) / blunting;
+                
+                scene.camera.eye += projection;
+                scene.camera.target += projection;
+            }
+            // D or RIGHT
+            if key == 68 || key == 39 {
+                log::info!("MOVE RIGHT");
+                let diff = scene.camera.target - scene.camera.eye;
+                let blunting = 1000.0;
+                //To rotate a vector 90 degrees clockwise, you can change the coordinates from (x,y) to (y,−x).
+                let projection = Vector3::new(diff.z,  0.0, -diff.x) / blunting;
+                
+                scene.camera.eye -= projection;
+                scene.camera.target -= projection;
+            }
         }
     }
 }

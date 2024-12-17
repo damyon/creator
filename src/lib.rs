@@ -28,7 +28,7 @@ pub fn draw_grid(
     let mut grid_xy = Grid{ scale: 4, ..Default::default() };
     let mut grid_yz = Grid{ scale: 4, ..Default::default() };
     
-    log::info!("Some info");
+    //log::info!("Some info");
 
     grid_xz.init();
     grid_xy.init();

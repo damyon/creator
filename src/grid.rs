@@ -68,7 +68,7 @@ pub mod grid {
                 self.vertices.push((col_vertices[4]) * scale_f);
                 self.vertices.push((col_vertices[5]) * scale_f);
             }
-            log::info!("Our vertices look like this: {:?}", self.vertices);
+            //log::info!("Our vertices look like this: {:?}", self.vertices);
             self.square_count = self.scale * self.scale;
             self.vertices_count = 2 * (self.scale + 1 + self.scale  + 1);
 

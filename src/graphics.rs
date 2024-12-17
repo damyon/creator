@@ -56,6 +56,16 @@ pub mod graphics {
                     panic!("Could not get webgl from canvas");
                 }
             };
+
+            let key_down_closure = EventListener::new(&canvas, "keydown", move | event| {
+                let key_event = event.clone().dyn_into::<web_sys::KeyboardEvent>().unwrap();
+                log::info!("########################################################################");
+                log::info!("Key down {}", key_event.key_code());
+                Scene::handle_key_pressed(key_event.key_code());
+            });
+
+            key_down_closure.forget();
+
             let mouse_move_closure = EventListener::new(&canvas, "mousemove", move | event| {
                 let move_event = event.clone().dyn_into::<web_sys::MouseEvent>().unwrap();
 
@@ -261,7 +271,7 @@ pub mod graphics {
                 0,
                 (drawable.count_vertices()) as i32,
             );
-            log::info!("We are drawing {} vertices", drawable.count_vertices());
+            //log::info!("We are drawing {} vertices", drawable.count_vertices());
         }
     }
     
