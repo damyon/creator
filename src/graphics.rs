@@ -234,11 +234,10 @@ pub mod graphics {
             self.gl.clear(WebGlRenderingContext::DEPTH_BUFFER_BIT | WebGlRenderingContext::COLOR_BUFFER_BIT);
         }
 
-        pub fn draw(&self, drawable: impl Drawable, shader_program: &WebGlProgram) {
+        pub fn draw(&self, drawable: impl Drawable, shader_program: &WebGlProgram, render_mode: u32, color: Vec<f32>) {
 
             self.setup_vertices(&drawable.vertices(), shader_program);
 
-            let color: Vec<f32> = vec![1.0, 1.0, 1.0, 1.0];
             let color_location = self.gl
                 .get_uniform_location(&shader_program, "u_color")
                 .unwrap();
@@ -267,7 +266,7 @@ pub mod graphics {
             self.gl.line_width(2.0);
             
             self.gl.draw_arrays(
-                WebGlRenderingContext::LINES,
+                render_mode,
                 0,
                 (drawable.count_vertices()) as i32,
             );
