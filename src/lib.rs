@@ -41,8 +41,8 @@ pub fn draw_grid(
     grid_yz.rotate(Vector3::new(0.0, (90.0 as f32).to_radians(), 0.0));
     
     context.clear();
-    let white = vec![1.0, 1.0, 1.0, 1.0];
-    let yellow = vec![1.0, 1.0, 0.0, 1.0];
+    let white = vec![1.0, 1.0, 1.0, 0.4];
+    let yellow = vec![0.4, 0.4, 0.2, 0.6];
 
     context.draw(grid_xz, &shader_program, WebGlRenderingContext::LINES, white.clone());
     context.draw(grid_xy, &shader_program, WebGlRenderingContext::LINES, white.clone());

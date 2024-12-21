@@ -57,6 +57,10 @@ pub mod graphics {
                 }
             };
 
+            gl.disable(WebGlRenderingContext::DEPTH_TEST);
+            gl.enable(WebGlRenderingContext::BLEND);
+            gl.blend_func(WebGlRenderingContext::ONE, WebGlRenderingContext::ONE_MINUS_SRC_ALPHA);
+
             let key_down_closure = EventListener::new(&canvas, "keydown", move | event| {
                 let key_event = event.clone().dyn_into::<web_sys::KeyboardEvent>().unwrap();
                 log::info!("########################################################################");
@@ -230,7 +234,7 @@ pub mod graphics {
         }
 
         pub fn clear(&self) {
-            self.gl.clear_color(0.4, 0.4, 0.7, 1.0);
+            self.gl.clear_color(0.1, 0.1, 0.8, 0.5);
             self.gl.clear(WebGlRenderingContext::DEPTH_BUFFER_BIT | WebGlRenderingContext::COLOR_BUFFER_BIT);
         }
 

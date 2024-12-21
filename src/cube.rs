@@ -34,9 +34,9 @@ pub mod cube {
             self.vertices.push(0.0); self.vertices.push(0.0); self.vertices.push(1.0);
             self.vertices.push(1.0); self.vertices.push(0.0); self.vertices.push(0.0);
 
-            self.vertices.push(0.0); self.vertices.push(0.0); self.vertices.push(0.0);
-            self.vertices.push(1.0); self.vertices.push(0.0); self.vertices.push(0.0);
+            self.vertices.push(0.0); self.vertices.push(0.0); self.vertices.push(1.0);
             self.vertices.push(1.0); self.vertices.push(0.0); self.vertices.push(1.0);
+            self.vertices.push(1.0); self.vertices.push(0.0); self.vertices.push(0.0);
             // Left
             self.vertices.push(0.0); self.vertices.push(0.0); self.vertices.push(0.0);
             self.vertices.push(0.0); self.vertices.push(1.0); self.vertices.push(0.0);
