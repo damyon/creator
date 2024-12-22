@@ -4,6 +4,7 @@ pub mod scene {
 
     use crate::camera::camera::Camera;
     use crate::mouse::mouse::Mouse;
+    use crate::command_queue::command_queue::CommandQueue;
 
     extern crate nalgebra as na;
     extern crate nalgebra_glm as glm;
@@ -12,12 +13,13 @@ pub mod scene {
 
     pub struct Scene {
         camera: Camera,
-        mouse: Mouse
+        mouse: Mouse,
+        commands: CommandQueue,
     }
 
     impl Scene {
         fn access() -> MutexGuard<'static, Scene> {
-            static GLOBSTATE: Mutex<Scene> = Mutex::new(Scene { camera: Camera::new(), mouse: Mouse::new() });
+            static GLOBSTATE: Mutex<Scene> = Mutex::new(Scene { camera: Camera::new(), mouse: Mouse::new(), commands: CommandQueue::new() });
             GLOBSTATE.lock().unwrap()
         }
 

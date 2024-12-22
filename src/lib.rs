@@ -9,6 +9,8 @@ mod cube;
 mod scene;
 mod camera;
 mod mouse;
+mod command;
+mod command_queue;
 
 use crate::drawable::drawable::Drawable;
 use crate::graphics::graphics::Context;
