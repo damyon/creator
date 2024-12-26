@@ -17,7 +17,6 @@ use crate::graphics::graphics::Context;
 use crate::grid::grid::Grid;
 use crate::cube::cube::Cube;
 extern crate nalgebra as na;
-use na::Vector3;
 
 #[wasm_bindgen]
 pub fn draw_grid(
@@ -28,19 +27,19 @@ pub fn draw_grid(
     let context: Context = Context::new(canvas_id);
     let shader_program: WebGlProgram = context.setup_shaders();
 
-    let mut grid_xz = Grid{ scale: 4, ..Default::default() };
-    let mut grid_xy = Grid{ scale: 4, ..Default::default() };
-    let mut grid_yz = Grid{ scale: 4, ..Default::default() };
+    let mut grid_xz = Grid::new();
+    let mut grid_xy = Grid::new();
+    let mut grid_yz = Grid::new();
 
-    let mut selection_cube = Cube{ ..Default::default()};
+    let mut selection_cube = Cube::new();
     
     grid_xz.init();
     grid_xy.init();
     grid_yz.init();
     selection_cube.init();
 
-    grid_xy.rotate(Vector3::new((90.0 as f32).to_radians(), 0.0, 0.0));
-    grid_yz.rotate(Vector3::new(0.0, (90.0 as f32).to_radians(), 0.0));
+    grid_xy.rotate([(90.0 as f32).to_radians(), 0.0, 0.0]);
+    grid_yz.rotate([0.0, (90.0 as f32).to_radians(), 0.0]);
     
     context.clear();
     let white = vec![1.0, 1.0, 1.0, 0.4];

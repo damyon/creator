@@ -2,8 +2,9 @@ pub mod scene {
 
     use std::sync::{Mutex, MutexGuard};
 
-    use crate::camera::camera::Camera;
+    use crate::{camera::camera::Camera, cube::cube::Cube};
     use crate::mouse::mouse::Mouse;
+    use crate::command::command::Command;
     use crate::command_queue::command_queue::CommandQueue;
 
     extern crate nalgebra as na;
@@ -14,12 +15,20 @@ pub mod scene {
     pub struct Scene {
         camera: Camera,
         mouse: Mouse,
-        commands: CommandQueue,
+        command_input: CommandQueue,
+        selection_cube: Cube
     }
 
     impl Scene {
         fn access() -> MutexGuard<'static, Scene> {
-            static GLOBSTATE: Mutex<Scene> = Mutex::new(Scene { camera: Camera::new(), mouse: Mouse::new(), commands: CommandQueue::new() });
+            static GLOBSTATE: Mutex<Scene> = Mutex::new(
+                Scene { 
+                    camera: Camera::new(), 
+                    mouse: Mouse::new(), 
+                    command_input: CommandQueue::new() ,
+                    selection_cube: Cube::new()
+                }
+            );
             GLOBSTATE.lock().unwrap()
         }
 
@@ -32,6 +41,12 @@ pub mod scene {
             let mut scene = Self::access();
 
             scene.camera.eye = eye;
+        }
+
+        pub fn queue_command(command: Command) {
+            let mut scene = Self::access();
+
+            scene.command_input.queue_command(command);
         }
 
         pub fn camera_target() -> Point3<f32> {

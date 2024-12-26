@@ -4,13 +4,14 @@ pub mod graphics {
     use wasm_bindgen::prelude::*;
     use wasm_bindgen::JsCast;
     use web_sys::{WebGlRenderingContext, WebGlShader, WebGlProgram};
+    use crate::command::command::Command;
     use crate::drawable::drawable::Drawable;
 
     extern crate nalgebra_glm as glm;
     extern crate nalgebra as na;
 
     use crate::scene::scene::Scene;
-    use na::{Point3, Point2, Vector3, Isometry3, Perspective3};
+    use na::{Point2, Vector3, Isometry3, Perspective3};
 
     extern crate js_sys;
     pub struct Context {
@@ -78,7 +79,9 @@ pub mod graphics {
                 // The code inside the closures is the only part of this 
                 // program that runs repeatedly.
                 let current_position = Point2::new(move_event.offset_x(), move_event.offset_y());
-                if Scene::mouse_is_pressed() {
+
+                Scene::queue_command(Command {command_type: crate::command::command::CommandType::MouseMoved, data1: move_event.offset_x() as u32, data2: move_event.offset_y() as u32});
+                /*if Scene::mouse_is_pressed() {
                     let position_diff = Scene::mouse_last_position_difference(current_position);
                     let current_camera_eye = Scene::camera_eye();
                     let current_camera_target = Scene::camera_target();
@@ -100,7 +103,7 @@ pub mod graphics {
                     Scene::set_camera_eye(Point3::new(current_camera_eye.x, adjusted.x, adjusted.y));
 
 
-                }
+                }*/
                 Scene::set_mouse_last_position(current_position);
 
                 log::info!("Mouse moved: {}, {}", move_event.offset_x(), move_event.offset_y());
@@ -256,7 +259,7 @@ pub mod graphics {
             let view   = Isometry3::look_at_rh(&eye, &target, &Vector3::y());
 
             // This is translation, rotation
-            let model      = Isometry3::new(drawable.translation(), drawable.rotation());
+            let model      = Isometry3::new(Vector3::from_row_slice(drawable.translation()), Vector3::from_row_slice(drawable.rotation()));
             
             let projection = Perspective3::new(16.0 / 9.0, 3.14 / 2.0, 0.0, 1000.0);
             let model_view_projection = projection.into_inner() * (view * model).to_homogeneous();

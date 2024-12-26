@@ -4,37 +4,38 @@
 pub mod grid {
 
     extern crate nalgebra as na;
-    use na::Vector3;
 
     pub struct Grid {
         pub scale: u8,
         pub square_count: u8,
         pub vertices_count: u8,
-        pub vertices: Vec<f32>,
+        pub vertices: [f32; 20],
         pub max_scale: u8,
-        pub translation: Vector3<f32>,
-        pub rotation: Vector3<f32>
+        pub translation: [f32; 3],
+        pub rotation: [f32; 3]
     }
-
 
     use crate::drawable::drawable::Drawable;
 
-    impl Default for Grid {
-        fn default() -> Grid {
+    impl Grid {
+        pub const fn new() -> Grid {
             Grid {
-                scale: 1,
+                scale: 4,
                 square_count: 1,
                 vertices_count: 8,
-                vertices: Vec::new(),
+                vertices: [0.0; 20],
                 max_scale: 10,
-                translation: Vector3::new(0.0, 0.0, 0.0),
-                rotation: Vector3::new(0.0, 0.0, 0.0)
+                translation: [0.0; 3],
+                rotation: [0.0; 3]
             }
         }
     }
 
     impl Drawable for Grid {
         fn init(&mut self) {
+            let mut index = 0;
+            let mut increment = || -> usize {let result = index; index += 1; result};
+
             let row_vertices: [f32; 6] = [
                 -1.0, 1.0, 0.0, // top left
                 1.0, 1.0, 0.0, // top right
@@ -52,52 +53,56 @@ pub mod grid {
 
             let scale_f = self.scale as f32;
             for row in 0..=self.scale {
-                self.vertices.push((row_vertices[0]) * scale_f);
-                self.vertices.push(((row as f32) / scale_f * 2.0 - 1.0) * scale_f);
-                self.vertices.push((row_vertices[2]) * scale_f);
-                self.vertices.push((row_vertices[3]) * scale_f);
-                self.vertices.push(((row as f32) / scale_f * 2.0 - 1.0) * scale_f);
-                self.vertices.push((row_vertices[5]) * scale_f);
+                self.vertices[increment()] = row_vertices[0] * scale_f;
+                self.vertices[increment()] = ((row as f32) / scale_f * 2.0 - 1.0) * scale_f;
+                self.vertices[increment()] = (row_vertices[2]) * scale_f;
+                self.vertices[increment()] = (row_vertices[3]) * scale_f;
+                self.vertices[increment()] = ((row as f32) / scale_f * 2.0 - 1.0) * scale_f;
+                self.vertices[increment()] = (row_vertices[5]) * scale_f;
             }
 
             for col in 0..=self.scale {
-                self.vertices.push(((col as f32) / scale_f * 2.0 - 1.0) * scale_f);
-                self.vertices.push((col_vertices[1]) * scale_f);
-                self.vertices.push((col_vertices[2]) * scale_f);
-                self.vertices.push(((col as f32) / scale_f * 2.0 - 1.0) * scale_f);
-                self.vertices.push((col_vertices[4]) * scale_f);
-                self.vertices.push((col_vertices[5]) * scale_f);
+                self.vertices[increment()] = ((col as f32) / scale_f * 2.0 - 1.0) * scale_f;
+                self.vertices[increment()] = (col_vertices[1]) * scale_f;
+                self.vertices[increment()] = (col_vertices[2]) * scale_f;
+                self.vertices[increment()] = ((col as f32) / scale_f * 2.0 - 1.0) * scale_f;
+                self.vertices[increment()] = (col_vertices[4]) * scale_f;
+                self.vertices[increment()] = (col_vertices[5]) * scale_f;
             }
             //log::info!("Our vertices look like this: {:?}", self.vertices);
             self.square_count = self.scale * self.scale;
             self.vertices_count = 2 * (self.scale + 1 + self.scale  + 1);
 
-            self.translation = Vector3::new(0.0, 0.0, 0.0);
-            self.rotation = Vector3::new(0.0, 0.0, 0.0);
+            self.translation = [0.0, 0.0, 0.0];
+            self.rotation = [0.0, 0.0, 0.0];
         }
 
         fn count_vertices(&self) -> u8 {
             self.vertices_count
         }
-
-        fn translation(&self) -> Vector3<f32> {
-            self.translation
+        
+        fn translation(&self) -> &[f32; 3] {
+            &self.translation
         }
 
-        fn translate(&mut self, amount: Vector3<f32>) {
-            self.translation += amount;
+        fn translate(&mut self, amount: [f32; 3]) {
+            self.translation[0] += amount[0];
+            self.translation[1] += amount[1];
+            self.translation[2] += amount[2];
         }
 
-        fn rotate(&mut self, amount: Vector3<f32>) {
-            self.rotation += amount;
+        fn rotate(&mut self, amount: [f32; 3]) {
+            self.rotation[0] += amount[0];
+            self.rotation[1] += amount[1];
+            self.rotation[2] += amount[2];
         }
 
-        fn rotation(&self) -> Vector3<f32> {
-            self.rotation
+        fn rotation(&self) -> &[f32; 3] {
+            &self.rotation
         }
 
-        fn vertices(&self) -> Vec<f32> {
-            self.vertices.clone()
+        fn vertices(&self) -> &[f32] {
+            &self.vertices
         }
 
     }
