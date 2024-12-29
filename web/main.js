@@ -7,7 +7,7 @@ async function run() {
   
   draw_scene(CANVAS_ID);
 
-  setTimeout(run, 60);
+  setTimeout(run, 100);
 }
 await init();
 

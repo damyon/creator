@@ -1,6 +1,6 @@
 pub mod command {
 
-    #[derive(Copy, Clone)]
+    #[derive(Copy, Clone, Debug)]
     pub enum CommandType {
         // An `enum` variant may either be `unit-like`,
         MouseMoved,

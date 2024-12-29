@@ -12,29 +12,12 @@ pub mod graphics {
     extern crate nalgebra as na;
 
     use crate::scene::scene::Scene;
-    use na::{Point2, Vector3, Isometry3, Perspective3};
+    use na::{Vector3, Isometry3, Perspective3};
 
     extern crate js_sys;
     pub struct Context {
         pub gl: WebGlRenderingContext
     }
-
-    fn rotate_2d(target: Point2<f32>, pivot: Point2<f32>, angle_radians: f32) -> Point2<f32> {
-
-        // Precalculate the cosine
-        let angle_sin = f32::sin(angle_radians);
-        let angle_cos = f32::cos(angle_radians);
-        
-
-        // Subtract the pivot from the target
-        let focused = target - pivot;
-        // Rotate
-        let rotated = Point2::new(focused.x * angle_cos - focused.y * angle_sin, focused.x * angle_sin + focused.y * angle_cos);
-
-        // Add the pivot back
-        Point2::new(rotated.x + pivot.x, rotated.y + pivot.y)
-    }
-
 
     impl Context {
 
@@ -65,10 +48,8 @@ pub mod graphics {
 
             let key_down_closure = EventListener::new(&canvas, "keydown", move | event| {
                 let key_event = event.clone().dyn_into::<web_sys::KeyboardEvent>().unwrap();
-                log::info!("########################################################################");
-                log::info!("Key down {}", key_event.key_code());
-                Scene::handle_key_pressed(key_event.key_code());
-            });
+                Scene::queue_command(Command {command_type: crate::command::command::CommandType::KeyDown, data1: key_event.key_code() as u32, data2: key_event.key_code() as u32});
+             });
 
             key_down_closure.forget();
 
@@ -79,49 +60,22 @@ pub mod graphics {
                 // closure is called by the JS event handler. 
                 // The code inside the closures is the only part of this 
                 // program that runs repeatedly.
-                let current_position = Point2::new(move_event.offset_x(), move_event.offset_y());
-
+                
                 Scene::queue_command(Command {command_type: crate::command::command::CommandType::MouseMoved, data1: move_event.offset_x() as u32, data2: move_event.offset_y() as u32});
-                /*if Scene::mouse_is_pressed() {
-                    let position_diff = Scene::mouse_last_position_difference(current_position);
-                    let current_camera_eye = Scene::camera_eye();
-                    let current_camera_target = Scene::camera_target();
-                    let blunting = 100.0;
-                    let current_camera_eye_2d = Point2::new(current_camera_eye.x, current_camera_eye.z);
-                    let current_camera_target_2d = Point2::new(current_camera_target.x, current_camera_target.z);
-                    // rotate the eye around the target
-                    let adjusted = rotate_2d(current_camera_eye_2d, current_camera_target_2d,  position_diff.x as f32 / blunting);
-
-                    Scene::set_camera_eye(Point3::new(adjusted.x, current_camera_eye.y, adjusted.y));
-
-                    // now do the same thing for vertical axis
-                    let current_camera_eye = Scene::camera_eye();
-                    let current_camera_eye_2d = Point2::new(current_camera_eye.y, current_camera_eye.z);
-                    let current_camera_target_2d = Point2::new(current_camera_target.y, current_camera_target.z);
-                    // rotate the eye around the target
-                    let adjusted = rotate_2d(current_camera_eye_2d, current_camera_target_2d,  -position_diff.y as f32 / blunting);
-
-                    Scene::set_camera_eye(Point3::new(current_camera_eye.x, adjusted.x, adjusted.y));
-
-
-                }*/
-                Scene::set_mouse_last_position(current_position);
-
-                log::info!("Mouse moved: {}, {}", move_event.offset_x(), move_event.offset_y());
             });
 
             mouse_move_closure.forget();
 
             let mouse_down_closure = EventListener::new(&canvas, "mousedown", move | _event| {
                 
-                Scene::set_mouse_is_pressed(true);
+                Scene::queue_command(Command {command_type: crate::command::command::CommandType::MouseDown, data1: 1, data2: 1});
             });
 
             mouse_down_closure.forget();
 
             let mouse_up_closure = EventListener::new(&canvas, "mouseup", move | _event| {
                 
-                Scene::set_mouse_is_pressed(false);
+                Scene::queue_command(Command {command_type: crate::command::command::CommandType::MouseUp, data1: 1, data2: 1});
             });
 
             mouse_up_closure.forget();
@@ -244,29 +198,22 @@ pub mod graphics {
 
         pub fn draw(&self, drawable: impl Drawable, shader_program: &WebGlProgram, render_mode: u32, color: Vec<f32>, camera: Camera) {
 
-            log::info!("setup_vertices");
             self.setup_vertices(&drawable.vertices(), shader_program);
 
-            log::info!("setup color shader");
             let color_location = self.gl
                 .get_uniform_location(&shader_program, "u_color")
                 .unwrap();
             self.gl.uniform4fv_with_f32_array(Some(&color_location), &color);
 
-            log::info!("setup viewport");
             // We want a model / view / projection matrix
             // Compute the matrices
             // Our camera looks toward the point (0.0, 0.0, 0.0).
             // It is located at (2.0, 2.0, 2.0).
             let eye = camera.eye;
-            log::info!("eye done");
             let target = camera.target;
-            log::info!("target done");
             let view   = Isometry3::look_at_rh(&eye, &target, &Vector3::y());
-            log::info!("view done");
             
             // This is translation, rotation
-            log::info!("setup matrices");
             let model      = Isometry3::new(Vector3::from_row_slice(drawable.translation()), Vector3::from_row_slice(drawable.rotation()));
             
             let projection = Perspective3::new(16.0 / 9.0, 3.14 / 2.0, 0.0, 1000.0);
@@ -285,7 +232,6 @@ pub mod graphics {
                 0,
                 (drawable.count_vertices()) as i32,
             );
-            log::info!("We are drawing {} vertices", drawable.count_vertices());
         }
     }
     

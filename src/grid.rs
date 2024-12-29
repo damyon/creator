@@ -35,11 +35,8 @@ pub mod grid {
     impl Drawable for Grid {
         fn init(&mut self) {
             let mut index = 0;
-            let mut huh = 0;
             let mut increment = || -> usize {let result = index; index += 1; result};
 
-            log::info!("init vertices");
-    
             let row_vertices: [f32; 6] = [
                 -1.0, 1.0, 0.0, // top left
                 1.0, 1.0, 0.0, // top right
@@ -52,13 +49,10 @@ pub mod grid {
             if self.scale > self.max_scale {
                 panic!("Scale for grid is out of bounds");
             }
-            log::info!("create vertices");
              // We want one pair of vertices for each row +1 and one for each column + 1
 
             let scale_f = self.scale as f32;
             for row in 0..=self.scale {
-                log::info!("next index {}", huh);
-                huh += 6;
                 self.vertices[increment()] = row_vertices[0] * scale_f;
                 self.vertices[increment()] = ((row as f32) / scale_f * 2.0 - 1.0) * scale_f;
                 self.vertices[increment()] = (row_vertices[2]) * scale_f;
@@ -68,8 +62,6 @@ pub mod grid {
             }
 
             for col in 0..=self.scale {
-                log::info!("next index {}", huh);
-                huh += 6;
                 self.vertices[increment()] = ((col as f32) / scale_f * 2.0 - 1.0) * scale_f;
                 self.vertices[increment()] = (col_vertices[1]) * scale_f;
                 self.vertices[increment()] = (col_vertices[2]) * scale_f;
@@ -78,7 +70,6 @@ pub mod grid {
                 self.vertices[increment()] = (col_vertices[5]) * scale_f;
             }
             
-            log::info!("Our vertices look like this: {:?}", self.vertices);
             self.square_count = self.scale * self.scale;
             self.vertices_count = 2 * (6 * (self.scale+1));
 
