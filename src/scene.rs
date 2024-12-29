@@ -1,11 +1,16 @@
 pub mod scene {
 
     use std::sync::{Mutex, MutexGuard};
+    use log::logger;
+    use web_sys::{WebGlRenderingContext, WebGlProgram};
 
+    use crate::drawable::drawable::Drawable;
+    use crate::grid::grid::Grid;
     use crate::{camera::camera::Camera, cube::cube::Cube};
     use crate::mouse::mouse::Mouse;
     use crate::command::command::Command;
     use crate::command_queue::command_queue::CommandQueue;
+    use crate::graphics::graphics::Context;
 
     extern crate nalgebra as na;
     extern crate nalgebra_glm as glm;
@@ -13,10 +18,13 @@ pub mod scene {
     use na::{Point2, Point3, Vector3};
 
     pub struct Scene {
-        camera: Camera,
+        pub camera: Camera,
         mouse: Mouse,
         command_input: CommandQueue,
-        selection_cube: Cube
+        selection_cube: Cube,
+        grid_xz: Grid,
+        grid_xy: Grid,
+        grid_yz: Grid,
     }
 
     impl Scene {
@@ -26,7 +34,10 @@ pub mod scene {
                     camera: Camera::new(), 
                     mouse: Mouse::new(), 
                     command_input: CommandQueue::new() ,
-                    selection_cube: Cube::new()
+                    selection_cube: Cube::new(),
+                    grid_xz: Grid::new(),
+                    grid_xy: Grid::new(),
+                    grid_yz: Grid::new(),
                 }
             );
             GLOBSTATE.lock().unwrap()
@@ -117,6 +128,34 @@ pub mod scene {
                 scene.camera.eye -= projection;
                 scene.camera.target -= projection;
             }
+        }
+
+        pub fn init_scene() {
+            let mut scene = Self::access();
+            scene.init();
+        }
+
+        pub fn init(&mut self) {
+            self.selection_cube.init();
+            self.grid_xz.init();
+            self.grid_xy.init();
+            self.grid_xy.rotate([(90.0 as f32).to_radians(), 0.0, 0.0]);
+            self.grid_yz.init();
+            self.grid_yz.rotate([0.0, (90.0 as f32).to_radians(), 0.0]);
+        }
+
+        pub fn draw(context: Context, shader: &WebGlProgram) {
+            let  scene = Self::access();
+            log::info!("Draw scene");
+                
+            
+            let yellow = vec![0.4, 0.4, 0.2, 0.6];
+            context.draw(scene.selection_cube, shader, WebGlRenderingContext::TRIANGLES, yellow, scene.camera);
+            let white = vec![1.0, 1.0, 1.0, 0.4];
+            context.draw(scene.grid_xz, shader, WebGlRenderingContext::LINES, white.clone(), scene.camera);
+            context.draw(scene.grid_xy, shader, WebGlRenderingContext::LINES, white.clone(), scene.camera);
+            context.draw(scene.grid_yz, shader, WebGlRenderingContext::LINES, white.clone(), scene.camera);
+    
         }
     }
 }

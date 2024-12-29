@@ -4,6 +4,7 @@ pub mod camera {
 
     use na::Point3;
 
+    #[derive(Copy, Clone)]
     pub struct Camera {
         pub eye: Point3<f32>,
         pub target: Point3<f32>

@@ -4,6 +4,7 @@ pub mod graphics {
     use wasm_bindgen::prelude::*;
     use wasm_bindgen::JsCast;
     use web_sys::{WebGlRenderingContext, WebGlShader, WebGlProgram};
+    use crate::camera::camera::Camera;
     use crate::command::command::Command;
     use crate::drawable::drawable::Drawable;
 
@@ -241,24 +242,31 @@ pub mod graphics {
             self.gl.clear(WebGlRenderingContext::DEPTH_BUFFER_BIT | WebGlRenderingContext::COLOR_BUFFER_BIT);
         }
 
-        pub fn draw(&self, drawable: impl Drawable, shader_program: &WebGlProgram, render_mode: u32, color: Vec<f32>) {
+        pub fn draw(&self, drawable: impl Drawable, shader_program: &WebGlProgram, render_mode: u32, color: Vec<f32>, camera: Camera) {
 
+            log::info!("setup_vertices");
             self.setup_vertices(&drawable.vertices(), shader_program);
 
+            log::info!("setup color shader");
             let color_location = self.gl
                 .get_uniform_location(&shader_program, "u_color")
                 .unwrap();
             self.gl.uniform4fv_with_f32_array(Some(&color_location), &color);
 
+            log::info!("setup viewport");
             // We want a model / view / projection matrix
             // Compute the matrices
             // Our camera looks toward the point (0.0, 0.0, 0.0).
             // It is located at (2.0, 2.0, 2.0).
-            let eye = Scene::camera_eye();
-            let target = Scene::camera_target();
+            let eye = camera.eye;
+            log::info!("eye done");
+            let target = camera.target;
+            log::info!("target done");
             let view   = Isometry3::look_at_rh(&eye, &target, &Vector3::y());
-
+            log::info!("view done");
+            
             // This is translation, rotation
+            log::info!("setup matrices");
             let model      = Isometry3::new(Vector3::from_row_slice(drawable.translation()), Vector3::from_row_slice(drawable.rotation()));
             
             let projection = Perspective3::new(16.0 / 9.0, 3.14 / 2.0, 0.0, 1000.0);
@@ -277,7 +285,7 @@ pub mod graphics {
                 0,
                 (drawable.count_vertices()) as i32,
             );
-            //log::info!("We are drawing {} vertices", drawable.count_vertices());
+            log::info!("We are drawing {} vertices", drawable.count_vertices());
         }
     }
     
