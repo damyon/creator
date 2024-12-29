@@ -196,14 +196,14 @@ pub mod graphics {
             self.gl.clear(WebGlRenderingContext::DEPTH_BUFFER_BIT | WebGlRenderingContext::COLOR_BUFFER_BIT);
         }
 
-        pub fn draw(&self, drawable: impl Drawable, shader_program: &WebGlProgram, render_mode: u32, color: Vec<f32>, camera: Camera) {
+        pub fn draw(&self, drawable: impl Drawable, shader_program: &WebGlProgram, render_mode: u32, camera: Camera) {
 
             self.setup_vertices(&drawable.vertices(), shader_program);
 
             let color_location = self.gl
                 .get_uniform_location(&shader_program, "u_color")
                 .unwrap();
-            self.gl.uniform4fv_with_f32_array(Some(&color_location), &color);
+            self.gl.uniform4fv_with_f32_array(Some(&color_location), drawable.color());
 
             // We want a model / view / projection matrix
             // Compute the matrices

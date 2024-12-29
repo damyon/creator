@@ -21,7 +21,7 @@ pub fn init_logger(
 
 ) -> Result<bool, JsValue> {
     wasm_logger::init(wasm_logger::Config::default());
-
+    Scene::init_scene();
     Ok(true)
 }
 
@@ -31,8 +31,6 @@ pub fn draw_scene(
 ) -> Result<bool, JsValue> {
     let context: Context = Context::new(canvas_id);
     let shader_program: WebGlProgram = context.setup_shaders();
-    
-    Scene::init_scene();
 
     Scene::process_commands();
     

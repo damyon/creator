@@ -13,7 +13,8 @@ pub mod grid {
         pub vertices: [f32; 60],
         pub max_scale: u8,
         pub translation: [f32; 3],
-        pub rotation: [f32; 3]
+        pub rotation: [f32; 3],
+        pub color: [f32; 4]
     }
 
     use crate::drawable::drawable::Drawable;
@@ -27,7 +28,8 @@ pub mod grid {
                 vertices: [0.0; 60],
                 max_scale: 10,
                 translation: [0.0; 3],
-                rotation: [0.0; 3]
+                rotation: [0.0; 3],
+                color: [0.8, 0.8, 0.6, 0.3],
             }
         }
     }
@@ -72,9 +74,6 @@ pub mod grid {
             
             self.square_count = self.scale * self.scale;
             self.vertices_count = 2 * (6 * (self.scale+1));
-
-            self.translation = [0.0, 0.0, 0.0];
-            self.rotation = [0.0, 0.0, 0.0];
         }
 
         fn count_vertices(&self) -> u8 {
@@ -103,6 +102,11 @@ pub mod grid {
 
         fn vertices(&self) -> &[f32] {
             &self.vertices
+        }
+
+
+        fn color(&self) -> &[f32; 4] {
+            &self.color
         }
 
     }

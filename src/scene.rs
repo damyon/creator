@@ -145,6 +145,34 @@ pub mod scene {
                                     scene.camera.eye -= projection;
                                     scene.camera.target -= projection;
                                 }
+                                // SPACEBAR
+                                if key == 32 {
+                                    scene.selection_cube.color = [0.4, 0.4, 0.2, 1.0];
+                                }
+
+                                // 4
+                                if key == 100 {
+                                    // Move selection left
+                                    scene.selection_cube.translate([-0.02, 0.0, 0.0]);
+                                }
+
+                                // 6
+                                if key == 102 {
+                                    // Move selection right
+                                    scene.selection_cube.translate([0.02, 0.0, 0.0]);
+                                }
+
+                                // 4
+                                if key == 98 {
+                                    // Move selection forward
+                                    scene.selection_cube.translate([0.0, 0.0, 0.025]);
+                                }
+
+                                // 8
+                                if key == 104 {
+                                    // Move selection backwards
+                                    scene.selection_cube.translate([0.0, 0.0, -0.025]);
+                                }
                             }
                         }
                         
@@ -174,12 +202,10 @@ pub mod scene {
             //log::info!("Draw scene");
                 
             
-            let yellow = vec![0.4, 0.4, 0.2, 0.6];
-            context.draw(scene.selection_cube, shader, WebGlRenderingContext::TRIANGLES, yellow, scene.camera);
-            let white = vec![1.0, 1.0, 1.0, 0.4];
-            context.draw(scene.grid_xz, shader, WebGlRenderingContext::LINES, white.clone(), scene.camera);
-            context.draw(scene.grid_xy, shader, WebGlRenderingContext::LINES, white.clone(), scene.camera);
-            context.draw(scene.grid_yz, shader, WebGlRenderingContext::LINES, white.clone(), scene.camera);
+            context.draw(scene.selection_cube, shader, WebGlRenderingContext::TRIANGLES, scene.camera);
+            context.draw(scene.grid_xz, shader, WebGlRenderingContext::LINES, scene.camera);
+            context.draw(scene.grid_xy, shader, WebGlRenderingContext::LINES, scene.camera);
+            context.draw(scene.grid_yz, shader, WebGlRenderingContext::LINES, scene.camera);
     
         }
     }

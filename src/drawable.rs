@@ -10,5 +10,6 @@ pub mod drawable {
         fn translate(&mut self, amount: [f32; 3]);
         fn rotate(&mut self, amount: [f32; 3]);
         fn vertices(&self) -> &[f32];
+        fn color(&self) -> &[f32; 4];
     }
 }
