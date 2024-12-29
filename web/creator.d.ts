@@ -1,13 +1,13 @@
 /* tslint:disable */
 /* eslint-disable */
-export function init_logger(): boolean;
+export function init_scene(canvas_id: string): boolean;
 export function draw_scene(canvas_id: string): boolean;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly init_logger: (a: number) => void;
+  readonly init_scene: (a: number, b: number, c: number) => void;
   readonly draw_scene: (a: number, b: number, c: number) => void;
   readonly __wbindgen_exn_store: (a: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;

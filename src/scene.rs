@@ -3,6 +3,8 @@ pub mod scene {
     use std::sync::{Mutex, MutexGuard};
     use web_sys::{WebGlRenderingContext, WebGlProgram};
 
+    use gloo::events::EventListener;
+    use wasm_bindgen::JsCast;
     use crate::drawable::drawable::Drawable;
     use crate::grid::grid::Grid;
     use crate::{camera::camera::Camera, cube::cube::Cube};
@@ -116,19 +118,19 @@ pub mod scene {
                                 // W or UP
                                 if key == 87 || key == 38 {
                                     // Move up
-                                    scene.camera.eye = Point3::new(scene.camera.eye.x, scene.camera.eye.y + 0.001 as f32, scene.camera.eye.z);
-                                    scene.camera.target = Point3::new(scene.camera.target.x, scene.camera.target.y + 0.001 as f32, scene.camera.target.z);
+                                    scene.camera.eye = Point3::new(scene.camera.eye.x, scene.camera.eye.y + 0.1 as f32, scene.camera.eye.z);
+                                    scene.camera.target = Point3::new(scene.camera.target.x, scene.camera.target.y + 0.1 as f32, scene.camera.target.z);
                                 }
                                 // S or X or DOWN
                                 if key == 83 || key == 88 || key == 40 {
                                     // Move down
-                                    scene.camera.eye = Point3::new(scene.camera.eye.x, scene.camera.eye.y - 0.001 as f32, scene.camera.eye.z);
-                                    scene.camera.target = Point3::new(scene.camera.target.x, scene.camera.target.y - 0.001 as f32, scene.camera.target.z);
+                                    scene.camera.eye = Point3::new(scene.camera.eye.x, scene.camera.eye.y - 0.1 as f32, scene.camera.eye.z);
+                                    scene.camera.target = Point3::new(scene.camera.target.x, scene.camera.target.y - 0.1 as f32, scene.camera.target.z);
                                 }
                                 // A or LEFT
                                 if key == 65 || key == 37 {
                                     let diff = scene.camera.target - scene.camera.eye;
-                                    let blunting = 1000.0;
+                                    let blunting = 10.0;
                                     //To rotate a vector 90 degrees clockwise, you can change the coordinates from (x,y) to (y,−x).
                                     let projection = Vector3::new(diff.z,  0.0, -diff.x) / blunting;
                                     
@@ -138,12 +140,30 @@ pub mod scene {
                                 // D or RIGHT
                                 if key == 68 || key == 39 {
                                     let diff = scene.camera.target - scene.camera.eye;
-                                    let blunting = 1000.0;
+                                    let blunting = 10.0;
                                     //To rotate a vector 90 degrees clockwise, you can change the coordinates from (x,y) to (y,−x).
                                     let projection = Vector3::new(diff.z,  0.0, -diff.x) / blunting;
                                     
                                     scene.camera.eye -= projection;
                                     scene.camera.target -= projection;
+                                }
+                                // E
+                                if key == 69 {
+                                    let diff = scene.camera.target - scene.camera.eye;
+                                    let blunting = 10.0;
+                                    let projection = Vector3::new(diff.x,  0.0, diff.z) / blunting;
+                                    
+                                    scene.camera.eye += projection;
+                                    scene.camera.target += projection;
+                                }
+                                // C
+                                if key == 67 {
+                                    let diff = scene.camera.target - scene.camera.eye;
+                                    let blunting = 10.0;
+                                    let projection = Vector3::new(-diff.x,  0.0, -diff.z) / blunting;
+                                    
+                                    scene.camera.eye += projection;
+                                    scene.camera.target += projection;
                                 }
                                 // SPACEBAR
                                 if key == 32 {
@@ -153,26 +173,40 @@ pub mod scene {
                                 // 4
                                 if key == 100 {
                                     // Move selection left
-                                    scene.selection_cube.translate([-0.02, 0.0, 0.0]);
+                                    scene.selection_cube.translate([-1.0, 0.0, 0.0]);
                                 }
 
                                 // 6
                                 if key == 102 {
                                     // Move selection right
-                                    scene.selection_cube.translate([0.02, 0.0, 0.0]);
+                                    scene.selection_cube.translate([1.0, 0.0, 0.0]);
+                                    log::info!("Move right");
                                 }
 
                                 // 4
                                 if key == 98 {
                                     // Move selection forward
-                                    scene.selection_cube.translate([0.0, 0.0, 0.025]);
+                                    scene.selection_cube.translate([0.0, 0.0, 1.0]);
                                 }
 
                                 // 8
                                 if key == 104 {
                                     // Move selection backwards
-                                    scene.selection_cube.translate([0.0, 0.0, -0.025]);
+                                    scene.selection_cube.translate([0.0, 0.0, -1.0]);
                                 }
+
+                                // 9
+                                if key == 105 {
+                                    // Move selection up
+                                    scene.selection_cube.translate([0.0, 1.0, 0.0]);
+                                }
+
+                                // 3
+                                if key == 99 {
+                                    // Move selection down
+                                    scene.selection_cube.translate([0.0, -1.0, 0.0]);
+                                }
+
                             }
                         }
                         
@@ -183,18 +217,64 @@ pub mod scene {
             }
         }
 
-        pub fn init_scene() {
+        pub fn init_scene(canvas_id: &str) {
             let mut scene = Self::access();
-            scene.init();
+            scene.init(canvas_id);
         }
 
-        pub fn init(&mut self) {
+        pub fn init(&mut self, canvas_id: &str) {
             self.selection_cube.init();
             self.grid_xz.init();
             self.grid_xy.init();
             self.grid_xy.rotate([(90.0 as f32).to_radians(), 0.0, 0.0]);
             self.grid_yz.init();
             self.grid_yz.rotate([0.0, (90.0 as f32).to_radians(), 0.0]);
+
+            let document = web_sys::window().unwrap().document().unwrap();
+            let canvas_element = document.get_element_by_id(canvas_id).unwrap();
+            let canvas: web_sys::HtmlCanvasElement = match canvas_element.dyn_into::<web_sys::HtmlCanvasElement>() {
+                Ok(canvas) => {
+                    canvas
+                }
+                Err(_) => {
+                    panic!("Could not find the canvas element");
+                }
+            };
+
+            let key_down_closure = EventListener::new(&canvas, "keydown", move | event| {
+                let key_event = event.clone().dyn_into::<web_sys::KeyboardEvent>().unwrap();
+                log::info!("Key down");
+                Scene::queue_command(Command {command_type: crate::command::command::CommandType::KeyDown, data1: key_event.key_code() as u32, data2: key_event.key_code() as u32});
+             });
+
+            key_down_closure.forget();
+
+            let mouse_move_closure = EventListener::new(&canvas, "mousemove", move | event| {
+                let move_event = event.clone().dyn_into::<web_sys::MouseEvent>().unwrap();
+
+                // The contents of the closure are only run when the 
+                // closure is called by the JS event handler. 
+                // The code inside the closures is the only part of this 
+                // program that runs repeatedly.
+                
+                Scene::queue_command(Command {command_type: crate::command::command::CommandType::MouseMoved, data1: move_event.offset_x() as u32, data2: move_event.offset_y() as u32});
+            });
+
+            mouse_move_closure.forget();
+
+            let mouse_down_closure = EventListener::new(&canvas, "mousedown", move | _event| {
+                
+                Scene::queue_command(Command {command_type: crate::command::command::CommandType::MouseDown, data1: 1, data2: 1});
+            });
+
+            mouse_down_closure.forget();
+
+            let mouse_up_closure = EventListener::new(&canvas, "mouseup", move | _event| {
+                
+                Scene::queue_command(Command {command_type: crate::command::command::CommandType::MouseUp, data1: 1, data2: 1});
+            });
+
+            mouse_up_closure.forget();
         }
 
         pub fn draw(context: Context, shader: &WebGlProgram) {

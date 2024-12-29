@@ -1,17 +1,14 @@
 pub mod graphics {
 
-    use gloo::events::EventListener;
     use wasm_bindgen::prelude::*;
     use wasm_bindgen::JsCast;
     use web_sys::{WebGlRenderingContext, WebGlShader, WebGlProgram};
     use crate::camera::camera::Camera;
-    use crate::command::command::Command;
     use crate::drawable::drawable::Drawable;
 
     extern crate nalgebra_glm as glm;
     extern crate nalgebra as na;
 
-    use crate::scene::scene::Scene;
     use na::{Vector3, Isometry3, Perspective3};
 
     extern crate js_sys;
@@ -45,40 +42,6 @@ pub mod graphics {
             gl.disable(WebGlRenderingContext::DEPTH_TEST);
             gl.enable(WebGlRenderingContext::BLEND);
             gl.blend_func(WebGlRenderingContext::ONE, WebGlRenderingContext::ONE_MINUS_SRC_ALPHA);
-
-            let key_down_closure = EventListener::new(&canvas, "keydown", move | event| {
-                let key_event = event.clone().dyn_into::<web_sys::KeyboardEvent>().unwrap();
-                Scene::queue_command(Command {command_type: crate::command::command::CommandType::KeyDown, data1: key_event.key_code() as u32, data2: key_event.key_code() as u32});
-             });
-
-            key_down_closure.forget();
-
-            let mouse_move_closure = EventListener::new(&canvas, "mousemove", move | event| {
-                let move_event = event.clone().dyn_into::<web_sys::MouseEvent>().unwrap();
-
-                // The contents of the closure are only run when the 
-                // closure is called by the JS event handler. 
-                // The code inside the closures is the only part of this 
-                // program that runs repeatedly.
-                
-                Scene::queue_command(Command {command_type: crate::command::command::CommandType::MouseMoved, data1: move_event.offset_x() as u32, data2: move_event.offset_y() as u32});
-            });
-
-            mouse_move_closure.forget();
-
-            let mouse_down_closure = EventListener::new(&canvas, "mousedown", move | _event| {
-                
-                Scene::queue_command(Command {command_type: crate::command::command::CommandType::MouseDown, data1: 1, data2: 1});
-            });
-
-            mouse_down_closure.forget();
-
-            let mouse_up_closure = EventListener::new(&canvas, "mouseup", move | _event| {
-                
-                Scene::queue_command(Command {command_type: crate::command::command::CommandType::MouseUp, data1: 1, data2: 1});
-            });
-
-            mouse_up_closure.forget();
 
             
             Context { 

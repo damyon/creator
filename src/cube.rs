@@ -33,7 +33,7 @@ pub mod cube {
         fn init(&mut self) {
             let mut index: usize = 0;
             let mut increment = || -> usize {let result = index; index += 1; result};
-            let scale: f32 = 2.0;
+            let scale: f32 = 1.0;
 
             // Bottom
             self.vertices[increment()] = 0.0;   self.vertices[increment()] = 0.0; self.vertices[increment()] = 0.0;

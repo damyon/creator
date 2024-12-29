@@ -17,11 +17,11 @@ use crate::scene::scene::Scene;
 extern crate nalgebra as na;
 
 #[wasm_bindgen]
-pub fn init_logger(
-
+pub fn init_scene(
+    canvas_id: &str
 ) -> Result<bool, JsValue> {
     wasm_logger::init(wasm_logger::Config::default());
-    Scene::init_scene();
+    Scene::init_scene(canvas_id);
     Ok(true)
 }
 

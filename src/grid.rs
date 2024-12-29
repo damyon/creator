@@ -55,21 +55,21 @@ pub mod grid {
 
             let scale_f = self.scale as f32;
             for row in 0..=self.scale {
-                self.vertices[increment()] = row_vertices[0] * scale_f;
-                self.vertices[increment()] = ((row as f32) / scale_f * 2.0 - 1.0) * scale_f;
-                self.vertices[increment()] = (row_vertices[2]) * scale_f;
-                self.vertices[increment()] = (row_vertices[3]) * scale_f;
-                self.vertices[increment()] = ((row as f32) / scale_f * 2.0 - 1.0) * scale_f;
-                self.vertices[increment()] = (row_vertices[5]) * scale_f;
+                self.vertices[increment()] = row_vertices[0] * scale_f / 2.0;
+                self.vertices[increment()] = (-scale_f) / 2.0 + row as f32;
+                self.vertices[increment()] = (row_vertices[2]) * scale_f / 2.0;
+                self.vertices[increment()] = (row_vertices[3]) * scale_f / 2.0;
+                self.vertices[increment()] = (-scale_f) / 2.0 + row as f32;
+                self.vertices[increment()] = (row_vertices[5]) * scale_f / 2.0;
             }
 
             for col in 0..=self.scale {
-                self.vertices[increment()] = ((col as f32) / scale_f * 2.0 - 1.0) * scale_f;
-                self.vertices[increment()] = (col_vertices[1]) * scale_f;
-                self.vertices[increment()] = (col_vertices[2]) * scale_f;
-                self.vertices[increment()] = ((col as f32) / scale_f * 2.0 - 1.0) * scale_f;
-                self.vertices[increment()] = (col_vertices[4]) * scale_f;
-                self.vertices[increment()] = (col_vertices[5]) * scale_f;
+                self.vertices[increment()] = (-scale_f) / 2.0 + col as f32;
+                self.vertices[increment()] = (col_vertices[1]) * scale_f / 2.0;
+                self.vertices[increment()] = (col_vertices[2]) * scale_f / 2.0;
+                self.vertices[increment()] = (-scale_f) / 2.0 + col as f32;
+                self.vertices[increment()] = (col_vertices[4]) * scale_f / 2.0;
+                self.vertices[increment()] = (col_vertices[5]) * scale_f / 2.0;
             }
             
             self.square_count = self.scale * self.scale;

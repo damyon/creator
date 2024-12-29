@@ -1,4 +1,4 @@
-import init, { draw_scene, init_logger } from "./creator.js";
+import init, { draw_scene, init_scene } from "./creator.js";
 
 const CANVAS_ID = "scene";
 var other = 10;
@@ -11,6 +11,6 @@ async function run() {
 }
 await init();
 
-await init_logger();
+await init_scene(CANVAS_ID);
 
 run();
