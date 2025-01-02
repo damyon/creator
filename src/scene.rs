@@ -67,6 +67,156 @@ pub mod scene {
             scene.command_input.queue_command(command);
         }
 
+        pub fn handle_mouse_down(scene: & mut Scene) {
+            scene.mouse.is_pressed = true;
+        }
+
+        pub fn handle_mouse_up(scene: & mut Scene) {
+            scene.mouse.is_pressed = false;
+        }
+
+        pub fn handle_mouse_moved(command: &Command, scene: &mut Scene) {
+            let current_position = Point2::new(command.data1 as i32, command.data2 as i32);
+            //Scene::handle_mouse_moved(current_position, scene.lock().unwrap());
+
+            if scene.mouse.is_pressed {
+                let position_diff = Point2::new(current_position.x - scene.mouse.last_position.x, current_position.y - scene.mouse.last_position.y);
+                let current_camera_eye = scene.camera.eye;
+                let current_camera_target = scene.camera.target;
+                let blunting = 100.0;
+                let current_camera_eye_2d = Point2::new(current_camera_eye.x, current_camera_eye.z);
+                let current_camera_target_2d = Point2::new(current_camera_target.x, current_camera_target.z);
+                // rotate the eye around the target
+                let adjusted = Self::rotate_2d(current_camera_eye_2d, current_camera_target_2d,  position_diff.x as f32 / blunting);
+
+                scene.camera.eye = Point3::new(adjusted.x, current_camera_eye.y, adjusted.y);
+
+                // now do the same thing for vertical axis
+                let current_camera_eye = scene.camera.eye;
+                let current_camera_eye_2d = Point2::new(current_camera_eye.y, current_camera_eye.z);
+                let current_camera_target_2d = Point2::new(current_camera_target.y, current_camera_target.z);
+                // rotate the eye around the target
+                let adjusted = Self::rotate_2d(current_camera_eye_2d, current_camera_target_2d,  -position_diff.y as f32 / blunting);
+
+                scene.camera.eye = Point3::new(current_camera_eye.x, adjusted.x, adjusted.y);
+
+            }
+            scene.mouse.last_position = current_position;
+            
+
+        }
+
+
+        pub fn handle_move_up(scene: &mut Scene) {
+            scene.camera.eye = Point3::new(scene.camera.eye.x, scene.camera.eye.y + 0.1 as f32, scene.camera.eye.z);
+            scene.camera.target = Point3::new(scene.camera.target.x, scene.camera.target.y + 0.1 as f32, scene.camera.target.z);
+        }
+
+        pub fn handle_move_down(scene: &mut Scene) {
+            scene.camera.eye = Point3::new(scene.camera.eye.x, scene.camera.eye.y - 0.1 as f32, scene.camera.eye.z);
+            scene.camera.target = Point3::new(scene.camera.target.x, scene.camera.target.y - 0.1 as f32, scene.camera.target.z);
+        }
+
+        pub fn handle_move_left(scene: &mut Scene) {
+            let diff = scene.camera.target - scene.camera.eye;
+            let blunting = 10.0;
+            //To rotate a vector 90 degrees clockwise, you can change the coordinates from (x,y) to (y,−x).
+            let projection = Vector3::new(diff.z,  0.0, -diff.x) / blunting;
+            
+            scene.camera.eye += projection;
+            scene.camera.target += projection;
+        }
+
+        pub fn handle_move_right(scene: &mut Scene) {
+            let diff = scene.camera.target - scene.camera.eye;
+            let blunting = 10.0;
+            //To rotate a vector 90 degrees clockwise, you can change the coordinates from (x,y) to (y,−x).
+            let projection = Vector3::new(diff.z,  0.0, -diff.x) / blunting;
+            
+            scene.camera.eye -= projection;
+            scene.camera.target -= projection;
+        }
+
+        pub fn handle_move_forward(scene: &mut Scene) {
+            let diff = scene.camera.target - scene.camera.eye;
+            let blunting = 10.0;
+            let projection = Vector3::new(diff.x,  0.0, diff.z) / blunting;
+            
+            scene.camera.eye += projection;
+            scene.camera.target += projection;
+        }
+
+        pub fn handle_move_backward(scene: &mut Scene) {
+            let diff = scene.camera.target - scene.camera.eye;
+            let blunting = 10.0;
+            let projection = Vector3::new(-diff.x,  0.0, -diff.z) / blunting;
+            
+            scene.camera.eye += projection;
+            scene.camera.target += projection;
+        }
+
+        pub fn handle_toggle_voxel(scene: &mut Scene) {
+            scene.selection_cube.color = [0.4, 0.4, 0.2, 1.0];
+        }
+
+        pub fn handle_move_selection_left(scene: &mut Scene) {
+            scene.selection_cube.translate([-1.0, 0.0, 0.0]);
+        }
+
+        pub fn handle_move_selection_right(scene: &mut Scene) {
+            scene.selection_cube.translate([1.0, 0.0, 0.0]);
+        }
+
+        pub fn handle_move_selection_forward(scene: &mut Scene) {
+            scene.selection_cube.translate([0.0, 0.0, 1.0]);
+        }
+
+        pub fn handle_move_selection_backward(scene: &mut Scene) {
+            scene.selection_cube.translate([0.0, 0.0, -1.0]);
+        }
+        
+        pub fn handle_move_selection_up(scene: &mut Scene) {
+            scene.selection_cube.translate([0.0, 1.0, 0.0]);
+        }
+
+        pub fn handle_move_selection_down(scene: &mut Scene) {
+            scene.selection_cube.translate([0.0, -1.0, 0.0]);
+        }
+
+        pub fn handle_key_down(command: &Command, scene: &mut Scene) {
+            let key = command.data1;
+            
+            match key {
+                // W or UP
+                87|38 => Self::handle_move_up(scene),
+                // S or X or DOWN
+                83|88|40 => Self::handle_move_down(scene),
+                // A or LEFT
+                65|37 => Self::handle_move_left(scene),
+                // D or RIGHT
+                68|39 => Self::handle_move_right(scene),
+                // E
+                69 => Self::handle_move_forward(scene),
+                // C
+                67 => Self::handle_move_backward(scene),
+                // SPACEBAR
+                32 => Self::handle_toggle_voxel(scene),
+                // 4
+                100 => Self::handle_move_selection_left(scene),
+                // 6
+                102 => Self::handle_move_selection_right(scene),
+                // 2
+                98 => Self::handle_move_selection_forward(scene),
+                // 8
+                104 => Self::handle_move_selection_backward(scene),
+                // 9
+                105 => Self::handle_move_selection_up(scene),
+                // 3
+                99 => Self::handle_move_selection_down(scene),
+                _ => log::info!("Unhandled key press: {}", key)
+            }
+        }
+
         pub fn process_commands() {
             let mut scene = Self::access();
             
@@ -77,136 +227,16 @@ pub mod scene {
                     Some(command) => {
                         match command.command_type {
                             CommandType::MouseDown => {
-                                scene.mouse.is_pressed = true;
+                                Self::handle_mouse_down(&mut scene);
                             }
                             CommandType::MouseUp => {
-                                scene.mouse.is_pressed = false;
+                                Self::handle_mouse_up(&mut scene);
                             }
                             CommandType::MouseMoved => {
-                                let current_position = Point2::new(command.data1 as i32, command.data2 as i32);
-                                //Scene::handle_mouse_moved(current_position, scene.lock().unwrap());
-
-                                if scene.mouse.is_pressed {
-                                    let position_diff = Point2::new(current_position.x - scene.mouse.last_position.x, current_position.y - scene.mouse.last_position.y);
-                                    let current_camera_eye = scene.camera.eye;
-                                    let current_camera_target = scene.camera.target;
-                                    let blunting = 100.0;
-                                    let current_camera_eye_2d = Point2::new(current_camera_eye.x, current_camera_eye.z);
-                                    let current_camera_target_2d = Point2::new(current_camera_target.x, current_camera_target.z);
-                                    // rotate the eye around the target
-                                    let adjusted = Self::rotate_2d(current_camera_eye_2d, current_camera_target_2d,  position_diff.x as f32 / blunting);
-                    
-                                    scene.camera.eye = Point3::new(adjusted.x, current_camera_eye.y, adjusted.y);
-                    
-                                    // now do the same thing for vertical axis
-                                    let current_camera_eye = scene.camera.eye;
-                                    let current_camera_eye_2d = Point2::new(current_camera_eye.y, current_camera_eye.z);
-                                    let current_camera_target_2d = Point2::new(current_camera_target.y, current_camera_target.z);
-                                    // rotate the eye around the target
-                                    let adjusted = Self::rotate_2d(current_camera_eye_2d, current_camera_target_2d,  -position_diff.y as f32 / blunting);
-                    
-                                    scene.camera.eye = Point3::new(current_camera_eye.x, adjusted.x, adjusted.y);
-                    
-                                }
-                                scene.mouse.last_position = current_position;
-                                
-
-
+                                Self::handle_mouse_moved(&command, &mut scene);
                             }
                             CommandType::KeyDown => {
-                                let key = command.data1;
-                                // W or UP
-                                if key == 87 || key == 38 {
-                                    // Move up
-                                    scene.camera.eye = Point3::new(scene.camera.eye.x, scene.camera.eye.y + 0.1 as f32, scene.camera.eye.z);
-                                    scene.camera.target = Point3::new(scene.camera.target.x, scene.camera.target.y + 0.1 as f32, scene.camera.target.z);
-                                }
-                                // S or X or DOWN
-                                if key == 83 || key == 88 || key == 40 {
-                                    // Move down
-                                    scene.camera.eye = Point3::new(scene.camera.eye.x, scene.camera.eye.y - 0.1 as f32, scene.camera.eye.z);
-                                    scene.camera.target = Point3::new(scene.camera.target.x, scene.camera.target.y - 0.1 as f32, scene.camera.target.z);
-                                }
-                                // A or LEFT
-                                if key == 65 || key == 37 {
-                                    let diff = scene.camera.target - scene.camera.eye;
-                                    let blunting = 10.0;
-                                    //To rotate a vector 90 degrees clockwise, you can change the coordinates from (x,y) to (y,−x).
-                                    let projection = Vector3::new(diff.z,  0.0, -diff.x) / blunting;
-                                    
-                                    scene.camera.eye += projection;
-                                    scene.camera.target += projection;
-                                }
-                                // D or RIGHT
-                                if key == 68 || key == 39 {
-                                    let diff = scene.camera.target - scene.camera.eye;
-                                    let blunting = 10.0;
-                                    //To rotate a vector 90 degrees clockwise, you can change the coordinates from (x,y) to (y,−x).
-                                    let projection = Vector3::new(diff.z,  0.0, -diff.x) / blunting;
-                                    
-                                    scene.camera.eye -= projection;
-                                    scene.camera.target -= projection;
-                                }
-                                // E
-                                if key == 69 {
-                                    let diff = scene.camera.target - scene.camera.eye;
-                                    let blunting = 10.0;
-                                    let projection = Vector3::new(diff.x,  0.0, diff.z) / blunting;
-                                    
-                                    scene.camera.eye += projection;
-                                    scene.camera.target += projection;
-                                }
-                                // C
-                                if key == 67 {
-                                    let diff = scene.camera.target - scene.camera.eye;
-                                    let blunting = 10.0;
-                                    let projection = Vector3::new(-diff.x,  0.0, -diff.z) / blunting;
-                                    
-                                    scene.camera.eye += projection;
-                                    scene.camera.target += projection;
-                                }
-                                // SPACEBAR
-                                if key == 32 {
-                                    scene.selection_cube.color = [0.4, 0.4, 0.2, 1.0];
-                                }
-
-                                // 4
-                                if key == 100 {
-                                    // Move selection left
-                                    scene.selection_cube.translate([-1.0, 0.0, 0.0]);
-                                }
-
-                                // 6
-                                if key == 102 {
-                                    // Move selection right
-                                    scene.selection_cube.translate([1.0, 0.0, 0.0]);
-                                    log::info!("Move right");
-                                }
-
-                                // 4
-                                if key == 98 {
-                                    // Move selection forward
-                                    scene.selection_cube.translate([0.0, 0.0, 1.0]);
-                                }
-
-                                // 8
-                                if key == 104 {
-                                    // Move selection backwards
-                                    scene.selection_cube.translate([0.0, 0.0, -1.0]);
-                                }
-
-                                // 9
-                                if key == 105 {
-                                    // Move selection up
-                                    scene.selection_cube.translate([0.0, 1.0, 0.0]);
-                                }
-
-                                // 3
-                                if key == 99 {
-                                    // Move selection down
-                                    scene.selection_cube.translate([0.0, -1.0, 0.0]);
-                                }
-
+                                Self::handle_key_down(&command, &mut scene);
                             }
                         }
                         
