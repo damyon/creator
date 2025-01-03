@@ -24,5 +24,9 @@ pub mod model {
         pub fn init(&mut self) {
             self.voxels.init();
         }
+
+        pub fn toggle_voxel(&mut self, position: [u32; 3]) {
+            self.voxels.toggle_voxel(position);
+        }
     }
 }

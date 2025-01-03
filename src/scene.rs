@@ -27,7 +27,8 @@ pub mod scene {
         grid_xz: Grid,
         grid_xy: Grid,
         grid_yz: Grid,
-        model: Model
+        model: Model,
+        selection_position: [u32; 3]
     }
 
     impl Scene {
@@ -58,7 +59,8 @@ pub mod scene {
                     grid_xz: Grid::new(),
                     grid_xy: Grid::new(),
                     grid_yz: Grid::new(),
-                    model: Model::new()
+                    model: Model::new(),
+                    selection_position: [0, 0, 0]
                 }
             );
             GLOBSTATE.lock().unwrap()
@@ -159,31 +161,37 @@ pub mod scene {
         }
 
         pub fn handle_toggle_voxel(scene: &mut Scene) {
-            scene.selection_cube.color = [0.4, 0.4, 0.2, 1.0];
+            scene.model.toggle_voxel(scene.selection_position);
         }
 
         pub fn handle_move_selection_left(scene: &mut Scene) {
             scene.selection_cube.translate([-1.0, 0.0, 0.0]);
+            scene.selection_position[0] -= 1;
         }
 
         pub fn handle_move_selection_right(scene: &mut Scene) {
             scene.selection_cube.translate([1.0, 0.0, 0.0]);
+            scene.selection_position[0] += 1;
         }
 
         pub fn handle_move_selection_forward(scene: &mut Scene) {
             scene.selection_cube.translate([0.0, 0.0, 1.0]);
+            scene.selection_position[2] += 1;
         }
 
         pub fn handle_move_selection_backward(scene: &mut Scene) {
             scene.selection_cube.translate([0.0, 0.0, -1.0]);
+            scene.selection_position[2] -= 1;
         }
         
         pub fn handle_move_selection_up(scene: &mut Scene) {
             scene.selection_cube.translate([0.0, 1.0, 0.0]);
+            scene.selection_position[1] += 1;
         }
 
         pub fn handle_move_selection_down(scene: &mut Scene) {
             scene.selection_cube.translate([0.0, -1.0, 0.0]);
+            scene.selection_position[1] -= 1;
         }
 
         pub fn handle_key_down(command: &Command, scene: &mut Scene) {
