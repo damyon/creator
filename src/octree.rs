@@ -2,30 +2,44 @@
 
 
 pub mod octree {
+    use crate::{cube::cube::Cube, drawable::drawable::Drawable};
+
 
     pub struct OcTree {
-        children: Option<[Box<OcNode>; 8]>
+        root: OcNode,
+        depth: u32
     }
 
     impl OcTree {
         pub const fn new() -> OcTree {
             OcTree {
-                children: None
+                root: OcNode {
+                    x_index: 0, 
+                    y_index: 0,
+                    z_index: 0,
+                    subdivide_level: 1,
+                    active: false,
+                    children: [None, None, None, None, None, None, None, None],
+                    has_children: false
+                },
+                depth: 1
             }
         }
 
         pub fn init(&mut self) {
-            // Noop
+            self.decimate(3);
         }
 
-        pub fn count_vertices(&self) -> u8 {
-            // Noop
-            5
+        pub fn drawables(&mut self) -> Vec<Cube> {
+            self.root.drawables()
         }
 
-        pub fn vertices(&self) -> &[f32] {
-            &[]
+        pub fn decimate(&mut self, levels: u32) {
+            log::info!("We are decimating {}", levels);
+            self.depth = levels;
+            self.root.decimate(levels);
         }
+
     }
 
     pub struct OcNode {
@@ -34,22 +48,14 @@ pub mod octree {
         z_index: u32,
         subdivide_level: u32,
         active: bool,
-        children: [Option<Box<Self>>; 8]
+        children: [Option<Box<Self>>; 8],
+        has_children: bool
     }
 
     impl OcNode {
-        pub const fn new() -> OcNode {
-            OcNode {
-                x_index: 0, 
-                y_index: 0,
-                z_index: 0,
-                subdivide_level: 1,
-                active: false,
-                children: [None, None, None, None, None, None, None, None]
-            }
-        }
 
         pub fn decimate(&mut self, levels: u32) {
+            log::info!("We are decimating {}", levels);
             if levels > 0 {
                 self.subdivide();
         
@@ -66,19 +72,62 @@ pub mod octree {
                     };
                 }
             }
+        }
 
-            
+        pub fn drawables(&mut self) -> Vec<Cube> {
+            if self.has_children {
+                let mut child_cubes: Vec<Cube> = vec![];
+
+                let squirts = self.children.each_mut();
+
+                for index in 0..8 {
+                    match squirts[index] {
+                        None => {
+                            log::info!("Should not get here")
+                        },
+                        Some(node) => {
+                            let mut cube = node.drawables();
+
+                            child_cubes.append(&mut cube);
+                        }
+                    };
+                }
+
+                child_cubes
+            } else {
+                if self.active {
+                    let scale = 2.0 / self.subdivide_level as f32;
+                    let mut cube = Cube::new();
+                    cube.color = [1.0, 0.0, 1.0, 0.2];
+                    cube.scale = scale / 2.0;
+                    cube.init();
+
+                    let x = self.x_index as f32 * scale - 1.0;
+                    let y = self.y_index as f32 * scale - 1.0;
+                    let z = self.z_index as f32 * scale - 1.0;
+
+                    cube.translate([x, y, z]);
+
+                    vec![cube]
+                } else {
+                    vec![]
+                }
+            }
         }
 
         pub fn subdivide(&mut self) {
+            log::info!("We are subdividing");
+            self.has_children = true;
+            let active = self.x_index + self.y_index + self.z_index % 2 == 0;
             self.children[0] = Some(
                 Box::new(OcNode {
                     x_index: self.x_index * 2, 
                     y_index: self.y_index * 2,
                     z_index: self.z_index * 2,
                     subdivide_level: self.subdivide_level + 1,
-                    active: false,
-                    children: [None, None, None, None, None, None, None, None]
+                    active: active,
+                    children: [None, None, None, None, None, None, None, None],
+                    has_children: false
                 })
             );
 
@@ -88,8 +137,9 @@ pub mod octree {
                     y_index: self.y_index * 2,
                     z_index: self.z_index * 2,
                     subdivide_level: self.subdivide_level + 1,
-                    active: false,
-                    children: [None, None, None, None, None, None, None, None]
+                    active: active,
+                    children: [None, None, None, None, None, None, None, None],
+                    has_children: false
                 })
             );
     
@@ -99,8 +149,9 @@ pub mod octree {
                     y_index: self.y_index * 2 + 1,
                     z_index: self.z_index * 2,
                     subdivide_level: self.subdivide_level + 1,
-                    active: false,
-                    children: [None, None, None, None, None, None, None, None]
+                    active: active,
+                    children: [None, None, None, None, None, None, None, None],
+                    has_children: false
                 })
             );
             self.children[3] = Some(
@@ -109,8 +160,9 @@ pub mod octree {
                     y_index: self.y_index * 2,
                     z_index: self.z_index * 2 + 1,
                     subdivide_level: self.subdivide_level + 1,
-                    active: false,
-                    children: [None, None, None, None, None, None, None, None]
+                    active: active,
+                    children: [None, None, None, None, None, None, None, None],
+                    has_children: false
                 })
             );
             self.children[4] = Some(
@@ -119,8 +171,9 @@ pub mod octree {
                     y_index: self.y_index * 2 + 1,
                     z_index: self.z_index * 2,
                     subdivide_level: self.subdivide_level + 1,
-                    active: false,
-                    children: [None, None, None, None, None, None, None, None]
+                    active: active,
+                    children: [None, None, None, None, None, None, None, None],
+                    has_children: false
                 })
             );
             self.children[5] = Some(
@@ -129,8 +182,9 @@ pub mod octree {
                     y_index: self.y_index * 2 + 1,
                     z_index: self.z_index * 2 + 1,
                     subdivide_level: self.subdivide_level + 1,
-                    active: false,
-                    children: [None, None, None, None, None, None, None, None]
+                    active: active,
+                    children: [None, None, None, None, None, None, None, None],
+                    has_children: false
                 })
             );
             self.children[6] = Some(
@@ -139,8 +193,9 @@ pub mod octree {
                     y_index: self.y_index * 2,
                     z_index: self.z_index * 2 + 1,
                     subdivide_level: self.subdivide_level + 1,
-                    active: false,
-                    children: [None, None, None, None, None, None, None, None]
+                    active: active,
+                    children: [None, None, None, None, None, None, None, None],
+                    has_children: false
                 })
             );
             self.children[7] = Some(
@@ -149,8 +204,9 @@ pub mod octree {
                     y_index: self.y_index * 2 + 1,
                     z_index: self.z_index * 2 + 1,
                     subdivide_level: self.subdivide_level + 1,
-                    active: false,
-                    children: [None, None, None, None, None, None, None, None]
+                    active: active,
+                    children: [None, None, None, None, None, None, None, None],
+                    has_children: false
                 })
             );
          }

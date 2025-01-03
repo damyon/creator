@@ -10,6 +10,7 @@ pub mod cube {
         pub translation: [f32; 3],
         pub rotation: [f32; 3],
         pub color: [f32; 4],
+        pub scale: f32,
     }
 
     use crate::drawable::drawable::Drawable;
@@ -22,6 +23,7 @@ pub mod cube {
                 translation: [0.0; 3],
                 rotation: [0.0; 3],
                 color: [0.4, 0.4, 0.2, 0.6],
+                scale: 1.0
             }
         }
     }
@@ -30,7 +32,7 @@ pub mod cube {
         fn init(&mut self) {
             let mut index: usize = 0;
             let mut increment = || -> usize {let result = index; index += 1; result};
-            let scale: f32 = 1.0;
+            let scale: f32 = self.scale;
 
             // Bottom
             self.vertices[increment()] = 0.0;   self.vertices[increment()] = 0.0; self.vertices[increment()] = 0.0;

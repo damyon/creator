@@ -263,6 +263,8 @@ pub mod scene {
             self.grid_yz.init();
             self.grid_yz.rotate([0.0, (90.0 as f32).to_radians(), 0.0]);
 
+            self.model.init();
+
             let document = web_sys::window().unwrap().document().unwrap();
             let canvas_element = document.get_element_by_id(canvas_id).unwrap();
             let canvas: web_sys::HtmlCanvasElement = match canvas_element.dyn_into::<web_sys::HtmlCanvasElement>() {
@@ -311,7 +313,7 @@ pub mod scene {
         }
 
         pub fn draw(context: Context, shader: &WebGlProgram) {
-            let  scene = Self::access();
+            let mut scene = Self::access();
             //log::info!("Draw scene");
                 
             
@@ -319,9 +321,10 @@ pub mod scene {
             context.draw(&scene.grid_xz, shader, WebGlRenderingContext::LINES, scene.camera);
             context.draw(&scene.grid_xy, shader, WebGlRenderingContext::LINES, scene.camera);
             context.draw(&scene.grid_yz, shader, WebGlRenderingContext::LINES, scene.camera);
-            context.draw(&scene.model, shader, WebGlRenderingContext::LINES, scene.camera);
-            
-    
+
+            for voxel in scene.model.drawables().iter() {
+                context.draw(voxel, shader, WebGlRenderingContext::TRIANGLES, scene.camera);
+            }
         }
     }
 }
