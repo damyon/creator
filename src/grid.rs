@@ -3,8 +3,6 @@
 
 pub mod grid {
 
-    extern crate nalgebra as na;
-
     #[derive(Copy, Clone)]
     pub struct Grid {
         pub scale: u8,

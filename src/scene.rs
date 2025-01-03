@@ -315,10 +315,12 @@ pub mod scene {
             //log::info!("Draw scene");
                 
             
-            context.draw(scene.selection_cube, shader, WebGlRenderingContext::TRIANGLES, scene.camera);
-            context.draw(scene.grid_xz, shader, WebGlRenderingContext::LINES, scene.camera);
-            context.draw(scene.grid_xy, shader, WebGlRenderingContext::LINES, scene.camera);
-            context.draw(scene.grid_yz, shader, WebGlRenderingContext::LINES, scene.camera);
+            context.draw(&scene.selection_cube, shader, WebGlRenderingContext::TRIANGLES, scene.camera);
+            context.draw(&scene.grid_xz, shader, WebGlRenderingContext::LINES, scene.camera);
+            context.draw(&scene.grid_xy, shader, WebGlRenderingContext::LINES, scene.camera);
+            context.draw(&scene.grid_yz, shader, WebGlRenderingContext::LINES, scene.camera);
+            context.draw(&scene.model, shader, WebGlRenderingContext::LINES, scene.camera);
+            
     
         }
     }

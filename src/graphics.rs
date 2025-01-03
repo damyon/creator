@@ -159,7 +159,7 @@ pub mod graphics {
             self.gl.clear(WebGlRenderingContext::DEPTH_BUFFER_BIT | WebGlRenderingContext::COLOR_BUFFER_BIT);
         }
 
-        pub fn draw(&self, drawable: impl Drawable, shader_program: &WebGlProgram, render_mode: u32, camera: Camera) {
+        pub fn draw(&self, drawable: & impl Drawable, shader_program: &WebGlProgram, render_mode: u32, camera: Camera) {
 
             self.setup_vertices(&drawable.vertices(), shader_program);
 

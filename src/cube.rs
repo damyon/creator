@@ -3,9 +3,6 @@
 
 pub mod cube {
 
-    extern crate nalgebra as na;
-
-
     #[derive(Copy, Clone)]
     pub struct Cube {
         pub vertices_count: u8,

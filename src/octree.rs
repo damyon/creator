@@ -13,6 +13,19 @@ pub mod octree {
                 children: None
             }
         }
+
+        pub fn init(&mut self) {
+            // Noop
+        }
+
+        pub fn count_vertices(&self) -> u8 {
+            // Noop
+            5
+        }
+
+        pub fn vertices(&self) -> &[f32] {
+            &[]
+        }
     }
 
     pub struct OcNode {
