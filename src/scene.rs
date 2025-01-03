@@ -12,6 +12,7 @@ pub mod scene {
     use crate::command::command::{Command, CommandType};
     use crate::command_queue::command_queue::CommandQueue;
     use crate::graphics::graphics::Context;
+    use crate::model::model::Model;
 
     extern crate nalgebra as na;
     extern crate nalgebra_glm as glm;
@@ -26,6 +27,7 @@ pub mod scene {
         grid_xz: Grid,
         grid_xy: Grid,
         grid_yz: Grid,
+        model: Model
     }
 
     impl Scene {
@@ -56,6 +58,7 @@ pub mod scene {
                     grid_xz: Grid::new(),
                     grid_xy: Grid::new(),
                     grid_yz: Grid::new(),
+                    model: Model::new()
                 }
             );
             GLOBSTATE.lock().unwrap()

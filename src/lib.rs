@@ -9,8 +9,10 @@ mod cube;
 mod scene;
 mod camera;
 mod mouse;
+mod model;
 mod command;
 mod command_queue;
+mod octree;
 
 use crate::graphics::graphics::Context;
 use crate::scene::scene::Scene;
