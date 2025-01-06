@@ -10,10 +10,11 @@ crate-type = ["cdylib"]
 gloo = "0.11.0"
 nalgebra-glm = "0.19.0" 
 nalgebra = "0.33.2"
-wasm-bindgen = "0.2.97"
-js-sys = "0.3.74"
+wasm-bindgen = "0.2.99"
+js-sys = "0.3.76"
 log = "0.4.6"
 wasm-logger = "0.2.0"
+serde_json = "1.0.134"
 [dependencies.web-sys]
 version = "0.3.74"
 features = [
@@ -27,5 +28,9 @@ features = [
   'WebGlBuffer', 
   'WebGlUniformLocation',
   'MouseEvent',
-  'KeyboardEvent'
+  'KeyboardEvent',
+  'Storage'
 ]
+[dependencies.serde]
+version = "1.0.217"
+features = ["derive"]

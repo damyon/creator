@@ -3,7 +3,8 @@
 
 pub mod octree {
     use crate::{cube::cube::Cube, drawable::drawable::Drawable};
-
+    use serde::{Serialize, Deserialize};
+    use serde_json;
 
     pub struct OcTree {
         root: OcNode,
@@ -22,12 +23,18 @@ pub mod octree {
                     children: [None, None, None, None, None, None, None, None],
                     has_children: false
                 },
-                depth: 1
+                depth: 1,
             }
         }
 
         pub fn init(&mut self) {
             self.decimate(3);
+
+            let str = Self::local_storage().get_item(&"model").unwrap().unwrap();
+
+            let unflattened: OcNode = serde_json::from_str(&str).unwrap();
+
+            self.root = unflattened;
         }
 
         pub fn drawables(&mut self) -> Vec<Cube> {
@@ -40,12 +47,21 @@ pub mod octree {
             self.root.decimate(levels);
         }
 
+        pub fn local_storage() -> web_sys::Storage {
+
+            let window = web_sys::window();
+            window.unwrap().local_storage().unwrap().unwrap()
+        }
+
         pub fn toggle_voxel(&mut self, position: [u32; 3]) {
             self.root.toggle_voxel(position);
+            let flattened = serde_json::to_string(&self.root).unwrap();
+            _ = Self::local_storage().set_item(&"model", &flattened);
         }
 
     }
 
+    #[derive(Serialize, Deserialize)]
     pub struct OcNode {
         x_index: u32,
         y_index: u32,
@@ -86,14 +102,14 @@ pub mod octree {
 
             for index in 0..8 {
                 match squirts[index] {
-                    None => {
-                        log::info!("Should not get here")
-                    },
+                    None => {},
                     Some(node) => {
                         node.toggle_voxel(position);
                     }
                 };
             }
+
+
         }
 
         pub fn drawables(&mut self) -> Vec<Cube> {
