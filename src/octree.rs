@@ -27,7 +27,7 @@ pub mod octree {
         }
 
         pub fn init(&mut self) {
-            self.decimate(2);
+            self.decimate(3);
         }
 
         pub fn drawables(&mut self) -> Vec<Cube> {
@@ -79,7 +79,7 @@ pub mod octree {
         }
 
         pub fn toggle_voxel(&mut self, position: [u32; 3]) {
-            if self.x_index-2 == position[0] && self.y_index-2 == position[1] && self.z_index-2 == position[2] {
+            if self.x_index-4 == position[0] && self.y_index-4 == position[1] && self.z_index-4 == position[2] {
                 self.active = !self.active;
             }
             let squirts = self.children.each_mut();
@@ -118,15 +118,15 @@ pub mod octree {
                 child_cubes
             } else {
                 if self.active {
-                    let scale = 4.0 / (self.subdivide_level as f32 + 1.0);
+                    let scale = 5.0 / (self.subdivide_level as f32 + 1.0);
                     let mut cube = Cube::new();
-                    cube.color = [1.0, 0.0, 1.0, 0.1];
+                    cube.color = [0.4, 0.4, 0.2, 0.4];
                     cube.scale = scale;
                     cube.init();
 
-                    let x = self.x_index as f32 * scale - 2.0;
-                    let y = self.y_index as f32 * scale - 2.0;
-                    let z = self.z_index as f32 * scale - 2.0;
+                    let x = self.x_index as f32 * scale - 4.0;
+                    let y = self.y_index as f32 * scale - 4.0;
+                    let z = self.z_index as f32 * scale - 4.0;
 
                     cube.translate([x, y, z]);
 
