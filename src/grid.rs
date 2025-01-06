@@ -5,11 +5,11 @@ pub mod grid {
 
     #[derive(Copy, Clone)]
     pub struct Grid {
-        pub scale: u8,
-        pub square_count: u8,
-        pub vertices_count: u8,
-        pub vertices: [f32; 108],
-        pub max_scale: u8,
+        pub scale: u16,
+        pub square_count: u16,
+        pub vertices_count: u16,
+        pub vertices: [f32; 204],
+        pub max_scale: u16,
         pub translation: [f32; 3],
         pub rotation: [f32; 3],
         pub color: [f32; 4]
@@ -20,11 +20,11 @@ pub mod grid {
     impl Grid {
         pub const fn new() -> Grid {
             Grid {
-                scale: 8,
-                square_count: 64, // self.scale * self.scale
-                vertices_count: 108, // 2 * (6 * (self.scale+1))
-                vertices: [0.0; 108],
-                max_scale: 10,
+                scale: 16,
+                square_count: 256, // self.scale * self.scale
+                vertices_count: 204, // 2 * (6 * (self.scale+1))
+                vertices: [0.0; 204],
+                max_scale: 20,
                 translation: [0.0; 3],
                 rotation: [0.0; 3],
                 color: [0.2, 0.2, 0.2, 0.1],
@@ -74,7 +74,7 @@ pub mod grid {
             self.vertices_count = 2 * (6 * (self.scale+1));
         }
 
-        fn count_vertices(&self) -> u8 {
+        fn count_vertices(&self) -> u16 {
             self.vertices_count
         }
         

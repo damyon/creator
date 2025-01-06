@@ -4,7 +4,7 @@ pub mod drawable {
 
     pub trait Drawable {
         fn init(&mut self);
-        fn count_vertices(&self) -> u8;
+        fn count_vertices(&self) -> u16;
         fn translation(&self) -> &[f32; 3];
         fn rotation(&self) -> &[f32; 3];
         fn translate(&mut self, amount: [f32; 3]);

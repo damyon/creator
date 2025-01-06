@@ -28,7 +28,7 @@ pub mod scene {
         grid_xy: Grid,
         grid_yz: Grid,
         model: Model,
-        selection_position: [u32; 3]
+        selection_position: [i32; 3]
     }
 
     impl Scene {

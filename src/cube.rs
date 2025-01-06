@@ -5,7 +5,7 @@ pub mod cube {
 
     #[derive(Copy, Clone)]
     pub struct Cube {
-        pub vertices_count: u8,
+        pub vertices_count: u16,
         pub vertices: [f32; 108],
         pub translation: [f32; 3],
         pub rotation: [f32; 3],
@@ -85,10 +85,10 @@ pub mod cube {
             self.vertices[increment()] = scale; self.vertices[increment()] = scale; self.vertices[increment()] = 0.0;
            
 
-            self.vertices_count = self.vertices.len() as u8;
+            self.vertices_count = self.vertices.len() as u16;
         }
 
-        fn count_vertices(&self) -> u8 {
+        fn count_vertices(&self) -> u16 {
             self.vertices_count
         }
 
