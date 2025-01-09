@@ -6,7 +6,8 @@ pub mod command {
         MouseMoved,
         MouseDown,
         MouseUp,
-        KeyDown
+        KeyDown,
+        MouseScroll
     }
 
     #[derive(Copy, Clone)]

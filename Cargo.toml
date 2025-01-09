@@ -29,7 +29,8 @@ features = [
   'WebGlUniformLocation',
   'MouseEvent',
   'KeyboardEvent',
-  'Storage'
+  'Storage',
+  'WheelEvent'
 ]
 [dependencies.serde]
 version = "1.0.217"

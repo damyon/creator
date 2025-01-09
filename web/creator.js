@@ -286,7 +286,7 @@ function addBorrowedObject(obj) {
 }
 function __wbg_adapter_20(arg0, arg1, arg2) {
     try {
-        wasm._dyn_core__ops__function__FnMut___A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h75e585f9476f3f66(arg0, arg1, addBorrowedObject(arg2));
+        wasm._dyn_core__ops__function__FnMut___A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h364ac544a04857ce(arg0, arg1, addBorrowedObject(arg2));
     } finally {
         heap[stack_pointer++] = undefined;
     }
@@ -372,6 +372,10 @@ function __wbg_get_imports() {
     };
     imports.wbg.__wbg_debug_19114f11037e4658 = function(arg0, arg1, arg2, arg3) {
         console.debug(getObject(arg0), getObject(arg1), getObject(arg2), getObject(arg3));
+    };
+    imports.wbg.__wbg_deltaY_1683a859ce933add = function(arg0) {
+        const ret = getObject(arg0).deltaY;
+        return ret;
     };
     imports.wbg.__wbg_disable_2f09f593bf0f5573 = function(arg0, arg1) {
         getObject(arg0).disable(arg1 >>> 0);
@@ -470,6 +474,16 @@ function __wbg_get_imports() {
         let result;
         try {
             result = getObject(arg0) instanceof WebGLRenderingContext;
+        } catch (_) {
+            result = false;
+        }
+        const ret = result;
+        return ret;
+    };
+    imports.wbg.__wbg_instanceof_WheelEvent_a9ac66d0bef34c1a = function(arg0) {
+        let result;
+        try {
+            result = getObject(arg0) instanceof WheelEvent;
         } catch (_) {
             result = false;
         }
@@ -583,8 +597,8 @@ function __wbg_get_imports() {
         const ret = false;
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper155 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 31, __wbg_adapter_20);
+    imports.wbg.__wbindgen_closure_wrapper156 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 34, __wbg_adapter_20);
         return addHeapObject(ret);
     };
     imports.wbg.__wbindgen_debug_string = function(arg0, arg1) {

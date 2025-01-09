@@ -82,8 +82,7 @@ pub mod scene {
 
         pub fn handle_mouse_moved(command: &Command, scene: &mut Scene) {
             let current_position = Point2::new(command.data1 as i32, command.data2 as i32);
-            //Scene::handle_mouse_moved(current_position, scene.lock().unwrap());
-
+            
             if scene.mouse.is_pressed {
                 let position_diff = Point2::new(current_position.x - scene.mouse.last_position.x, current_position.y - scene.mouse.last_position.y);
                 let current_camera_eye = scene.camera.eye;
@@ -194,6 +193,16 @@ pub mod scene {
             scene.selection_position[1] -= 1;
         }
 
+        pub fn handle_mouse_scroll(command: &Command, scene: &mut Scene) {
+            let direction = command.data1;
+
+            if (direction > 0) {
+                log::info!("Increase the selection");
+            } else {
+                log::info!("Decrease the selection");
+            }
+        }
+
         pub fn handle_key_down(command: &Command, scene: &mut Scene) {
             let key = command.data1;
             
@@ -249,6 +258,9 @@ pub mod scene {
                             CommandType::KeyDown => {
                                 Self::handle_key_down(&command, &mut scene);
                             }
+                            CommandType::MouseScroll => {
+                                Self::handle_mouse_scroll(&command, &mut scene);
+                            }
                         }
                         
                         command_opt = scene.command_input.next();
@@ -287,7 +299,7 @@ pub mod scene {
             let key_down_closure = EventListener::new(&canvas, "keydown", move | event| {
                 let key_event = event.clone().dyn_into::<web_sys::KeyboardEvent>().unwrap();
                 log::info!("Key down");
-                Scene::queue_command(Command {command_type: crate::command::command::CommandType::KeyDown, data1: key_event.key_code() as u32, data2: key_event.key_code() as u32});
+                Scene::queue_command(Command {command_type: CommandType::KeyDown, data1: key_event.key_code() as u32, data2: key_event.key_code() as u32});
              });
 
             key_down_closure.forget();
@@ -300,21 +312,30 @@ pub mod scene {
                 // The code inside the closures is the only part of this 
                 // program that runs repeatedly.
                 
-                Scene::queue_command(Command {command_type: crate::command::command::CommandType::MouseMoved, data1: move_event.offset_x() as u32, data2: move_event.offset_y() as u32});
+                Scene::queue_command(Command {command_type: CommandType::MouseMoved, data1: move_event.offset_x() as u32, data2: move_event.offset_y() as u32});
             });
 
             mouse_move_closure.forget();
 
+            let wheel_closure = EventListener::new(&canvas, "wheel", move | event | {
+                let wheel_event = event.clone().dyn_into::<web_sys::WheelEvent>().unwrap();
+
+                let direction = if wheel_event.delta_y() < 0.0 { 1 as u32 } else { 0 as u32};
+                Scene::queue_command(Command {command_type: CommandType::MouseScroll, data1: direction, data2: 1});
+            });
+
+            wheel_closure.forget();
+
             let mouse_down_closure = EventListener::new(&canvas, "mousedown", move | _event| {
                 
-                Scene::queue_command(Command {command_type: crate::command::command::CommandType::MouseDown, data1: 1, data2: 1});
+                Scene::queue_command(Command {command_type: CommandType::MouseDown, data1: 1, data2: 1});
             });
 
             mouse_down_closure.forget();
 
             let mouse_up_closure = EventListener::new(&canvas, "mouseup", move | _event| {
                 
-                Scene::queue_command(Command {command_type: crate::command::command::CommandType::MouseUp, data1: 1, data2: 1});
+                Scene::queue_command(Command {command_type: CommandType::MouseUp, data1: 1, data2: 1});
             });
 
             mouse_up_closure.forget();
