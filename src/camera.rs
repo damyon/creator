@@ -14,7 +14,7 @@ pub mod camera {
 
         pub const fn new() -> Camera {
             Camera {
-                eye: Point3::new(3.8, 1.0, 7.0),
+                eye: Point3::new(4.0, 2.0, 20.0),
                 target: Point3::new(1.0, 0.0, 0.0),
             }
         }

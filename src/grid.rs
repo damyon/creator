@@ -8,7 +8,7 @@ pub mod grid {
         pub scale: u16,
         pub square_count: u16,
         pub vertices_count: u16,
-        pub vertices: [f32; 204],
+        pub vertices: [f32; 396 ],
         pub max_scale: u16,
         pub translation: [f32; 3],
         pub rotation: [f32; 3],
@@ -20,11 +20,11 @@ pub mod grid {
     impl Grid {
         pub const fn new() -> Grid {
             Grid {
-                scale: 16,
-                square_count: 256, // self.scale * self.scale
-                vertices_count: 204, // 2 * (6 * (self.scale+1))
-                vertices: [0.0; 204],
-                max_scale: 20,
+                scale: 32,
+                square_count: 1024, // self.scale * self.scale
+                vertices_count: 396, // 2 * (6 * (self.scale+1))
+                vertices: [0.0; 396],
+                max_scale: 40,
                 translation: [0.0; 3],
                 rotation: [0.0; 3],
                 color: [0.2, 0.2, 0.2, 0.1],

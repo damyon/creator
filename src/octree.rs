@@ -28,13 +28,13 @@ pub mod octree {
         }
 
         pub fn init(&mut self) {
-            self.decimate(4);
+            self.decimate(5);
 
             let str = Self::local_storage().get_item(&"model").unwrap().unwrap();
 
             let unflattened: OcNode = serde_json::from_str(&str).unwrap();
 
-            self.root = unflattened;
+            //self.root = unflattened;
         }
 
         pub fn drawables(&mut self) -> Vec<Cube> {
@@ -53,7 +53,7 @@ pub mod octree {
         }
 
         pub fn toggle_voxel(&mut self, position: [i32; 3]) {
-            log::info!("Toggle voxel: {},{},{}", position[0], position[1], position[2]);
+            log::debug!("Toggle voxel: {},{},{}", position[0], position[1], position[2]);
             self.root.toggle_voxel(position);
             let flattened = serde_json::to_string(&self.root).unwrap();
             _ = Self::local_storage().set_item(&"model", &flattened);
@@ -83,7 +83,7 @@ pub mod octree {
                 for index in 0..8 {
                     match squirts[index] {
                         None => {
-                            log::info!("Should not get here")
+                            log::debug!("Should not get here")
                         },
                         Some(node) => {
                             node.decimate(levels - 1);
@@ -95,12 +95,8 @@ pub mod octree {
 
         pub fn toggle_voxel(&mut self, position: [i32; 3]) {
 
-            log::info!("Checking {},{},{} against {},{},{}", self.x_index, self.y_index, self.z_index, position[0], position[1], position[2]);
             if self.x_index == position[0] && self.y_index == position[1] && self.z_index == position[2] {
-                log::info!("We got a hit");
                 self.active = !self.active;
-            } else {
-                log::info!("Miss");
             }
             let squirts = self.children.each_mut();
 
@@ -138,7 +134,7 @@ pub mod octree {
                 if self.active {
                     let scale = 1.0;
                     let mut cube = Cube::new();
-                    
+
                     cube.color = [0.4, 0.4, 0.2, 0.4];
                     cube.scale = scale;
                     cube.init();
@@ -161,10 +157,10 @@ pub mod octree {
             let active = false;
 
             if self.subdivide_level < 2 {
-                log::info!("We are applying negative indexes");
+                log::debug!("We are applying negative indexes");
                 self.children[0] = Some(
                     Box::new(OcNode {
-                        x_index: -1, 
+                        x_index: -1,
                         y_index: -1,
                         z_index: -1,
                         subdivide_level: self.subdivide_level + 1,
@@ -176,7 +172,7 @@ pub mod octree {
 
                 self.children[1] = Some(
                     Box::new(OcNode {
-                        x_index: 0, 
+                        x_index: 0,
                         y_index: -1,
                         z_index: -1,
                         subdivide_level: self.subdivide_level + 1,
@@ -185,10 +181,9 @@ pub mod octree {
                         has_children: false
                     })
                 );
-        
                 self.children[2] = Some(
                     Box::new(OcNode {
-                        x_index: -1, 
+                        x_index: -1,
                         y_index: 0,
                         z_index: -1,
                         subdivide_level: self.subdivide_level + 1,
@@ -199,7 +194,7 @@ pub mod octree {
                 );
                 self.children[3] = Some(
                     Box::new(OcNode {
-                        x_index: -1, 
+                        x_index: -1,
                         y_index: -1,
                         z_index: 0,
                         subdivide_level: self.subdivide_level + 1,
@@ -210,7 +205,7 @@ pub mod octree {
                 );
                 self.children[4] = Some(
                     Box::new(OcNode {
-                        x_index: 0, 
+                        x_index: 0,
                         y_index: 0,
                         z_index: -1,
                         subdivide_level: self.subdivide_level + 1,
@@ -221,7 +216,7 @@ pub mod octree {
                 );
                 self.children[5] = Some(
                     Box::new(OcNode {
-                        x_index: -1, 
+                        x_index: -1,
                         y_index: 0,
                         z_index: 0,
                         subdivide_level: self.subdivide_level + 1,
@@ -232,7 +227,7 @@ pub mod octree {
                 );
                 self.children[6] = Some(
                     Box::new(OcNode {
-                        x_index: 0, 
+                        x_index: 0,
                         y_index: -1,
                         z_index: 0,
                         subdivide_level: self.subdivide_level + 1,
@@ -243,7 +238,7 @@ pub mod octree {
                 );
                 self.children[7] = Some(
                     Box::new(OcNode {
-                        x_index: 0, 
+                        x_index: 0,
                         y_index: 0,
                         z_index: 0,
                         subdivide_level: self.subdivide_level + 1,
@@ -256,7 +251,7 @@ pub mod octree {
 
                 self.children[0] = Some(
                     Box::new(OcNode {
-                        x_index: self.x_index * 2, 
+                        x_index: self.x_index * 2,
                         y_index: self.y_index * 2,
                         z_index: self.z_index * 2,
                         subdivide_level: self.subdivide_level + 1,
@@ -265,10 +260,9 @@ pub mod octree {
                         has_children: false
                     })
                 );
-
                 self.children[1] = Some(
                     Box::new(OcNode {
-                        x_index: self.x_index * 2 + 1, 
+                        x_index: self.x_index * 2 + 1,
                         y_index: self.y_index * 2,
                         z_index: self.z_index * 2,
                         subdivide_level: self.subdivide_level + 1,
@@ -277,10 +271,9 @@ pub mod octree {
                         has_children: false
                     })
                 );
-        
                 self.children[2] = Some(
                     Box::new(OcNode {
-                        x_index: self.x_index * 2, 
+                        x_index: self.x_index * 2,
                         y_index: self.y_index * 2 + 1,
                         z_index: self.z_index * 2,
                         subdivide_level: self.subdivide_level + 1,
@@ -291,7 +284,7 @@ pub mod octree {
                 );
                 self.children[3] = Some(
                     Box::new(OcNode {
-                        x_index: self.x_index * 2, 
+                        x_index: self.x_index * 2,
                         y_index: self.y_index * 2,
                         z_index: self.z_index * 2 + 1,
                         subdivide_level: self.subdivide_level + 1,
@@ -302,7 +295,7 @@ pub mod octree {
                 );
                 self.children[4] = Some(
                     Box::new(OcNode {
-                        x_index: self.x_index * 2 + 1, 
+                        x_index: self.x_index * 2 + 1,
                         y_index: self.y_index * 2 + 1,
                         z_index: self.z_index * 2,
                         subdivide_level: self.subdivide_level + 1,
@@ -313,7 +306,7 @@ pub mod octree {
                 );
                 self.children[5] = Some(
                     Box::new(OcNode {
-                        x_index: self.x_index * 2, 
+                        x_index: self.x_index * 2,
                         y_index: self.y_index * 2 + 1,
                         z_index: self.z_index * 2 + 1,
                         subdivide_level: self.subdivide_level + 1,
@@ -324,7 +317,7 @@ pub mod octree {
                 );
                 self.children[6] = Some(
                     Box::new(OcNode {
-                        x_index: self.x_index * 2 + 1, 
+                        x_index: self.x_index * 2 + 1,
                         y_index: self.y_index * 2,
                         z_index: self.z_index * 2 + 1,
                         subdivide_level: self.subdivide_level + 1,
@@ -335,7 +328,7 @@ pub mod octree {
                 );
                 self.children[7] = Some(
                     Box::new(OcNode {
-                        x_index: self.x_index * 2 + 1, 
+                        x_index: self.x_index * 2 + 1,
                         y_index: self.y_index * 2 + 1,
                         z_index: self.z_index * 2 + 1,
                         subdivide_level: self.subdivide_level + 1,
