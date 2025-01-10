@@ -193,10 +193,10 @@ pub mod scene {
             scene.selection_position[1] -= 1;
         }
 
-        pub fn handle_mouse_scroll(command: &Command, scene: &mut Scene) {
+        pub fn handle_mouse_scroll(command: &Command, _scene: &mut Scene) {
             let direction = command.data1;
 
-            if (direction > 0) {
+            if direction > 0 {
                 log::info!("Increase the selection");
             } else {
                 log::info!("Decrease the selection");
@@ -343,7 +343,7 @@ pub mod scene {
 
         pub fn draw(context: Context, shader: &WebGlProgram) {
             let mut scene = Self::access();
-            //log::info!("Draw scene");
+            log::info!("Draw scene");
                 
             
             context.draw(&scene.selection_cube, shader, WebGlRenderingContext::TRIANGLES, scene.camera);

@@ -1,5 +1,7 @@
 pub mod graphics {
 
+    use std::cmp::min;
+
     use wasm_bindgen::prelude::*;
     use wasm_bindgen::JsCast;
     use web_sys::{WebGlRenderingContext, WebGlShader, WebGlProgram};
@@ -189,12 +191,22 @@ pub mod graphics {
             self.gl.uniform_matrix4fv_with_f32_array(Some(&u_matrix_location), false, model_view_projection.as_slice());
 
             self.gl.line_width(2.0);
+
+            let chunk_size: i32 = 30;
+
+            for chunk in 0..(drawable.count_vertices() as i32) / chunk_size {
+
+                let count = min(chunk_size, drawable.count_vertices() as i32 - (chunk * chunk_size));
+
+                self.gl.draw_arrays(
+                    render_mode,
+                    chunk * chunk_size as i32,
+                    count,
+                );
+            }
+
             
-            self.gl.draw_arrays(
-                render_mode,
-                0,
-                (drawable.count_vertices()) as i32,
-            );
+            
         }
     }
     

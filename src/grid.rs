@@ -102,7 +102,6 @@ pub mod grid {
             &self.vertices
         }
 
-
         fn color(&self) -> &[f32; 4] {
             &self.color
         }
