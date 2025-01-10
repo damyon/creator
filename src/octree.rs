@@ -55,11 +55,17 @@ pub mod octree {
             window.unwrap().local_storage().unwrap().unwrap()
         }
 
-        pub fn toggle_voxel(&mut self, position: [i32; 3]) {
-            log::debug!("Toggle voxel: {},{},{}", position[0], position[1], position[2]);
-            self.root.toggle_voxel(position);
+        pub fn toggle_voxel(&mut self, position: [i32; 3], value: bool) {
+            self.root.toggle_voxel(position, value);
+        }
+
+        pub fn save(&self) {
             let flattened = serde_json::to_string(&self.root).unwrap();
             _ = Self::local_storage().set_item(&"creator_model", &flattened);
+        }
+
+        pub fn all_voxels_active(&self, positions: &Vec<[i32; 3]>) -> bool {
+            self.root.all_voxels_active(positions)
         }
 
     }
@@ -96,10 +102,32 @@ pub mod octree {
             }
         }
 
-        pub fn toggle_voxel(&mut self, position: [i32; 3]) {
+        pub fn all_voxels_active(&self, positions: &Vec<[i32; 3]>) -> bool {
+            for position in positions {
+                if self.x_index == position[0] && self.y_index == position[1] && self.z_index == position[2] && !self.active {
+                    return false;
+                }
+            }
+            let squirts = self.fry.each_ref();
+
+            for index in 0..8 {
+                match squirts[index] {
+                    None => {},
+                    Some(node) => {
+                        if !node.all_voxels_active(positions) {
+                            return false;
+                        }
+                    }
+                };
+            }
+
+            return true;
+        }
+
+        pub fn toggle_voxel(&mut self, position: [i32; 3], value: bool) {
 
             if self.x_index == position[0] && self.y_index == position[1] && self.z_index == position[2] {
-                self.active = !self.active;
+                self.active = value;
             }
             let squirts = self.fry.each_mut();
 
@@ -107,7 +135,7 @@ pub mod octree {
                 match squirts[index] {
                     None => {},
                     Some(node) => {
-                        node.toggle_voxel(position);
+                        node.toggle_voxel(position, value);
                     }
                 };
             }

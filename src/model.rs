@@ -25,8 +25,16 @@ pub mod model {
             self.voxels.init();
         }
 
-        pub fn toggle_voxel(&mut self, position: [i32; 3]) {
-            self.voxels.toggle_voxel(position);
+        pub fn toggle_voxel(&mut self, position: [i32; 3], value: bool) {
+            self.voxels.toggle_voxel(position, value);
+        }
+
+        pub fn all_voxels_active(&self, positions: &Vec<[i32; 3]>) -> bool {
+            self.voxels.all_voxels_active(positions)
+        }
+
+        pub fn save(&self) {
+            self.voxels.save();
         }
     }
 }

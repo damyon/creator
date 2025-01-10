@@ -165,11 +165,17 @@ pub mod scene {
         pub fn handle_toggle_voxel(scene: &mut Scene) {
             let selections = Self::selection_voxels(&scene.selection_position, scene.selection_radius as i32);
 
-            // Need to implement all on or off based on selection of contents
+            let value: bool = scene.model.all_voxels_active(&selections);
 
-            for selection in selections {
-                scene.model.toggle_voxel(selection);
+            if value {
+                log::info!("Toggle all voxels active: TRUE");
+            } else {
+                log::info!("Toggle all voxels active: FALSE");    
             }
+            for selection in selections {
+                scene.model.toggle_voxel(selection, !value);
+            }
+            scene.model.save();
         }
 
         pub fn handle_move_selection_left(scene: &mut Scene) {
