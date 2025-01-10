@@ -1,5 +1,6 @@
 pub mod scene {
 
+    use std::cmp::{max, min};
     use std::sync::{Mutex, MutexGuard};
     use web_sys::{WebGlRenderingContext, WebGlProgram};
 
@@ -28,7 +29,8 @@ pub mod scene {
         grid_xy: Grid,
         grid_yz: Grid,
         model: Model,
-        selection_position: [i32; 3]
+        selection_position: [i32; 3],
+        selection_radius: u32
     }
 
     impl Scene {
@@ -60,7 +62,8 @@ pub mod scene {
                     grid_xy: Grid::new(),
                     grid_yz: Grid::new(),
                     model: Model::new(),
-                    selection_position: [0, 0, 0]
+                    selection_position: [0, 0, 0],
+                    selection_radius: 1
                 }
             );
             GLOBSTATE.lock().unwrap()
@@ -160,7 +163,13 @@ pub mod scene {
         }
 
         pub fn handle_toggle_voxel(scene: &mut Scene) {
-            scene.model.toggle_voxel(scene.selection_position);
+            let selections = Self::selection_voxels(&scene.selection_position, scene.selection_radius as i32);
+
+            // Need to implement all on or off based on selection of contents
+
+            for selection in selections {
+                scene.model.toggle_voxel(selection);
+            }
         }
 
         pub fn handle_move_selection_left(scene: &mut Scene) {
@@ -193,13 +202,15 @@ pub mod scene {
             scene.selection_position[1] -= 1;
         }
 
-        pub fn handle_mouse_scroll(command: &Command, _scene: &mut Scene) {
-            let direction = command.data1;
+        pub fn handle_mouse_scroll(command: &Command, scene: &mut Scene) {
+            let direction: u32 = command.data1;
+            let max_selection_radius: u32 = 16;
+            let min_selection_radius: u32 = 1;
 
             if direction > 0 {
-                log::info!("Increase the selection");
+                scene.selection_radius = min(scene.selection_radius + 1, max_selection_radius);
             } else {
-                log::info!("Decrease the selection");
+                scene.selection_radius = max(scene.selection_radius - 1, min_selection_radius);
             }
         }
 
@@ -341,12 +352,39 @@ pub mod scene {
             mouse_up_closure.forget();
         }
 
+        pub fn calculate_distance_squared(from: &[i32; 3], to: &[i32; 3]) -> i32 {
+            (from[0] - to[0]).pow(2) + (from[1] - to[1]).pow(2) + (from[2] - to[2]).pow(2)
+        }
+
+        pub fn selection_voxels(center: &[i32; 3], radius: i32) -> Vec<[i32; 3]> {
+            let mut voxels = Vec::new();
+            let range: i32 = 16;
+            let radius_squared: i32 = radius.pow(2);
+
+            for x in -range..=range {
+                for y in -range..=range {
+                    for z in -range..=range {
+                        let voxel_position = [x, y, z];
+                        let distance: i32 = Self::calculate_distance_squared(center, &voxel_position);
+
+                        if distance < radius_squared {
+                            voxels.push([x, y, z]);
+                        }
+                    }                        
+                }
+            }
+
+            voxels
+        }
+
         pub fn draw(context: Context, shader: &WebGlProgram) {
             let mut scene = Self::access();
-            log::info!("Draw scene");
-                
-            
-            context.draw(&scene.selection_cube, shader, WebGlRenderingContext::TRIANGLES, scene.camera);
+            let selections = Self::selection_voxels(&scene.selection_position, scene.selection_radius as i32);
+
+            for selection in selections {
+                scene.selection_cube.translation = [selection[0] as f32, selection[1] as f32, selection[2] as f32];
+                context.draw(&scene.selection_cube, shader, WebGlRenderingContext::TRIANGLES, scene.camera);
+            }
             context.draw(&scene.grid_xz, shader, WebGlRenderingContext::LINES, scene.camera);
             context.draw(&scene.grid_xy, shader, WebGlRenderingContext::LINES, scene.camera);
             context.draw(&scene.grid_yz, shader, WebGlRenderingContext::LINES, scene.camera);
