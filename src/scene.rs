@@ -224,18 +224,18 @@ pub mod scene {
             let key = command.data1;
             
             match key {
-                // W or UP
-                87|38 => Self::handle_move_up(scene),
-                // S or X or DOWN
-                83|88|40 => Self::handle_move_down(scene),
+                // E
+                69 => Self::handle_move_up(scene),
+                // C
+                67 => Self::handle_move_down(scene),
                 // A or LEFT
                 65|37 => Self::handle_move_left(scene),
                 // D or RIGHT
                 68|39 => Self::handle_move_right(scene),
-                // E
-                69 => Self::handle_move_forward(scene),
-                // C
-                67 => Self::handle_move_backward(scene),
+                // W or UP
+                87|38 => Self::handle_move_forward(scene),
+                // S or X or DOWN
+                83|88|40 => Self::handle_move_backward(scene),
                 // SPACEBAR
                 32 => Self::handle_toggle_voxel(scene),
                 // 4
