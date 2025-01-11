@@ -20,6 +20,12 @@ pub mod scene {
 
     use na::{Point2, Point3, Vector3};
 
+    #[derive(PartialEq, Eq, Copy, Clone)] 
+    pub enum SelectionShape {
+        Sphere,
+        Cube,
+    }
+
     pub struct Scene {
         pub camera: Camera,
         mouse: Mouse,
@@ -30,7 +36,8 @@ pub mod scene {
         grid_yz: Grid,
         model: Model,
         selection_position: [i32; 3],
-        selection_radius: u32
+        selection_radius: u32,
+        selection_shape: SelectionShape
     }
 
     impl Scene {
@@ -63,7 +70,8 @@ pub mod scene {
                     grid_yz: Grid::new(),
                     model: Model::new(),
                     selection_position: [0, 0, 0],
-                    selection_radius: 1
+                    selection_radius: 1,
+                    selection_shape: SelectionShape::Sphere
                 }
             );
             GLOBSTATE.lock().unwrap()
@@ -163,7 +171,7 @@ pub mod scene {
         }
 
         pub fn handle_toggle_voxel(scene: &mut Scene) {
-            let selections = Self::selection_voxels(&scene.selection_position, scene.selection_radius as i32);
+            let selections = Self::selection_voxels(&scene.selection_position, scene.selection_radius as i32, scene.selection_shape);
 
             let value: bool = scene.model.all_voxels_active(&selections);
 
@@ -208,6 +216,15 @@ pub mod scene {
             scene.selection_position[1] -= 1;
         }
 
+        pub fn handle_toggle_selection_shape(scene: & mut Scene) {
+            scene.selection_shape = 
+            if scene.selection_shape == SelectionShape::Sphere {
+                SelectionShape::Cube
+            } else {
+                SelectionShape::Sphere
+            }
+        }
+
         pub fn handle_mouse_scroll(command: &Command, scene: &mut Scene) {
             let direction: u32 = command.data1;
             let max_selection_radius: u32 = 16;
@@ -250,6 +267,8 @@ pub mod scene {
                 105 => Self::handle_move_selection_up(scene),
                 // 3
                 99 => Self::handle_move_selection_down(scene),
+                // T
+                84 => Self::handle_toggle_selection_shape(scene),
                 _ => log::info!("Unhandled key press: {}", key)
             }
         }
@@ -362,21 +381,36 @@ pub mod scene {
             (from[0] - to[0]).pow(2) + (from[1] - to[1]).pow(2) + (from[2] - to[2]).pow(2)
         }
 
-        pub fn selection_voxels(center: &[i32; 3], radius: i32) -> Vec<[i32; 3]> {
+        pub fn selection_voxels(center: &[i32; 3], radius: i32, shape: SelectionShape) -> Vec<[i32; 3]> {
             let mut voxels = Vec::new();
             let range: i32 = 16;
             let radius_squared: i32 = radius.pow(2);
 
-            for x in -range..=range {
-                for y in -range..=range {
-                    for z in -range..=range {
-                        let voxel_position = [x, y, z];
-                        let distance: i32 = Self::calculate_distance_squared(center, &voxel_position);
+            if shape == SelectionShape::Sphere {
+                for x in -range..range {
+                    for y in -range..range {
+                        for z in -range..range {
+                            let voxel_position = [x, y, z];
+                            let distance: i32 = Self::calculate_distance_squared(center, &voxel_position);
 
-                        if distance < radius_squared {
-                            voxels.push([x, y, z]);
-                        }
-                    }                        
+                            if distance < radius_squared {
+                                voxels.push([x, y, z]);
+                            }
+                        }                        
+                    }
+                }
+            } else {
+                for x in -range..range {
+                    for y in -range..range {
+                        for z in -range..range {
+                            let voxel_position = [x, y, z];
+                            if (center[0] - voxel_position[0]).abs() < radius && 
+                                (center[1] - voxel_position[1]).abs() < radius && 
+                                (center[2] - voxel_position[2]).abs() < radius {
+                                voxels.push([x, y, z]);
+                            }
+                        }                        
+                    }
                 }
             }
 
@@ -385,7 +419,7 @@ pub mod scene {
 
         pub fn draw(context: Context, shader: &WebGlProgram) {
             let mut scene = Self::access();
-            let selections = Self::selection_voxels(&scene.selection_position, scene.selection_radius as i32);
+            let selections = Self::selection_voxels(&scene.selection_position, scene.selection_radius as i32, scene.selection_shape);
 
             for selection in selections {
                 scene.selection_cube.translation = [selection[0] as f32, selection[1] as f32, selection[2] as f32];
