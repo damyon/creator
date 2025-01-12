@@ -166,7 +166,7 @@ pub mod octree {
                     let scale = 1.0;
                     let mut cube = Cube::new();
 
-                    cube.color = [0.4, 0.4, 0.2, 0.4];
+                    cube.color = [0.4, 0.4, 0.4, 0.6];
                     cube.scale = scale;
                     cube.init();
 
