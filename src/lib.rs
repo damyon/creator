@@ -41,3 +41,11 @@ pub fn draw_scene(
     
     Ok(true)
 }
+
+#[wasm_bindgen]
+pub fn set_material_color(red: &str, green: &str, blue: &str) -> Result<bool, JsValue>{
+
+    Scene::set_scene_material_color(red, green, blue);
+
+    Ok(true)
+}

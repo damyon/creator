@@ -37,7 +37,8 @@ pub mod scene {
         model: Model,
         selection_position: [i32; 3],
         selection_radius: u32,
-        selection_shape: SelectionShape
+        selection_shape: SelectionShape,
+        material_color: [f32; 4]
     }
 
     impl Scene {
@@ -71,7 +72,8 @@ pub mod scene {
                     model: Model::new(),
                     selection_position: [0, 0, 0],
                     selection_radius: 1,
-                    selection_shape: SelectionShape::Sphere
+                    selection_shape: SelectionShape::Sphere,
+                    material_color: [0.0, 0.0, 0.0, 0.8]
                 }
             );
             GLOBSTATE.lock().unwrap()
@@ -181,7 +183,7 @@ pub mod scene {
                 log::info!("Toggle all voxels active: FALSE");    
             }
             for selection in selections {
-                scene.model.toggle_voxel(selection, !value);
+                scene.model.toggle_voxel(selection, !value, scene.material_color);
             }
             scene.model.save();
         }
@@ -311,6 +313,22 @@ pub mod scene {
             scene.init(canvas_id);
         }
 
+        pub fn set_scene_material_color(red_str: &str, green_str: &str, blue_str: &str) {
+            let mut scene = Self::access();
+            scene.set_material_color(red_str, green_str, blue_str);
+        }
+
+        pub fn set_material_color(&mut self, red_str: &str, green_str: &str, blue_str: &str) {
+            let red = red_str.parse::<i32>().unwrap();
+            let red_f32 = red as f32 / 255.0;
+            let green = green_str.parse::<i32>().unwrap();
+            let green_f32 = green as f32 / 255.0;
+            let blue = blue_str.parse::<i32>().unwrap();
+            let blue_f32 = blue as f32 / 255.0;
+
+            self.material_color = [red_f32, green_f32, blue_f32, 0.8];
+        }
+
         pub fn init(&mut self, canvas_id: &str) {
             self.selection_cube.init();
             self.grid_xz.init();
@@ -318,9 +336,9 @@ pub mod scene {
             self.grid_xy.rotate([(90.0 as f32).to_radians(), 0.0, 0.0]);
             self.grid_yz.init();
             self.grid_yz.rotate([0.0, (90.0 as f32).to_radians(), 0.0]);
-
+            
             self.model.init();
-
+            
             let document = web_sys::window().unwrap().document().unwrap();
             let canvas_element = document.get_element_by_id(canvas_id).unwrap();
             let canvas: web_sys::HtmlCanvasElement = match canvas_element.dyn_into::<web_sys::HtmlCanvasElement>() {

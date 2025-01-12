@@ -3,6 +3,7 @@
 export const memory: WebAssembly.Memory;
 export const init_scene: (a: number, b: number, c: number) => void;
 export const draw_scene: (a: number, b: number, c: number) => void;
+export const set_material_color: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
 export const __wbindgen_exn_store: (a: number) => void;
 export const __wbindgen_malloc: (a: number, b: number) => number;
 export const __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;

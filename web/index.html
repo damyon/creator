@@ -4,13 +4,13 @@
     <title>WebGL with Rust + WebAssembly</title>
 
     <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <canvas id="scene" width="800" height="800" tabindex="1" autofocus> </canvas>
-
     <script type="module" src="creator.js"></script>
     <script type="module" src="main.js"></script>
-    <div id="instructions" style="box-shadow: 2px 2px 4px #000000;" popover>
+  </head>
+  <body>
+    <canvas id="scene" tabindex="0" width="800" height="800" tabindex="1" autofocus> </canvas>
+
+   <div id="instructions" style="box-shadow: 2px 2px 4px #000000;" popover>
       <h2>Controls</h2>
       <h3>Mouse</h3>
       <div>Click and drag the mouse to rotate the camera.</div>
@@ -23,8 +23,18 @@
       <div>Use the <b>spacebar</b> to toggle the selected cubes on or off.</div>
       <div>Use <b>T</b> to toggle the selection shape.</div>
     </div>
+    <input type="color" id="color" style="
+      position: absolute; 
+      left: 10px; 
+      bottom: 10px;"/>
     <button popovertarget="instructions" style="
-  box-shadow: 2px 2px 4px #000000; border-radius: 50%; font-weight: 700; font-size: 20pt; position: absolute; right: 10px; bottom: 10px">?</button>
+      box-shadow: 2px 2px 4px #000000; 
+      border-radius: 50%; 
+      font-weight: 700; 
+      font-size: 20pt; 
+      position: absolute; 
+      right: 10px; 
+      bottom: 10px">?</button>
   </body>
 </html>
 

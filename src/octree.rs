@@ -15,27 +15,29 @@ pub mod octree {
         pub const fn new() -> OcTree {
             OcTree {
                 root: OcNode {
-                    x_index: 0, 
-                    y_index: 0,
-                    z_index: 0,
-                    subdivide_level: 1,
+                    x_i: 0, 
+                    y_i: 0,
+                    z_i: 0,
+                    level: 1,
                     active: false,
                     fry: [None, None, None, None, None, None, None, None],
-                    has_fry: false
+                    has_fry: false,
+                    clr: [0.2, 0.2, 0.2, 0.8]
                 },
                 depth: 1,
             }
         }
 
         pub fn init(&mut self) {
+            
             self.decimate(5);
-
+            
             let saved_value = Self::local_storage().get_item(&"creator_model").unwrap();
             
             if saved_value.is_some() {
                 let str = saved_value.unwrap();
                 let unflattened: OcNode = serde_json::from_str(&str).unwrap();
-    
+             
                 self.root = unflattened;
             }
         }
@@ -55,13 +57,15 @@ pub mod octree {
             window.unwrap().local_storage().unwrap().unwrap()
         }
 
-        pub fn toggle_voxel(&mut self, position: [i32; 3], value: bool) {
-            self.root.toggle_voxel(position, value);
+        pub fn toggle_voxel(&mut self, position: [i32; 3], value: bool, clr: [f32; 4]) {
+            self.root.toggle_voxel(position, value, clr);
         }
 
         pub fn save(&self) {
             let flattened = serde_json::to_string(&self.root).unwrap();
-            _ = Self::local_storage().set_item(&"creator_model", &flattened);
+            log::info!("Saving bits");
+            let result = Self::local_storage().set_item(&"creator_model", &flattened);
+            log::info!("Saved {:?}", result);
         }
 
         pub fn all_voxels_active(&self, positions: &Vec<[i32; 3]>) -> bool {
@@ -72,13 +76,14 @@ pub mod octree {
 
     #[derive(Serialize, Deserialize)]
     pub struct OcNode {
-        x_index: i32,
-        y_index: i32,
-        z_index: i32,
-        subdivide_level: u32,
+        x_i: i32,
+        y_i: i32,
+        z_i: i32,
+        level: u32,
         active: bool,
         fry: [Option<Box<Self>>; 8],
-        has_fry: bool
+        has_fry: bool,
+        clr: [f32; 4]
     }
 
     impl OcNode {
@@ -104,7 +109,7 @@ pub mod octree {
 
         pub fn all_voxels_active(&self, positions: &Vec<[i32; 3]>) -> bool {
             for position in positions {
-                if self.x_index == position[0] && self.y_index == position[1] && self.z_index == position[2] && !self.active {
+                if self.x_i == position[0] && self.y_i == position[1] && self.z_i == position[2] && !self.active {
                     return false;
                 }
             }
@@ -124,10 +129,11 @@ pub mod octree {
             return true;
         }
 
-        pub fn toggle_voxel(&mut self, position: [i32; 3], value: bool) {
+        pub fn toggle_voxel(&mut self, position: [i32; 3], value: bool, clr: [f32; 4]) {
 
-            if self.x_index == position[0] && self.y_index == position[1] && self.z_index == position[2] {
+            if self.x_i == position[0] && self.y_i == position[1] && self.z_i == position[2] {
                 self.active = value;
+                self.clr = clr;
             }
             let squirts = self.fry.each_mut();
 
@@ -135,7 +141,7 @@ pub mod octree {
                 match squirts[index] {
                     None => {},
                     Some(node) => {
-                        node.toggle_voxel(position, value);
+                        node.toggle_voxel(position, value, clr);
                     }
                 };
             }
@@ -166,13 +172,13 @@ pub mod octree {
                     let scale = 1.0;
                     let mut cube = Cube::new();
 
-                    cube.color = [0.4, 0.4, 0.4, 0.6];
+                    cube.color = self.clr;
                     cube.scale = scale;
                     cube.init();
 
-                    let x = self.x_index as f32 * (scale);
-                    let y = self.y_index as f32 * (scale);
-                    let z = self.z_index as f32 * (scale);
+                    let x = self.x_i as f32 * (scale);
+                    let y = self.y_i as f32 * (scale);
+                    let z = self.z_i as f32 * (scale);
 
                     cube.translate([x, y, z]);
 
@@ -187,184 +193,200 @@ pub mod octree {
             self.has_fry = true;
             let active = false;
 
-            if self.subdivide_level < 2 {
+            if self.level < 2 {
                 self.fry[0] = Some(
                     Box::new(OcNode {
-                        x_index: -1,
-                        y_index: -1,
-                        z_index: -1,
-                        subdivide_level: self.subdivide_level + 1,
+                        x_i: -1,
+                        y_i: -1,
+                        z_i: -1,
+                        level: self.level + 1,
                         active: active,
                         fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false
+                        has_fry: false,
+                        clr: self.clr
                     })
                 );
 
                 self.fry[1] = Some(
                     Box::new(OcNode {
-                        x_index: 0,
-                        y_index: -1,
-                        z_index: -1,
-                        subdivide_level: self.subdivide_level + 1,
+                        x_i: 0,
+                        y_i: -1,
+                        z_i: -1,
+                        level: self.level + 1,
                         active: active,
                         fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false
+                        has_fry: false,
+                        clr: self.clr
                     })
                 );
                 self.fry[2] = Some(
                     Box::new(OcNode {
-                        x_index: -1,
-                        y_index: 0,
-                        z_index: -1,
-                        subdivide_level: self.subdivide_level + 1,
+                        x_i: -1,
+                        y_i: 0,
+                        z_i: -1,
+                        level: self.level + 1,
                         active: active,
                         fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false
+                        has_fry: false,
+                        clr: self.clr
                     })
                 );
                 self.fry[3] = Some(
                     Box::new(OcNode {
-                        x_index: -1,
-                        y_index: -1,
-                        z_index: 0,
-                        subdivide_level: self.subdivide_level + 1,
+                        x_i: -1,
+                        y_i: -1,
+                        z_i: 0,
+                        level: self.level + 1,
                         active: active,
                         fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false
+                        has_fry: false,
+                        clr: self.clr
                     })
                 );
                 self.fry[4] = Some(
                     Box::new(OcNode {
-                        x_index: 0,
-                        y_index: 0,
-                        z_index: -1,
-                        subdivide_level: self.subdivide_level + 1,
+                        x_i: 0,
+                        y_i: 0,
+                        z_i: -1,
+                        level: self.level + 1,
                         active: active,
                         fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false
+                        has_fry: false,
+                        clr: self.clr
                     })
                 );
                 self.fry[5] = Some(
                     Box::new(OcNode {
-                        x_index: -1,
-                        y_index: 0,
-                        z_index: 0,
-                        subdivide_level: self.subdivide_level + 1,
+                        x_i: -1,
+                        y_i: 0,
+                        z_i: 0,
+                        level: self.level + 1,
                         active: active,
                         fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false
+                        has_fry: false,
+                        clr: self.clr
                     })
                 );
                 self.fry[6] = Some(
                     Box::new(OcNode {
-                        x_index: 0,
-                        y_index: -1,
-                        z_index: 0,
-                        subdivide_level: self.subdivide_level + 1,
+                        x_i: 0,
+                        y_i: -1,
+                        z_i: 0,
+                        level: self.level + 1,
                         active: active,
                         fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false
+                        has_fry: false,
+                        clr: self.clr
                     })
                 );
                 self.fry[7] = Some(
                     Box::new(OcNode {
-                        x_index: 0,
-                        y_index: 0,
-                        z_index: 0,
-                        subdivide_level: self.subdivide_level + 1,
+                        x_i: 0,
+                        y_i: 0,
+                        z_i: 0,
+                        level: self.level + 1,
                         active: active,
                         fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false
+                        has_fry: false,
+                        clr: self.clr
                     })
                 );
             } else {
                 
                 self.fry[0] = Some(
                     Box::new(OcNode {
-                        x_index: self.x_index * 2,
-                        y_index: self.y_index * 2,
-                        z_index: self.z_index * 2,
-                        subdivide_level: self.subdivide_level + 1,
+                        x_i: self.x_i * 2,
+                        y_i: self.y_i * 2,
+                        z_i: self.z_i * 2,
+                        level: self.level + 1,
                         active: active,
                         fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false
+                        has_fry: false,
+                        clr: self.clr
                     })
                 );
                 self.fry[1] = Some(
                     Box::new(OcNode {
-                        x_index: self.x_index * 2 + 1,
-                        y_index: self.y_index * 2,
-                        z_index: self.z_index * 2,
-                        subdivide_level: self.subdivide_level + 1,
+                        x_i: self.x_i * 2 + 1,
+                        y_i: self.y_i * 2,
+                        z_i: self.z_i * 2,
+                        level: self.level + 1,
                         active: active,
                         fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false
+                        has_fry: false,
+                        clr: self.clr
                     })
                 );
                 self.fry[2] = Some(
                     Box::new(OcNode {
-                        x_index: self.x_index * 2,
-                        y_index: self.y_index * 2 + 1,
-                        z_index: self.z_index * 2,
-                        subdivide_level: self.subdivide_level + 1,
+                        x_i: self.x_i * 2,
+                        y_i: self.y_i * 2 + 1,
+                        z_i: self.z_i * 2,
+                        level: self.level + 1,
                         active: active,
                         fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false
+                        has_fry: false,
+                        clr: self.clr
                     })
                 );
                 self.fry[3] = Some(
                     Box::new(OcNode {
-                        x_index: self.x_index * 2,
-                        y_index: self.y_index * 2,
-                        z_index: self.z_index * 2 + 1,
-                        subdivide_level: self.subdivide_level + 1,
+                        x_i: self.x_i * 2,
+                        y_i: self.y_i * 2,
+                        z_i: self.z_i * 2 + 1,
+                        level: self.level + 1,
                         active: active,
                         fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false
+                        has_fry: false,
+                        clr: self.clr
                     })
                 );
                 self.fry[4] = Some(
                     Box::new(OcNode {
-                        x_index: self.x_index * 2 + 1,
-                        y_index: self.y_index * 2 + 1,
-                        z_index: self.z_index * 2,
-                        subdivide_level: self.subdivide_level + 1,
+                        x_i: self.x_i * 2 + 1,
+                        y_i: self.y_i * 2 + 1,
+                        z_i: self.z_i * 2,
+                        level: self.level + 1,
                         active: active,
                         fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false
+                        has_fry: false,
+                        clr: self.clr
                     })
                 );
                 self.fry[5] = Some(
                     Box::new(OcNode {
-                        x_index: self.x_index * 2,
-                        y_index: self.y_index * 2 + 1,
-                        z_index: self.z_index * 2 + 1,
-                        subdivide_level: self.subdivide_level + 1,
+                        x_i: self.x_i * 2,
+                        y_i: self.y_i * 2 + 1,
+                        z_i: self.z_i * 2 + 1,
+                        level: self.level + 1,
                         active: active,
                         fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false
+                        has_fry: false,
+                        clr: self.clr
                     })
                 );
                 self.fry[6] = Some(
                     Box::new(OcNode {
-                        x_index: self.x_index * 2 + 1,
-                        y_index: self.y_index * 2,
-                        z_index: self.z_index * 2 + 1,
-                        subdivide_level: self.subdivide_level + 1,
+                        x_i: self.x_i * 2 + 1,
+                        y_i: self.y_i * 2,
+                        z_i: self.z_i * 2 + 1,
+                        level: self.level + 1,
                         active: active,
                         fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false
+                        has_fry: false,
+                        clr: self.clr
                     })
                 );
                 self.fry[7] = Some(
                     Box::new(OcNode {
-                        x_index: self.x_index * 2 + 1,
-                        y_index: self.y_index * 2 + 1,
-                        z_index: self.z_index * 2 + 1,
-                        subdivide_level: self.subdivide_level + 1,
+                        x_i: self.x_i * 2 + 1,
+                        y_i: self.y_i * 2 + 1,
+                        z_i: self.z_i * 2 + 1,
+                        level: self.level + 1,
                         active: active,
                         fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false
+                        has_fry: false,
+                        clr: self.clr
                     })
                 );
             }
