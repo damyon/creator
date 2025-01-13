@@ -28,6 +28,10 @@ pub mod octree {
             }
         }
 
+        pub fn active_nodes(&self) -> Vec<&OcNode> {
+            self.root.active_nodes()
+        }
+
         pub fn init(&mut self) {
             
             self.decimate(5);
@@ -36,9 +40,11 @@ pub mod octree {
             
             if saved_value.is_some() {
                 let str = saved_value.unwrap();
-                let unflattened: OcNode = serde_json::from_str(&str).unwrap();
-             
-                self.root = unflattened;
+                let unflattened: Vec<OcNode> = serde_json::from_str(&str).unwrap();
+
+                for node in unflattened {
+                    self.root.apply(&node);
+                }
             }
         }
 
@@ -62,10 +68,9 @@ pub mod octree {
         }
 
         pub fn save(&self) {
-            let flattened = serde_json::to_string(&self.root).unwrap();
-            log::info!("Saving bits");
-            let result = Self::local_storage().set_item(&"creator_model", &flattened);
-            log::info!("Saved {:?}", result);
+            log::info!("SAVE NODES: {}", &self.active_nodes().len());
+            let flattened = serde_json::to_string(&self.active_nodes()).unwrap();
+            _ = Self::local_storage().set_item(&"creator_model", &flattened);
         }
 
         pub fn all_voxels_active(&self, positions: &Vec<[i32; 3]>) -> bool {
@@ -74,7 +79,11 @@ pub mod octree {
 
     }
 
-    #[derive(Serialize, Deserialize)]
+    fn empty_list() -> [Option<Box<OcNode>>; 8] {
+        [None, None, None, None, None, None, None, None]
+    }
+
+    #[derive(Serialize, Deserialize, Clone)]
     pub struct OcNode {
         #[serde(rename = "x")]
         x_index: i32,
@@ -86,7 +95,8 @@ pub mod octree {
         sub_division_level: u32,
         #[serde(rename = "a")]
         active: bool,
-        #[serde(rename = "k")]
+        #[serde(skip)]
+        #[serde(default = "empty_list")]
         children: [Option<Box<Self>>; 8],
         #[serde(rename = "h")]
         has_children: bool,
@@ -113,6 +123,52 @@ pub mod octree {
                     };
                 }
             }
+        }
+
+        pub fn active_nodes(&self) -> Vec<&OcNode> {
+            let mut found: Vec<&OcNode> = vec![];
+
+            if self.active {
+                found.push(self);
+            }
+            if self.has_children {
+                let squirts = self.children.each_ref();
+
+                for index in 0..8 {
+                    match squirts[index] {
+                        None => {
+                            log::debug!("Should not get here")
+                        },
+                        Some(node) => {
+                            found.extend(node.active_nodes());
+                        }
+                    };
+                }
+            }
+
+            found
+        }
+
+        pub fn apply(&mut self, node: &OcNode) {
+            if node.x_index == self.x_index && 
+                node.y_index == self.y_index && 
+                node.z_index == self.z_index && 
+                node.sub_division_level == self.sub_division_level {
+                // We got a match. Apply it.
+                self.active = node.active;
+                self.color = node.color;
+            }
+            let squirts = self.children.each_mut();
+
+            for index in 0..8 {
+                match squirts[index] {
+                    None => {},
+                    Some(squirt) => {
+                        squirt.apply(node);
+                    }
+                };
+            }
+
         }
 
         pub fn all_voxels_active(&self, positions: &Vec<[i32; 3]>) -> bool {
