@@ -73,7 +73,7 @@ pub mod scene {
                     selection_position: [0, 0, 0],
                     selection_radius: 1,
                     selection_shape: SelectionShape::Sphere,
-                    material_color: [0.8, 0.8, 0.8, 0.8]
+                    material_color: [0.8, 0.8, 0.8, 1.0]
                 }
             );
             GLOBSTATE.lock().unwrap()
@@ -326,7 +326,7 @@ pub mod scene {
             let blue = blue_str.parse::<i32>().unwrap();
             let blue_f32 = blue as f32 / 255.0;
 
-            self.material_color = [red_f32, green_f32, blue_f32, 0.8];
+            self.material_color = [red_f32, green_f32, blue_f32, 1.0];
         }
 
         pub fn init(&mut self, canvas_id: &str) {
