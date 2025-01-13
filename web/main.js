@@ -26,6 +26,7 @@ document.getElementById("color").onchange = function (event) {
   if (rgb) {
     set_material_color(rgb[0] + "", rgb[1] + "", rgb[2] + "");
   }
+  document.getElementById(CANVAS_ID).focus();
 };
 
 
