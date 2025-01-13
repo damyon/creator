@@ -22,7 +22,7 @@ pub mod octree {
                     active: false,
                     children: [None, None, None, None, None, None, None, None],
                     has_children: false,
-                    color: [0.2, 0.2, 0.2, 0.8]
+                    color: [0.8, 0.8, 0.8, 0.8]
                 },
                 depth: 1,
             }

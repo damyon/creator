@@ -73,7 +73,7 @@ pub mod scene {
                     selection_position: [0, 0, 0],
                     selection_radius: 1,
                     selection_shape: SelectionShape::Sphere,
-                    material_color: [0.0, 0.0, 0.0, 0.8]
+                    material_color: [0.8, 0.8, 0.8, 0.8]
                 }
             );
             GLOBSTATE.lock().unwrap()
