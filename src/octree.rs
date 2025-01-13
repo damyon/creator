@@ -15,14 +15,14 @@ pub mod octree {
         pub const fn new() -> OcTree {
             OcTree {
                 root: OcNode {
-                    x_i: 0, 
-                    y_i: 0,
-                    z_i: 0,
-                    level: 1,
+                    x_index: 0, 
+                    y_index: 0,
+                    z_index: 0,
+                    sub_division_level: 1,
                     active: false,
-                    fry: [None, None, None, None, None, None, None, None],
-                    has_fry: false,
-                    clr: [0.2, 0.2, 0.2, 0.8]
+                    children: [None, None, None, None, None, None, None, None],
+                    has_children: false,
+                    color: [0.2, 0.2, 0.2, 0.8]
                 },
                 depth: 1,
             }
@@ -46,9 +46,9 @@ pub mod octree {
             self.root.drawables()
         }
 
-        pub fn decimate(&mut self, levels: u32) {
-            self.depth = levels;
-            self.root.decimate(levels);
+        pub fn decimate(&mut self, sub_division_level: u32) {
+            self.depth = sub_division_level;
+            self.root.decimate(sub_division_level);
         }
 
         pub fn local_storage() -> web_sys::Storage {
@@ -57,8 +57,8 @@ pub mod octree {
             window.unwrap().local_storage().unwrap().unwrap()
         }
 
-        pub fn toggle_voxel(&mut self, position: [i32; 3], value: bool, clr: [f32; 4]) {
-            self.root.toggle_voxel(position, value, clr);
+        pub fn toggle_voxel(&mut self, position: [i32; 3], value: bool, color: [f32; 4]) {
+            self.root.toggle_voxel(position, value, color);
         }
 
         pub fn save(&self) {
@@ -76,23 +76,31 @@ pub mod octree {
 
     #[derive(Serialize, Deserialize)]
     pub struct OcNode {
-        x_i: i32,
-        y_i: i32,
-        z_i: i32,
-        level: u32,
+        #[serde(rename = "x")]
+        x_index: i32,
+        #[serde(rename = "y")]
+        y_index: i32,
+        #[serde(rename = "z")]
+        z_index: i32,
+        #[serde(rename = "l")]
+        sub_division_level: u32,
+        #[serde(rename = "a")]
         active: bool,
-        fry: [Option<Box<Self>>; 8],
-        has_fry: bool,
-        clr: [f32; 4]
+        #[serde(rename = "k")]
+        children: [Option<Box<Self>>; 8],
+        #[serde(rename = "h")]
+        has_children: bool,
+        #[serde(rename = "c")]
+        color: [f32; 4]
     }
 
     impl OcNode {
 
-        pub fn decimate(&mut self, levels: u32) {
-            if levels > 0 {
+        pub fn decimate(&mut self, sub_division_level: u32) {
+            if sub_division_level > 0 {
                 self.subdivide();
         
-                let squirts = self.fry.each_mut();
+                let squirts = self.children.each_mut();
 
                 for index in 0..8 {
                     match squirts[index] {
@@ -100,7 +108,7 @@ pub mod octree {
                             log::debug!("Should not get here")
                         },
                         Some(node) => {
-                            node.decimate(levels - 1);
+                            node.decimate(sub_division_level - 1);
                         }
                     };
                 }
@@ -109,11 +117,11 @@ pub mod octree {
 
         pub fn all_voxels_active(&self, positions: &Vec<[i32; 3]>) -> bool {
             for position in positions {
-                if self.x_i == position[0] && self.y_i == position[1] && self.z_i == position[2] && !self.active {
+                if self.x_index == position[0] && self.y_index == position[1] && self.z_index == position[2] && !self.active {
                     return false;
                 }
             }
-            let squirts = self.fry.each_ref();
+            let squirts = self.children.each_ref();
 
             for index in 0..8 {
                 match squirts[index] {
@@ -129,19 +137,19 @@ pub mod octree {
             return true;
         }
 
-        pub fn toggle_voxel(&mut self, position: [i32; 3], value: bool, clr: [f32; 4]) {
+        pub fn toggle_voxel(&mut self, position: [i32; 3], value: bool, color: [f32; 4]) {
 
-            if self.x_i == position[0] && self.y_i == position[1] && self.z_i == position[2] {
+            if self.x_index == position[0] && self.y_index == position[1] && self.z_index == position[2] {
                 self.active = value;
-                self.clr = clr;
+                self.color = color;
             }
-            let squirts = self.fry.each_mut();
+            let squirts = self.children.each_mut();
 
             for index in 0..8 {
                 match squirts[index] {
                     None => {},
                     Some(node) => {
-                        node.toggle_voxel(position, value, clr);
+                        node.toggle_voxel(position, value, color);
                     }
                 };
             }
@@ -150,10 +158,10 @@ pub mod octree {
         }
 
         pub fn drawables(&mut self) -> Vec<Cube> {
-            if self.has_fry {
+            if self.has_children {
                 let mut child_cubes: Vec<Cube> = vec![];
 
-                let squirts = self.fry.each_mut();
+                let squirts = self.children.each_mut();
 
                 for index in 0..8 {
                     match squirts[index] {
@@ -172,13 +180,13 @@ pub mod octree {
                     let scale = 1.0;
                     let mut cube = Cube::new();
 
-                    cube.color = self.clr;
+                    cube.color = self.color;
                     cube.scale = scale;
                     cube.init();
 
-                    let x = self.x_i as f32 * (scale);
-                    let y = self.y_i as f32 * (scale);
-                    let z = self.z_i as f32 * (scale);
+                    let x = self.x_index as f32 * (scale);
+                    let y = self.y_index as f32 * (scale);
+                    let z = self.z_index as f32 * (scale);
 
                     cube.translate([x, y, z]);
 
@@ -190,203 +198,203 @@ pub mod octree {
         }
 
         pub fn subdivide(&mut self) {
-            self.has_fry = true;
+            self.has_children = true;
             let active = false;
 
-            if self.level < 2 {
-                self.fry[0] = Some(
+            if self.sub_division_level < 2 {
+                self.children[0] = Some(
                     Box::new(OcNode {
-                        x_i: -1,
-                        y_i: -1,
-                        z_i: -1,
-                        level: self.level + 1,
+                        x_index: -1,
+                        y_index: -1,
+                        z_index: -1,
+                        sub_division_level: self.sub_division_level + 1,
                         active: active,
-                        fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false,
-                        clr: self.clr
+                        children: [None, None, None, None, None, None, None, None],
+                        has_children: false,
+                        color: self.color
                     })
                 );
 
-                self.fry[1] = Some(
+                self.children[1] = Some(
                     Box::new(OcNode {
-                        x_i: 0,
-                        y_i: -1,
-                        z_i: -1,
-                        level: self.level + 1,
+                        x_index: 0,
+                        y_index: -1,
+                        z_index: -1,
+                        sub_division_level: self.sub_division_level + 1,
                         active: active,
-                        fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false,
-                        clr: self.clr
+                        children: [None, None, None, None, None, None, None, None],
+                        has_children: false,
+                        color: self.color
                     })
                 );
-                self.fry[2] = Some(
+                self.children[2] = Some(
                     Box::new(OcNode {
-                        x_i: -1,
-                        y_i: 0,
-                        z_i: -1,
-                        level: self.level + 1,
+                        x_index: -1,
+                        y_index: 0,
+                        z_index: -1,
+                        sub_division_level: self.sub_division_level + 1,
                         active: active,
-                        fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false,
-                        clr: self.clr
+                        children: [None, None, None, None, None, None, None, None],
+                        has_children: false,
+                        color: self.color
                     })
                 );
-                self.fry[3] = Some(
+                self.children[3] = Some(
                     Box::new(OcNode {
-                        x_i: -1,
-                        y_i: -1,
-                        z_i: 0,
-                        level: self.level + 1,
+                        x_index: -1,
+                        y_index: -1,
+                        z_index: 0,
+                        sub_division_level: self.sub_division_level + 1,
                         active: active,
-                        fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false,
-                        clr: self.clr
+                        children: [None, None, None, None, None, None, None, None],
+                        has_children: false,
+                        color: self.color
                     })
                 );
-                self.fry[4] = Some(
+                self.children[4] = Some(
                     Box::new(OcNode {
-                        x_i: 0,
-                        y_i: 0,
-                        z_i: -1,
-                        level: self.level + 1,
+                        x_index: 0,
+                        y_index: 0,
+                        z_index: -1,
+                        sub_division_level: self.sub_division_level + 1,
                         active: active,
-                        fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false,
-                        clr: self.clr
+                        children: [None, None, None, None, None, None, None, None],
+                        has_children: false,
+                        color: self.color
                     })
                 );
-                self.fry[5] = Some(
+                self.children[5] = Some(
                     Box::new(OcNode {
-                        x_i: -1,
-                        y_i: 0,
-                        z_i: 0,
-                        level: self.level + 1,
+                        x_index: -1,
+                        y_index: 0,
+                        z_index: 0,
+                        sub_division_level: self.sub_division_level + 1,
                         active: active,
-                        fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false,
-                        clr: self.clr
+                        children: [None, None, None, None, None, None, None, None],
+                        has_children: false,
+                        color: self.color
                     })
                 );
-                self.fry[6] = Some(
+                self.children[6] = Some(
                     Box::new(OcNode {
-                        x_i: 0,
-                        y_i: -1,
-                        z_i: 0,
-                        level: self.level + 1,
+                        x_index: 0,
+                        y_index: -1,
+                        z_index: 0,
+                        sub_division_level: self.sub_division_level + 1,
                         active: active,
-                        fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false,
-                        clr: self.clr
+                        children: [None, None, None, None, None, None, None, None],
+                        has_children: false,
+                        color: self.color
                     })
                 );
-                self.fry[7] = Some(
+                self.children[7] = Some(
                     Box::new(OcNode {
-                        x_i: 0,
-                        y_i: 0,
-                        z_i: 0,
-                        level: self.level + 1,
+                        x_index: 0,
+                        y_index: 0,
+                        z_index: 0,
+                        sub_division_level: self.sub_division_level + 1,
                         active: active,
-                        fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false,
-                        clr: self.clr
+                        children: [None, None, None, None, None, None, None, None],
+                        has_children: false,
+                        color: self.color
                     })
                 );
             } else {
                 
-                self.fry[0] = Some(
+                self.children[0] = Some(
                     Box::new(OcNode {
-                        x_i: self.x_i * 2,
-                        y_i: self.y_i * 2,
-                        z_i: self.z_i * 2,
-                        level: self.level + 1,
+                        x_index: self.x_index * 2,
+                        y_index: self.y_index * 2,
+                        z_index: self.z_index * 2,
+                        sub_division_level: self.sub_division_level + 1,
                         active: active,
-                        fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false,
-                        clr: self.clr
+                        children: [None, None, None, None, None, None, None, None],
+                        has_children: false,
+                        color: self.color
                     })
                 );
-                self.fry[1] = Some(
+                self.children[1] = Some(
                     Box::new(OcNode {
-                        x_i: self.x_i * 2 + 1,
-                        y_i: self.y_i * 2,
-                        z_i: self.z_i * 2,
-                        level: self.level + 1,
+                        x_index: self.x_index * 2 + 1,
+                        y_index: self.y_index * 2,
+                        z_index: self.z_index * 2,
+                        sub_division_level: self.sub_division_level + 1,
                         active: active,
-                        fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false,
-                        clr: self.clr
+                        children: [None, None, None, None, None, None, None, None],
+                        has_children: false,
+                        color: self.color
                     })
                 );
-                self.fry[2] = Some(
+                self.children[2] = Some(
                     Box::new(OcNode {
-                        x_i: self.x_i * 2,
-                        y_i: self.y_i * 2 + 1,
-                        z_i: self.z_i * 2,
-                        level: self.level + 1,
+                        x_index: self.x_index * 2,
+                        y_index: self.y_index * 2 + 1,
+                        z_index: self.z_index * 2,
+                        sub_division_level: self.sub_division_level + 1,
                         active: active,
-                        fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false,
-                        clr: self.clr
+                        children: [None, None, None, None, None, None, None, None],
+                        has_children: false,
+                        color: self.color
                     })
                 );
-                self.fry[3] = Some(
+                self.children[3] = Some(
                     Box::new(OcNode {
-                        x_i: self.x_i * 2,
-                        y_i: self.y_i * 2,
-                        z_i: self.z_i * 2 + 1,
-                        level: self.level + 1,
+                        x_index: self.x_index * 2,
+                        y_index: self.y_index * 2,
+                        z_index: self.z_index * 2 + 1,
+                        sub_division_level: self.sub_division_level + 1,
                         active: active,
-                        fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false,
-                        clr: self.clr
+                        children: [None, None, None, None, None, None, None, None],
+                        has_children: false,
+                        color: self.color
                     })
                 );
-                self.fry[4] = Some(
+                self.children[4] = Some(
                     Box::new(OcNode {
-                        x_i: self.x_i * 2 + 1,
-                        y_i: self.y_i * 2 + 1,
-                        z_i: self.z_i * 2,
-                        level: self.level + 1,
+                        x_index: self.x_index * 2 + 1,
+                        y_index: self.y_index * 2 + 1,
+                        z_index: self.z_index * 2,
+                        sub_division_level: self.sub_division_level + 1,
                         active: active,
-                        fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false,
-                        clr: self.clr
+                        children: [None, None, None, None, None, None, None, None],
+                        has_children: false,
+                        color: self.color
                     })
                 );
-                self.fry[5] = Some(
+                self.children[5] = Some(
                     Box::new(OcNode {
-                        x_i: self.x_i * 2,
-                        y_i: self.y_i * 2 + 1,
-                        z_i: self.z_i * 2 + 1,
-                        level: self.level + 1,
+                        x_index: self.x_index * 2,
+                        y_index: self.y_index * 2 + 1,
+                        z_index: self.z_index * 2 + 1,
+                        sub_division_level: self.sub_division_level + 1,
                         active: active,
-                        fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false,
-                        clr: self.clr
+                        children: [None, None, None, None, None, None, None, None],
+                        has_children: false,
+                        color: self.color
                     })
                 );
-                self.fry[6] = Some(
+                self.children[6] = Some(
                     Box::new(OcNode {
-                        x_i: self.x_i * 2 + 1,
-                        y_i: self.y_i * 2,
-                        z_i: self.z_i * 2 + 1,
-                        level: self.level + 1,
+                        x_index: self.x_index * 2 + 1,
+                        y_index: self.y_index * 2,
+                        z_index: self.z_index * 2 + 1,
+                        sub_division_level: self.sub_division_level + 1,
                         active: active,
-                        fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false,
-                        clr: self.clr
+                        children: [None, None, None, None, None, None, None, None],
+                        has_children: false,
+                        color: self.color
                     })
                 );
-                self.fry[7] = Some(
+                self.children[7] = Some(
                     Box::new(OcNode {
-                        x_i: self.x_i * 2 + 1,
-                        y_i: self.y_i * 2 + 1,
-                        z_i: self.z_i * 2 + 1,
-                        level: self.level + 1,
+                        x_index: self.x_index * 2 + 1,
+                        y_index: self.y_index * 2 + 1,
+                        z_index: self.z_index * 2 + 1,
+                        sub_division_level: self.sub_division_level + 1,
                         active: active,
-                        fry: [None, None, None, None, None, None, None, None],
-                        has_fry: false,
-                        clr: self.clr
+                        children: [None, None, None, None, None, None, None, None],
+                        has_children: false,
+                        color: self.color
                     })
                 );
             }
