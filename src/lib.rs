@@ -31,6 +31,7 @@ pub fn draw_scene(
     canvas_id: &str
 ) -> Result<bool, JsValue> {
     let mut graphics: Graphics = Graphics::new(canvas_id);
+
     graphics.setup_shaders();
 
     graphics.create_shadow_depth_texture();

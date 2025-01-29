@@ -145,6 +145,7 @@ pub mod graphics {
         }
 
         pub fn setup_shaders(&mut self) {
+
             let light_vertex_shader_source = "
                 attribute vec3 aVertexPosition;
       
@@ -185,23 +186,30 @@ pub mod graphics {
                     gl_FragColor = encodeFloat(gl_FragCoord.z);
                 }
                 ";
-
+            
             let light_vertex_shader_opt = self.create_shader(
                 WebGlRenderingContext::VERTEX_SHADER,
                 light_vertex_shader_source,
             );
 
+
             if light_vertex_shader_opt.is_err() {
-                panic!("Could not compile light vertex shader {:?}", light_vertex_shader_opt.err());
+                log::error!("Could not compile light vertex shader {:?}", light_vertex_shader_opt.err());
+                panic!("");
             }
+
             let light_fragment_shader_opt = self.create_shader(
                 WebGlRenderingContext::FRAGMENT_SHADER,
                 light_fragment_shader_source,
             );
+
             if light_fragment_shader_opt.is_err() {
-                panic!("Could not compile light fragment shader {:?}", light_fragment_shader_opt.err());
+                log::error!("Could not compile light fragment shader {:?}", light_fragment_shader_opt.err());
+                panic!("");
             }
-        
+
+
+            
             self.light_program = Some(self.create_program(light_vertex_shader_opt.unwrap().as_ref(), light_fragment_shader_opt.unwrap().as_ref()));
 
             let camera_vertex_shader_source = "
@@ -293,7 +301,7 @@ pub mod graphics {
                     float shadowAcneRemover = 0.005;
                     fragmentDepth.z -= shadowAcneRemover;
 
-                    float texelSize = 1.0 / ${this.shadowDepthTextureSize}.0;
+                    float texelSize = 1.0 / 8192.0;
                     float amountInLight = 0.0;
 
                     // Check whether or not the current fragment and the 8 fragments surrounding
@@ -354,19 +362,20 @@ pub mod graphics {
             );
 
             if camera_vertex_shader_opt.is_err() {
-                panic!("Could not compile lcameraight vertex shader {:?}", camera_vertex_shader_opt.err());
+                log::error!("Could not compile lcameraight vertex shader {:?}", camera_vertex_shader_opt.err());
+                panic!("");
             }
             let camera_fragment_shader_opt = self.create_shader(
                 WebGlRenderingContext::FRAGMENT_SHADER,
                 camera_fragment_shader_source,
             );
             if camera_fragment_shader_opt.is_err() {
-                panic!("Could not compile camera fragment shader {:?}", camera_fragment_shader_opt.err());
+                log::error!("Could not compile camera fragment shader {:?}", camera_fragment_shader_opt.err());
+                panic!("");
             }
-        
+            
             self.camera_program = Some(self.create_program(camera_vertex_shader_opt.unwrap().as_ref(), camera_fragment_shader_opt.unwrap().as_ref()));
-
-        
+            
         }
 
         pub fn clear(&self) {
