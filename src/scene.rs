@@ -444,9 +444,9 @@ pub mod scene {
 
             graphics.use_light_program();
             graphics.prepare_shadow_frame();
-
+            log::debug!("draw ");
             for voxel in scene.model.drawables().iter() {
-                graphics.draw_shadow_map(voxel, WebGlRenderingContext::TRIANGLES, scene.camera, scene.light);
+              //  graphics.draw_shadow_map(voxel, WebGlRenderingContext::TRIANGLES, scene.camera, scene.light);
             }
 
             graphics.finish_shadow_frame();
@@ -454,16 +454,25 @@ pub mod scene {
 
 
 
+            log::debug!("draw ");
             let selections = Self::selection_voxels(&scene.selection_position, scene.selection_radius as i32, scene.selection_shape);
 
+            log::debug!("draw ");
             for selection in selections {
                 scene.selection_cube.translation = [selection[0] as f32, selection[1] as f32, selection[2] as f32];
+                
+                log::debug!("draw ");
                 graphics.draw(&scene.selection_cube, WebGlRenderingContext::TRIANGLES, scene.camera, scene.light);
             }
+            log::debug!("draw ");
             graphics.draw(&scene.grid_xz, WebGlRenderingContext::LINES, scene.camera, scene.light);
+            log::debug!("draw ");
             graphics.draw(&scene.grid_xy, WebGlRenderingContext::LINES, scene.camera, scene.light);
+            log::debug!("draw ");
             graphics.draw(&scene.grid_yz, WebGlRenderingContext::LINES, scene.camera, scene.light);
 
+            log::debug!("draw ");
+            
             for voxel in scene.model.drawables().iter() {
                 graphics.draw(voxel, WebGlRenderingContext::TRIANGLES, scene.camera, scene.light);
             }

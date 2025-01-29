@@ -120,18 +120,18 @@ pub mod graphics {
                 WebGlRenderingContext::STATIC_DRAW,
             );
         
-            let a_position = self.gl.get_attrib_location(&shader_program, "a_position");
+            let a_vertex_position = self.gl.get_attrib_location(&shader_program, "aVertexPosition");
         
             self.gl.bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&vertex_buffer));
             self.gl.vertex_attrib_pointer_with_i32(
-                a_position as u32,
+                a_vertex_position as u32,
                 3,
                 WebGlRenderingContext::FLOAT,
                 false,
                 0,
                 0,
             );
-            self.gl.enable_vertex_attrib_array(a_position as u32);
+            self.gl.enable_vertex_attrib_array(a_vertex_position as u32);
 
 
         }
@@ -413,8 +413,9 @@ pub mod graphics {
             self.use_light_program();
             self.setup_vertices(&drawable.vertices(), self.light_program.as_ref().expect("fail"));
 
-            let chunk_size: i32 = 30;
+            let chunk_size: i32 = 12;
 
+            log::error!("draw shadow map");
             for chunk in 0..(drawable.count_vertices() as i32) / chunk_size {
 
                 let count = min(chunk_size, drawable.count_vertices() as i32 - (chunk * chunk_size));
@@ -430,13 +431,19 @@ pub mod graphics {
 
         pub fn draw(&mut self, drawable: & impl Drawable, render_mode: u32, camera: Camera, light: Camera) {
 
+
+            log::debug!("draw ");
             self.setup_vertices(&drawable.vertices(), self.camera_program.as_ref().expect("fail"));
 
+
+            log::debug!("draw ");
             let color_location = self.gl
-                .get_uniform_location(self.camera_program.as_ref().expect("fail"), "u_color")
+                .get_uniform_location(self.camera_program.as_ref().expect("fail"), "uColor")
                 .unwrap();
             self.gl.uniform4fv_with_f32_array(Some(&color_location), drawable.color());
 
+
+            log::debug!("draw ");
             // We want a model / view / projection matrix
             // Compute the matrices
             // Our camera looks toward the point (0.0, 0.0, 0.0).
@@ -459,7 +466,7 @@ pub mod graphics {
 
             self.gl.line_width(2.0);
 
-            let chunk_size: i32 = 30;
+            let chunk_size: i32 = 12;
 
             for chunk in 0..(drawable.count_vertices() as i32) / chunk_size {
 
