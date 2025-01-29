@@ -1,5 +1,4 @@
 use wasm_bindgen::prelude::*;
-use web_sys::WebGlProgram;
 extern crate js_sys;
 
 mod drawable;
@@ -14,7 +13,7 @@ mod command;
 mod command_queue;
 mod octree;
 
-use crate::graphics::graphics::Context;
+use crate::graphics::graphics::Graphics;
 use crate::scene::scene::Scene;
 extern crate nalgebra as na;
 
@@ -31,13 +30,14 @@ pub fn init_scene(
 pub fn draw_scene(
     canvas_id: &str
 ) -> Result<bool, JsValue> {
-    let context: Context = Context::new(canvas_id);
-    let shader_program: WebGlProgram = context.setup_shaders();
+    let mut graphics: Graphics = Graphics::new(canvas_id);
+    graphics.setup_shaders();
+
+    graphics.create_shadow_depth_texture();
 
     Scene::process_commands();
     
-    context.clear();
-    Scene::draw(context, &shader_program);
+    Scene::draw(&mut graphics);
     
     Ok(true)
 }

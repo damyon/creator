@@ -2,7 +2,7 @@ pub mod scene {
 
     use std::cmp::{max, min};
     use std::sync::{Mutex, MutexGuard};
-    use web_sys::{WebGlRenderingContext, WebGlProgram};
+    use web_sys::WebGlRenderingContext;
 
     use gloo::events::EventListener;
     use wasm_bindgen::JsCast;
@@ -12,7 +12,7 @@ pub mod scene {
     use crate::mouse::mouse::Mouse;
     use crate::command::command::{Command, CommandType};
     use crate::command_queue::command_queue::CommandQueue;
-    use crate::graphics::graphics::Context;
+    use crate::graphics::graphics::Graphics;
     use crate::model::model::Model;
 
     extern crate nalgebra as na;
@@ -28,6 +28,7 @@ pub mod scene {
 
     pub struct Scene {
         pub camera: Camera,
+        pub light: Camera,
         mouse: Mouse,
         command_input: CommandQueue,
         selection_cube: Cube,
@@ -63,6 +64,7 @@ pub mod scene {
             static GLOBSTATE: Mutex<Scene> = Mutex::new(
                 Scene { 
                     camera: Camera::new(), 
+                    light: Camera::new(),
                     mouse: Mouse::new(), 
                     command_input: CommandQueue::new() ,
                     selection_cube: Cube::new(),
@@ -330,6 +332,8 @@ pub mod scene {
         }
 
         pub fn init(&mut self, canvas_id: &str) {
+            self.light.eye = Point3::new(-10.0, 30.0, 0.0);
+            self.light.target = Point3::new(0.0, 0.0, 0.0);
             self.selection_cube.init();
             self.grid_xz.init();
             self.grid_xy.init();
@@ -435,20 +439,33 @@ pub mod scene {
             voxels
         }
 
-        pub fn draw(context: Context, shader: &WebGlProgram) {
+        pub fn draw(graphics: &mut Graphics) {
             let mut scene = Self::access();
+
+            graphics.use_light_program();
+            graphics.prepare_shadow_frame();
+
+            for voxel in scene.model.drawables().iter() {
+                graphics.draw_shadow_map(voxel, WebGlRenderingContext::TRIANGLES, scene.camera, scene.light);
+            }
+
+            graphics.finish_shadow_frame();
+
+
+
+
             let selections = Self::selection_voxels(&scene.selection_position, scene.selection_radius as i32, scene.selection_shape);
 
             for selection in selections {
                 scene.selection_cube.translation = [selection[0] as f32, selection[1] as f32, selection[2] as f32];
-                context.draw(&scene.selection_cube, shader, WebGlRenderingContext::TRIANGLES, scene.camera);
+                graphics.draw(&scene.selection_cube, WebGlRenderingContext::TRIANGLES, scene.camera, scene.light);
             }
-            context.draw(&scene.grid_xz, shader, WebGlRenderingContext::LINES, scene.camera);
-            context.draw(&scene.grid_xy, shader, WebGlRenderingContext::LINES, scene.camera);
-            context.draw(&scene.grid_yz, shader, WebGlRenderingContext::LINES, scene.camera);
+            graphics.draw(&scene.grid_xz, WebGlRenderingContext::LINES, scene.camera, scene.light);
+            graphics.draw(&scene.grid_xy, WebGlRenderingContext::LINES, scene.camera, scene.light);
+            graphics.draw(&scene.grid_yz, WebGlRenderingContext::LINES, scene.camera, scene.light);
 
             for voxel in scene.model.drawables().iter() {
-                context.draw(voxel, shader, WebGlRenderingContext::TRIANGLES, scene.camera);
+                graphics.draw(voxel, WebGlRenderingContext::TRIANGLES, scene.camera, scene.light);
             }
         }
     }
