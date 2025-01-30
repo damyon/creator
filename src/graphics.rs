@@ -175,21 +175,16 @@ pub mod graphics {
 
             let model_view_matrix = (view * model).to_homogeneous();
 
-            log::debug!("draw ");
             let u_mv_matrix_location = self
                 .gl
                 .get_uniform_location(&shader_program, "uMVMatrix")
                 .expect("fail");
-
-            log::debug!("draw ");
 
             self.gl.uniform_matrix4fv_with_f32_array(
                 Some(&u_mv_matrix_location),
                 false,
                 model_view_matrix.as_slice(),
             );
-
-            log::debug!("draw ");
             // uMVMatrix done
         }
 
@@ -489,7 +484,6 @@ pub mod graphics {
 
             let chunk_size: i32 = 12;
 
-            log::error!("draw shadow map");
             for chunk in 0..(drawable.count_vertices() as i32) / chunk_size {
                 let count = min(
                     chunk_size,
@@ -523,7 +517,6 @@ pub mod graphics {
 
             let light_model_view_matrix = (view * model).to_homogeneous();
 
-            log::debug!("draw ");
             let u_light_m_view_matrix_location = self
                 .gl
                 .get_uniform_location(
@@ -531,8 +524,6 @@ pub mod graphics {
                     "lightMViewMatrix",
                 )
                 .expect("fail");
-
-            log::debug!("draw ");
 
             self.gl.uniform_matrix4fv_with_f32_array(
                 Some(&u_light_m_view_matrix_location),
@@ -548,7 +539,6 @@ pub mod graphics {
             camera: Camera,
             light: Camera,
         ) {
-            log::debug!("draw ");
             self.setup_vertices(
                 &drawable.vertices(),
                 self.camera_program.as_ref().expect("fail"),
@@ -557,7 +547,6 @@ pub mod graphics {
                 drawable.rotation(),
             );
 
-            log::debug!("draw ");
             let color_location = self
                 .gl
                 .get_uniform_location(self.camera_program.as_ref().expect("fail"), "uColor")
@@ -618,7 +607,6 @@ pub mod graphics {
             );
             let projection_matrix = projection.into_inner();
 
-            log::debug!("draw ");
             let u_p_matrix_location = self
                 .gl
                 .get_uniform_location(self.light_program.as_ref().expect("fail"), "uPMatrix");
@@ -626,7 +614,6 @@ pub mod graphics {
                 log::error!("Could not get light uPMatrix location");
                 panic!("fail");
             }
-            log::debug!("draw ");
 
             self.gl.uniform_matrix4fv_with_f32_array(
                 Some(u_p_matrix_location.as_ref().expect("fail")),
@@ -670,7 +657,6 @@ pub mod graphics {
             );
             let projection_matrix = projection.into_inner();
 
-            log::debug!("draw ");
             let u_p_matrix_location = self
                 .gl
                 .get_uniform_location(self.camera_program.as_ref().expect("fail"), "uPMatrix");
@@ -678,7 +664,6 @@ pub mod graphics {
                 log::error!("Could not get light uPMatrix location");
                 panic!("fail");
             }
-            log::debug!("draw ");
 
             self.gl.uniform_matrix4fv_with_f32_array(
                 Some(u_p_matrix_location.as_ref().expect("fail")),
@@ -695,7 +680,6 @@ pub mod graphics {
             );
             let light_projection_matrix = light_projection.into_inner();
 
-            log::debug!("draw ");
             let u_light_projection_matrix_location = self.gl.get_uniform_location(
                 self.camera_program.as_ref().expect("fail"),
                 "lightProjectionMatrix",
@@ -704,7 +688,6 @@ pub mod graphics {
                 log::error!("Could not get light projection matrix location");
                 panic!("fail");
             }
-            log::debug!("draw ");
 
             self.gl.uniform_matrix4fv_with_f32_array(
                 Some(u_light_projection_matrix_location.as_ref().expect("fail")),

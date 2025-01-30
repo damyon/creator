@@ -383,7 +383,6 @@ pub mod scene {
 
             let key_down_closure = EventListener::new(&canvas, "keydown", move |event| {
                 let key_event = event.clone().dyn_into::<web_sys::KeyboardEvent>().unwrap();
-                log::info!("Key down");
                 Scene::queue_command(Command {
                     command_type: CommandType::KeyDown,
                     data1: key_event.key_code() as u32,
@@ -498,7 +497,7 @@ pub mod scene {
             let mut scene = Self::access();
 
             graphics.prepare_shadow_frame();
-            log::debug!("draw ");
+            graphics.clear();
             for voxel in scene.model.drawables().iter() {
                 graphics.draw_shadow_map(
                     voxel,
@@ -511,15 +510,13 @@ pub mod scene {
             graphics.finish_shadow_frame();
 
             graphics.prepare_camera_frame();
-
-            log::debug!("draw ");
+            graphics.clear();
             let selections = Self::selection_voxels(
                 &scene.selection_position,
                 scene.selection_radius as i32,
                 scene.selection_shape,
             );
 
-            log::debug!("draw ");
             for selection in selections {
                 scene.selection_cube.translation = [
                     selection[0] as f32,
@@ -527,7 +524,6 @@ pub mod scene {
                     selection[2] as f32,
                 ];
 
-                log::debug!("draw ");
                 graphics.draw(
                     &scene.selection_cube,
                     WebGlRenderingContext::TRIANGLES,
@@ -535,29 +531,24 @@ pub mod scene {
                     scene.light,
                 );
             }
-            log::debug!("draw ");
             graphics.draw(
                 &scene.grid_xz,
                 WebGlRenderingContext::LINES,
                 scene.camera,
                 scene.light,
             );
-            log::debug!("draw ");
             graphics.draw(
                 &scene.grid_xy,
                 WebGlRenderingContext::LINES,
                 scene.camera,
                 scene.light,
             );
-            log::debug!("draw ");
             graphics.draw(
                 &scene.grid_yz,
                 WebGlRenderingContext::LINES,
                 scene.camera,
                 scene.light,
             );
-
-            log::debug!("draw ");
 
             for voxel in scene.model.drawables().iter() {
                 graphics.draw(
