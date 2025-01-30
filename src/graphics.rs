@@ -497,6 +497,14 @@ pub mod graphics {
         pub fn finish_shadow_frame(&mut self) {
             self.gl.bind_framebuffer(WebGlRenderingContext::FRAMEBUFFER, None);
         }
+
+        pub fn prepare_camera_frame(&mut self) {
+            self.use_camera_program();
+        }
+
+        pub fn finish_camera_frame(&mut self) {
+            // Noop
+        }
     }
     
 }
