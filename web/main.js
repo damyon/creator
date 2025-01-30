@@ -6,7 +6,7 @@ var other = 10;
 async function run() {
   draw_scene(CANVAS_ID);
 
-  setTimeout(run, 10000);
+  requestAnimationFrame(run);
 }
 
 function hex_to_rgb(hex) {

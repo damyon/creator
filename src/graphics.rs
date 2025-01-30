@@ -4,6 +4,7 @@ pub mod graphics {
 
     use crate::camera::camera::Camera;
     use crate::drawable::drawable::Drawable;
+    use na::Orthographic3;
     use wasm_bindgen::prelude::*;
     use wasm_bindgen::JsCast;
     use web_sys::WebGlFramebuffer;
@@ -124,14 +125,7 @@ pub mod graphics {
             }
         }
 
-        pub fn setup_vertices(
-            &self,
-            vertices: &[f32],
-            shader_program: &WebGlProgram,
-            view: &Camera,
-            translation: &[f32; 3],
-            rotation: &[f32; 3],
-        ) {
+        pub fn setup_vertices(&self, vertices: &[f32], shader_program: &WebGlProgram) {
             let vertices_array = unsafe { js_sys::Float32Array::view(&vertices) };
             let vertex_buffer = self.gl.create_buffer().unwrap();
 
@@ -158,34 +152,6 @@ pub mod graphics {
                 0,
             );
             self.gl.enable_vertex_attrib_array(a_vertex_position as u32);
-
-            // Set UVMatrix
-            //
-            // We want a model / view matrix
-            // Compute the matrices
-            let eye = view.eye;
-            let target = view.target;
-            let view = Isometry3::look_at_rh(&eye, &target, &Vector3::y());
-
-            // This is translation, rotation
-            let model = Isometry3::new(
-                Vector3::from_row_slice(translation),
-                Vector3::from_row_slice(rotation),
-            );
-
-            let model_view_matrix = (view * model).to_homogeneous();
-
-            let u_mv_matrix_location = self
-                .gl
-                .get_uniform_location(&shader_program, "uMVMatrix")
-                .expect("fail");
-
-            self.gl.uniform_matrix4fv_with_f32_array(
-                Some(&u_mv_matrix_location),
-                false,
-                model_view_matrix.as_slice(),
-            );
-            // uMVMatrix done
         }
 
         pub fn use_light_program(&self) {
@@ -275,7 +241,7 @@ pub mod graphics {
 
                 uniform mat4 uPMatrix;
                 uniform mat4 uMVMatrix;
-                uniform mat4 lightMViewMatrix;
+                uniform mat4 lightModelViewMatrix;
                 uniform mat4 lightProjectionMatrix;
                 varying highp vec2 vTextureCoord;
 
@@ -298,7 +264,7 @@ pub mod graphics {
                     depthPos = gl_Position;
                     worldPos = aVertexPosition;
 
-                    shadowPos = texUnitConverter * lightProjectionMatrix * lightMViewMatrix * vec4(aVertexPosition, 1.0);
+                    shadowPos = texUnitConverter * lightProjectionMatrix * lightModelViewMatrix * vec4(aVertexPosition, 1.0);
 
                     vTextureCoord = aTextureCoord;
                 }
@@ -312,7 +278,7 @@ pub mod graphics {
                 varying vec4 depthPos;
 
                 uniform sampler2D depthColorTexture;
-                uniform vec3 uColor;
+                uniform vec4 uColor;
                 uniform float uCanvasWidth;
                 uniform float uCanvasHeight;
                 varying vec3 worldPos;
@@ -362,7 +328,8 @@ pub mod graphics {
                     }
 
                     amountInLight /= blendLength * blendLength;
-                    gl_FragColor = vec4(ambientLight * directionalLightColor * amountInLight * uColor, 1.0);
+
+                    gl_FragColor = vec4(ambientLight * directionalLightColor * amountInLight * uColor.rgb, uColor.a);
                 }
                 ";
 
@@ -466,20 +433,11 @@ pub mod graphics {
                 .bind_renderbuffer(WebGlRenderingContext::RENDERBUFFER, None);
         }
 
-        pub fn draw_shadow_map(
-            &self,
-            drawable: &impl Drawable,
-            render_mode: u32,
-            _camera: Camera,
-            light: Camera,
-        ) {
+        pub fn draw_shadow_map(&self, drawable: &impl Drawable, render_mode: u32) {
             self.use_light_program();
             self.setup_vertices(
                 &drawable.vertices(),
                 self.light_program.as_ref().expect("fail"),
-                &light,
-                drawable.translation(),
-                drawable.rotation(),
             );
 
             let chunk_size: i32 = 12;
@@ -521,7 +479,7 @@ pub mod graphics {
                 .gl
                 .get_uniform_location(
                     self.camera_program.as_ref().expect("fail"),
-                    "lightMViewMatrix",
+                    "lightModelViewMatrix",
                 )
                 .expect("fail");
 
@@ -530,6 +488,36 @@ pub mod graphics {
                 false,
                 light_model_view_matrix.as_slice(),
             );
+        }
+
+        pub fn prepare_camera_model_view(&mut self, camera: &Camera, drawable: &impl Drawable) {
+            // Set UVMatrix
+            //
+            // We want a model / view matrix
+            // Compute the matrices
+            let eye = camera.eye;
+            let target = camera.target;
+            let view = Isometry3::look_at_rh(&eye, &target, &Vector3::y());
+
+            // This is translation, rotation
+            let model = Isometry3::new(
+                Vector3::from_row_slice(drawable.translation()),
+                Vector3::from_row_slice(drawable.rotation()),
+            );
+
+            let model_view_matrix = (view * model).to_homogeneous();
+
+            let u_mv_matrix_location = self
+                .gl
+                .get_uniform_location(self.camera_program.as_ref().expect("fail"), "uMVMatrix")
+                .expect("fail");
+
+            self.gl.uniform_matrix4fv_with_f32_array(
+                Some(&u_mv_matrix_location),
+                false,
+                model_view_matrix.as_slice(),
+            );
+            // uMVMatrix done
         }
 
         pub fn draw(
@@ -542,9 +530,6 @@ pub mod graphics {
             self.setup_vertices(
                 &drawable.vertices(),
                 self.camera_program.as_ref().expect("fail"),
-                &camera,
-                drawable.translation(),
-                drawable.rotation(),
             );
 
             let color_location = self
@@ -552,13 +537,15 @@ pub mod graphics {
                 .get_uniform_location(self.camera_program.as_ref().expect("fail"), "uColor")
                 .unwrap();
             self.gl
-                .uniform3fv_with_f32_array(Some(&color_location), drawable.color());
+                .uniform4fv_with_f32_array(Some(&color_location), drawable.color());
 
             self.prepare_light_model_view_for_camera(
                 &light,
                 drawable.translation(),
                 drawable.rotation(),
             );
+
+            self.prepare_camera_model_view(&camera, drawable);
 
             self.gl.line_width(2.0);
 
@@ -575,7 +562,7 @@ pub mod graphics {
             }
         }
 
-        pub fn prepare_shadow_frame(&mut self) {
+        pub fn prepare_shadow_frame(&mut self, light: &Camera) {
             self.use_light_program();
 
             // Draw to our off screen drawing buffer
@@ -594,17 +581,12 @@ pub mod graphics {
             //
             //      attribute vec3 aVertexPosition; - Set in setup_vertices
             //      uniform mat4 uPMatrix; - Set below
-            //      uniform mat4 uMVMatrix; - Set in setup_vertices
+            //      uniform mat4 uMVMatrix; - Set below
             //
             //   Light fragment shader
             //
             //      None
-            let projection = Perspective3::new(
-                self.canvas_width as f32 / self.canvas_height as f32,
-                3.14 / 2.0,
-                0.0,
-                1000.0,
-            );
+            let projection = Orthographic3::new(-20.0, 20.0, -20.0, 20.0, -20.0, 20.0);
             let projection_matrix = projection.into_inner();
 
             let u_p_matrix_location = self
@@ -621,6 +603,28 @@ pub mod graphics {
                 projection_matrix.as_slice(),
             );
             // uPMatrix done
+            // uMVMatrix
+            // Set UVMatrix
+            //
+            // We want a model / view matrix
+            // Compute the matrices
+            let eye = light.eye;
+            let target = light.target;
+            let view = Isometry3::look_at_rh(&eye, &target, &Vector3::y());
+
+            let model_view_matrix = (view).to_homogeneous();
+
+            let u_mv_matrix_location = self
+                .gl
+                .get_uniform_location(self.light_program.as_ref().expect("fail"), "uMVMatrix")
+                .expect("fail");
+
+            self.gl.uniform_matrix4fv_with_f32_array(
+                Some(&u_mv_matrix_location),
+                false,
+                model_view_matrix.as_slice(),
+            );
+            // uMVMatrix done
         }
 
         pub fn finish_shadow_frame(&mut self) {
@@ -638,7 +642,7 @@ pub mod graphics {
             //      attribute vec3 aVertexPosition; - Set in setup_vertices
             //      uniform mat4 uPMatrix; - Set below
             //      uniform mat4 uMVMatrix; - Set in setup_vertices
-            //      uniform mat4 lightMViewMatrix; - Set in prepare_light_model_view_for_camera
+            //      uniform mat4 lightModelViewMatrix; - Set in prepare_light_model_view_for_camera
             //      uniform mat4 lightProjectionMatrix; - Set below
             //
             //   Camera fragment shader
@@ -648,7 +652,6 @@ pub mod graphics {
             //      uniform float uCanvasWidth; - Set below
             //      uniform float uCanvasHeight; - Set below
             //
-
             let projection = Perspective3::new(
                 self.canvas_width as f32 / self.canvas_height as f32,
                 3.14 / 2.0,
@@ -672,6 +675,7 @@ pub mod graphics {
             );
             // uPMatrix done
             // lightProjectionMatrix
+            // This is wrong!
             let light_projection = Perspective3::new(
                 self.canvas_width as f32 / self.canvas_height as f32,
                 3.14 / 2.0,

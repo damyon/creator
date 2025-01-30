@@ -362,6 +362,8 @@ pub mod scene {
         pub fn init(&mut self, canvas_id: &str) {
             self.light.eye = Point3::new(-10.0, 30.0, 0.0);
             self.light.target = Point3::new(0.0, 0.0, 0.0);
+            self.camera.eye = Point3::new(-80.0, -10.0, 80.0);
+            self.camera.target = Point3::new(-70.0, 2.0, 70.0);
             self.selection_cube.init();
             self.grid_xz.init();
             self.grid_xy.init();
@@ -496,15 +498,10 @@ pub mod scene {
         pub fn draw(graphics: &mut Graphics) {
             let mut scene = Self::access();
 
-            graphics.prepare_shadow_frame();
+            graphics.prepare_shadow_frame(&scene.light);
             graphics.clear();
             for voxel in scene.model.drawables().iter() {
-                graphics.draw_shadow_map(
-                    voxel,
-                    WebGlRenderingContext::TRIANGLES,
-                    scene.camera,
-                    scene.light,
-                );
+                graphics.draw_shadow_map(voxel, WebGlRenderingContext::TRIANGLES);
             }
 
             graphics.finish_shadow_frame();
@@ -560,6 +557,12 @@ pub mod scene {
             }
 
             graphics.finish_camera_frame();
+
+            log::debug!(
+                "Camera is at {:?} {:?}",
+                scene.camera.eye,
+                scene.camera.target
+            );
         }
     }
 }
