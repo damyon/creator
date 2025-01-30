@@ -1,6 +1,3 @@
-
-
-
 pub mod cube {
 
     #[derive(Copy, Clone)]
@@ -23,7 +20,7 @@ pub mod cube {
                 translation: [0.0; 3],
                 rotation: [0.0; 3],
                 color: [0.6, 0.6, 0.2, 0.6],
-                scale: 1.0
+                scale: 1.0,
             }
         }
     }
@@ -31,59 +28,134 @@ pub mod cube {
     impl Drawable for Cube {
         fn init(&mut self) {
             let mut index: usize = 0;
-            let mut increment = || -> usize {let result = index; index += 1; result};
+            let mut increment = || -> usize {
+                let result = index;
+                index += 1;
+                result
+            };
             let scale: f32 = self.scale;
 
             // Bottom
-            self.vertices[increment()] = 0.0;   self.vertices[increment()] = 0.0; self.vertices[increment()] = 0.0;
-            self.vertices[increment()] = 0.0;   self.vertices[increment()] = 0.0; self.vertices[increment()] = scale;
-            self.vertices[increment()] = scale; self.vertices[increment()] = 0.0; self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
 
-            self.vertices[increment()] = 0.0;   self.vertices[increment()] = 0.0; self.vertices[increment()] = scale;
-            self.vertices[increment()] = scale; self.vertices[increment()] = 0.0; self.vertices[increment()] = scale;
-            self.vertices[increment()] = scale; self.vertices[increment()] = 0.0; self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
             // Left
-            self.vertices[increment()] = 0.0; self.vertices[increment()] = 0.0;   self.vertices[increment()] = 0.0;
-            self.vertices[increment()] = 0.0; self.vertices[increment()] = scale; self.vertices[increment()] = 0.0;
-            self.vertices[increment()] = 0.0; self.vertices[increment()] = scale; self.vertices[increment()] = scale;
-            
-            self.vertices[increment()] = 0.0; self.vertices[increment()] = 0.0;   self.vertices[increment()] = 0.0;
-            self.vertices[increment()] = 0.0; self.vertices[increment()] = scale; self.vertices[increment()] = scale;
-            self.vertices[increment()] = 0.0; self.vertices[increment()] = 0.0;   self.vertices[increment()] = scale;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
             // Right
-            self.vertices[increment()] = scale; self.vertices[increment()] = 0.0;   self.vertices[increment()] = 0.0;
-            self.vertices[increment()] = scale; self.vertices[increment()] = scale; self.vertices[increment()] = 0.0;
-            self.vertices[increment()] = scale; self.vertices[increment()] = scale; self.vertices[increment()] = scale;
-            
-            self.vertices[increment()] = scale; self.vertices[increment()] = 0.0;   self.vertices[increment()] = 0.0;
-            self.vertices[increment()] = scale; self.vertices[increment()] = scale; self.vertices[increment()] = scale;
-            self.vertices[increment()] = scale; self.vertices[increment()] = 0.0;   self.vertices[increment()] = scale;
-           
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
+
             // Front
-            self.vertices[increment()] = 0.0;   self.vertices[increment()] = 0.0;   self.vertices[increment()] = 0.0;
-            self.vertices[increment()] = scale; self.vertices[increment()] = 0.0;   self.vertices[increment()] = 0.0;
-            self.vertices[increment()] = scale; self.vertices[increment()] = scale; self.vertices[increment()] = 0.0;
-            
-            self.vertices[increment()] = 0.0;   self.vertices[increment()] = 0.0;   self.vertices[increment()] = 0.0;
-            self.vertices[increment()] = scale; self.vertices[increment()] = scale; self.vertices[increment()] = 0.0;
-            self.vertices[increment()] = 0.0;   self.vertices[increment()] = scale; self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = 0.0;
+
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = 0.0;
             // Back
-            self.vertices[increment()] = 0.0;   self.vertices[increment()] = 0.0;   self.vertices[increment()] = scale;
-            self.vertices[increment()] = scale; self.vertices[increment()] = 0.0;   self.vertices[increment()] = scale;
-            self.vertices[increment()] = scale; self.vertices[increment()] = scale; self.vertices[increment()] = scale;
-            
-            self.vertices[increment()] = 0.0;   self.vertices[increment()] = 0.0;   self.vertices[increment()] = scale;
-            self.vertices[increment()] = scale; self.vertices[increment()] = scale; self.vertices[increment()] = scale;
-            self.vertices[increment()] = 0.0;   self.vertices[increment()] = scale; self.vertices[increment()] = scale;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
             // Top
-            self.vertices[increment()] = 0.0;   self.vertices[increment()] = scale; self.vertices[increment()] = 0.0;
-            self.vertices[increment()] = 0.0;   self.vertices[increment()] = scale; self.vertices[increment()] = scale;
-            self.vertices[increment()] = scale; self.vertices[increment()] = scale; self.vertices[increment()] = scale;
-            
-            self.vertices[increment()] = 0.0;   self.vertices[increment()] = scale; self.vertices[increment()] = 0.0;
-            self.vertices[increment()] = scale; self.vertices[increment()] = scale; self.vertices[increment()] = scale;
-            self.vertices[increment()] = scale; self.vertices[increment()] = scale; self.vertices[increment()] = 0.0;
-           
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = 0.0;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = 0.0;
 
             self.vertices_count = self.vertices.len() as u16;
         }
@@ -119,6 +191,5 @@ pub mod cube {
         fn vertices(&self) -> &[f32] {
             &self.vertices
         }
-
     }
 }

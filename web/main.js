@@ -4,21 +4,15 @@ const CANVAS_ID = "scene";
 var other = 10;
 
 async function run() {
-  
   draw_scene(CANVAS_ID);
 
-  setTimeout(run, 100);
+  setTimeout(run, 10000);
 }
 
 function hex_to_rgb(hex) {
   var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result ? [
-    parseInt(result[1], 16),
-    parseInt(result[2], 16),
-    parseInt(result[3], 16)
-   ] : null;
+  return result ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)] : null;
 }
-
 
 document.getElementById("color").onchange = function (event) {
   var hexColor = event.target.value;
@@ -28,7 +22,6 @@ document.getElementById("color").onchange = function (event) {
   }
   document.getElementById(CANVAS_ID).focus();
 };
-
 
 await init();
 
