@@ -252,6 +252,14 @@ pub mod graphics {
             program
         }
 
+        pub fn use_light_shader(&self) {
+            self.gl.use_program(self.light_program.as_ref());
+        }
+
+        pub fn use_camera_shader(&self) {
+            self.gl.use_program(self.camera_program.as_ref());
+        }
+
         pub fn clear(&self) {
             self.gl.clear_color(0.1, 0.1, 0.8, 0.5);
             self.gl.clear(
@@ -261,6 +269,7 @@ pub mod graphics {
 
         pub fn draw(&self, drawable: &impl Drawable, render_mode: u32, camera: Camera) {
             let shader = self.camera_program.as_ref();
+            self.use_camera_shader();
             self.setup_vertices(&drawable.vertices(), shader.expect("fail"));
 
             let color_location = self
