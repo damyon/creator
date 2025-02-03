@@ -409,9 +409,15 @@ function __wbg_get_imports() {
     imports.wbg.__wbg_debug_19114f11037e4658 = function(arg0, arg1, arg2, arg3) {
         console.debug(getObject(arg0), getObject(arg1), getObject(arg2), getObject(arg3));
     };
+    imports.wbg.__wbg_deleteShader_e4fe2574d9c3afab = function(arg0, arg1) {
+        getObject(arg0).deleteShader(getObject(arg1));
+    };
     imports.wbg.__wbg_deltaY_1683a859ce933add = function(arg0) {
         const ret = getObject(arg0).deltaY;
         return ret;
+    };
+    imports.wbg.__wbg_detachShader_444b29fa4e93147e = function(arg0, arg1, arg2) {
+        getObject(arg0).detachShader(getObject(arg1), getObject(arg2));
     };
     imports.wbg.__wbg_disable_2f09f593bf0f5573 = function(arg0, arg1) {
         getObject(arg0).disable(arg1 >>> 0);
@@ -633,7 +639,7 @@ function __wbg_get_imports() {
         const ret = false;
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper165 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper167 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 39, __wbg_adapter_20);
         return addHeapObject(ret);
     };

@@ -199,7 +199,16 @@ pub mod graphics {
                 )
                 .unwrap();
 
-            self.create_program(&vertex_shader, &fragment_shader)
+            let program = self.create_program(&vertex_shader, &fragment_shader);
+
+            self.gl.link_program(&program);
+
+            self.gl.detach_shader(&program, &vertex_shader);
+            self.gl.delete_shader(Some(&vertex_shader));
+            self.gl.detach_shader(&program, &fragment_shader);
+            self.gl.delete_shader(Some(&fragment_shader));
+
+            program
         }
 
         pub fn setup_camera_shaders(&mut self) -> WebGlProgram {
@@ -231,7 +240,16 @@ pub mod graphics {
                 )
                 .unwrap();
 
-            self.create_program(&vertex_shader, &fragment_shader)
+            let program = self.create_program(&vertex_shader, &fragment_shader);
+
+            self.gl.link_program(&program);
+
+            self.gl.detach_shader(&program, &vertex_shader);
+            self.gl.delete_shader(Some(&vertex_shader));
+            self.gl.detach_shader(&program, &fragment_shader);
+            self.gl.delete_shader(Some(&fragment_shader));
+
+            program
         }
 
         pub fn clear(&self) {
