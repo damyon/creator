@@ -2,25 +2,25 @@ pub mod scene {
 
     use std::cmp::{max, min};
     use std::sync::{Mutex, MutexGuard};
-    use web_sys::{WebGlRenderingContext, WebGlProgram};
+    use web_sys::{WebGlProgram, WebGlRenderingContext};
 
-    use gloo::events::EventListener;
-    use wasm_bindgen::JsCast;
-    use crate::drawable::drawable::Drawable;
-    use crate::grid::grid::Grid;
-    use crate::{camera::camera::Camera, cube::cube::Cube};
-    use crate::mouse::mouse::Mouse;
     use crate::command::command::{Command, CommandType};
     use crate::command_queue::command_queue::CommandQueue;
-    use crate::graphics::graphics::Context;
+    use crate::drawable::drawable::Drawable;
+    use crate::graphics::graphics::Graphics;
+    use crate::grid::grid::Grid;
     use crate::model::model::Model;
+    use crate::mouse::mouse::Mouse;
+    use crate::{camera::camera::Camera, cube::cube::Cube};
+    use gloo::events::EventListener;
+    use wasm_bindgen::JsCast;
 
     extern crate nalgebra as na;
     extern crate nalgebra_glm as glm;
 
     use na::{Point2, Point3, Vector3};
 
-    #[derive(PartialEq, Eq, Copy, Clone)] 
+    #[derive(PartialEq, Eq, Copy, Clone)]
     pub enum SelectionShape {
         Sphere,
         Cube,
@@ -38,44 +38,42 @@ pub mod scene {
         selection_position: [i32; 3],
         selection_radius: u32,
         selection_shape: SelectionShape,
-        material_color: [f32; 4]
+        material_color: [f32; 4],
     }
 
     impl Scene {
-
         fn rotate_2d(target: Point2<f32>, pivot: Point2<f32>, angle_radians: f32) -> Point2<f32> {
-
             // Precalculate the cosine
             let angle_sin = f32::sin(angle_radians);
             let angle_cos = f32::cos(angle_radians);
-            
-    
+
             // Subtract the pivot from the target
             let focused = target - pivot;
             // Rotate
-            let rotated = Point2::new(focused.x * angle_cos - focused.y * angle_sin, focused.x * angle_sin + focused.y * angle_cos);
-    
+            let rotated = Point2::new(
+                focused.x * angle_cos - focused.y * angle_sin,
+                focused.x * angle_sin + focused.y * angle_cos,
+            );
+
             // Add the pivot back
             Point2::new(rotated.x + pivot.x, rotated.y + pivot.y)
         }
-    
+
         fn access() -> MutexGuard<'static, Scene> {
-            static GLOBSTATE: Mutex<Scene> = Mutex::new(
-                Scene { 
-                    camera: Camera::new(), 
-                    mouse: Mouse::new(), 
-                    command_input: CommandQueue::new() ,
-                    selection_cube: Cube::new(),
-                    grid_xz: Grid::new(),
-                    grid_xy: Grid::new(),
-                    grid_yz: Grid::new(),
-                    model: Model::new(),
-                    selection_position: [0, 0, 0],
-                    selection_radius: 1,
-                    selection_shape: SelectionShape::Sphere,
-                    material_color: [0.8, 0.8, 0.8, 1.0]
-                }
-            );
+            static GLOBSTATE: Mutex<Scene> = Mutex::new(Scene {
+                camera: Camera::new(),
+                mouse: Mouse::new(),
+                command_input: CommandQueue::new(),
+                selection_cube: Cube::new(),
+                grid_xz: Grid::new(),
+                grid_xy: Grid::new(),
+                grid_yz: Grid::new(),
+                model: Model::new(),
+                selection_position: [0, 0, 0],
+                selection_radius: 1,
+                selection_shape: SelectionShape::Sphere,
+                material_color: [0.8, 0.8, 0.8, 1.0],
+            });
             GLOBSTATE.lock().unwrap()
         }
 
@@ -85,61 +83,86 @@ pub mod scene {
             scene.command_input.queue_command(command);
         }
 
-        pub fn handle_mouse_down(scene: & mut Scene) {
+        pub fn handle_mouse_down(scene: &mut Scene) {
             scene.mouse.is_pressed = true;
         }
 
-        pub fn handle_mouse_up(scene: & mut Scene) {
+        pub fn handle_mouse_up(scene: &mut Scene) {
             scene.mouse.is_pressed = false;
         }
 
         pub fn handle_mouse_moved(command: &Command, scene: &mut Scene) {
             let current_position = Point2::new(command.data1 as i32, command.data2 as i32);
-            
+
             if scene.mouse.is_pressed {
-                let position_diff = Point2::new(current_position.x - scene.mouse.last_position.x, current_position.y - scene.mouse.last_position.y);
+                let position_diff = Point2::new(
+                    current_position.x - scene.mouse.last_position.x,
+                    current_position.y - scene.mouse.last_position.y,
+                );
                 let current_camera_eye = scene.camera.eye;
                 let current_camera_target = scene.camera.target;
                 let blunting = 100.0;
                 let current_camera_eye_2d = Point2::new(current_camera_eye.x, current_camera_eye.z);
-                let current_camera_target_2d = Point2::new(current_camera_target.x, current_camera_target.z);
+                let current_camera_target_2d =
+                    Point2::new(current_camera_target.x, current_camera_target.z);
                 // rotate the eye around the target
-                let adjusted = Self::rotate_2d(current_camera_eye_2d, current_camera_target_2d,  position_diff.x as f32 / blunting);
+                let adjusted = Self::rotate_2d(
+                    current_camera_eye_2d,
+                    current_camera_target_2d,
+                    position_diff.x as f32 / blunting,
+                );
 
                 scene.camera.eye = Point3::new(adjusted.x, current_camera_eye.y, adjusted.y);
 
                 // now do the same thing for vertical axis
                 let current_camera_eye = scene.camera.eye;
                 let current_camera_eye_2d = Point2::new(current_camera_eye.y, current_camera_eye.z);
-                let current_camera_target_2d = Point2::new(current_camera_target.y, current_camera_target.z);
+                let current_camera_target_2d =
+                    Point2::new(current_camera_target.y, current_camera_target.z);
                 // rotate the eye around the target
-                let adjusted = Self::rotate_2d(current_camera_eye_2d, current_camera_target_2d,  -position_diff.y as f32 / blunting);
+                let adjusted = Self::rotate_2d(
+                    current_camera_eye_2d,
+                    current_camera_target_2d,
+                    -position_diff.y as f32 / blunting,
+                );
 
                 scene.camera.eye = Point3::new(current_camera_eye.x, adjusted.x, adjusted.y);
-
             }
             scene.mouse.last_position = current_position;
-            
-
         }
 
-
         pub fn handle_move_up(scene: &mut Scene) {
-            scene.camera.eye = Point3::new(scene.camera.eye.x, scene.camera.eye.y + 0.1 as f32, scene.camera.eye.z);
-            scene.camera.target = Point3::new(scene.camera.target.x, scene.camera.target.y + 0.1 as f32, scene.camera.target.z);
+            scene.camera.eye = Point3::new(
+                scene.camera.eye.x,
+                scene.camera.eye.y + 0.1 as f32,
+                scene.camera.eye.z,
+            );
+            scene.camera.target = Point3::new(
+                scene.camera.target.x,
+                scene.camera.target.y + 0.1 as f32,
+                scene.camera.target.z,
+            );
         }
 
         pub fn handle_move_down(scene: &mut Scene) {
-            scene.camera.eye = Point3::new(scene.camera.eye.x, scene.camera.eye.y - 0.1 as f32, scene.camera.eye.z);
-            scene.camera.target = Point3::new(scene.camera.target.x, scene.camera.target.y - 0.1 as f32, scene.camera.target.z);
+            scene.camera.eye = Point3::new(
+                scene.camera.eye.x,
+                scene.camera.eye.y - 0.1 as f32,
+                scene.camera.eye.z,
+            );
+            scene.camera.target = Point3::new(
+                scene.camera.target.x,
+                scene.camera.target.y - 0.1 as f32,
+                scene.camera.target.z,
+            );
         }
 
         pub fn handle_move_left(scene: &mut Scene) {
             let diff = scene.camera.target - scene.camera.eye;
             let blunting = 10.0;
             //To rotate a vector 90 degrees clockwise, you can change the coordinates from (x,y) to (y,−x).
-            let projection = Vector3::new(diff.z,  0.0, -diff.x) / blunting;
-            
+            let projection = Vector3::new(diff.z, 0.0, -diff.x) / blunting;
+
             scene.camera.eye += projection;
             scene.camera.target += projection;
         }
@@ -148,8 +171,8 @@ pub mod scene {
             let diff = scene.camera.target - scene.camera.eye;
             let blunting = 10.0;
             //To rotate a vector 90 degrees clockwise, you can change the coordinates from (x,y) to (y,−x).
-            let projection = Vector3::new(diff.z,  0.0, -diff.x) / blunting;
-            
+            let projection = Vector3::new(diff.z, 0.0, -diff.x) / blunting;
+
             scene.camera.eye -= projection;
             scene.camera.target -= projection;
         }
@@ -157,8 +180,8 @@ pub mod scene {
         pub fn handle_move_forward(scene: &mut Scene) {
             let diff = scene.camera.target - scene.camera.eye;
             let blunting = 10.0;
-            let projection = Vector3::new(diff.x,  0.0, diff.z) / blunting;
-            
+            let projection = Vector3::new(diff.x, 0.0, diff.z) / blunting;
+
             scene.camera.eye += projection;
             scene.camera.target += projection;
         }
@@ -166,24 +189,30 @@ pub mod scene {
         pub fn handle_move_backward(scene: &mut Scene) {
             let diff = scene.camera.target - scene.camera.eye;
             let blunting = 10.0;
-            let projection = Vector3::new(-diff.x,  0.0, -diff.z) / blunting;
-            
+            let projection = Vector3::new(-diff.x, 0.0, -diff.z) / blunting;
+
             scene.camera.eye += projection;
             scene.camera.target += projection;
         }
 
         pub fn handle_toggle_voxel(scene: &mut Scene) {
-            let selections = Self::selection_voxels(&scene.selection_position, scene.selection_radius as i32, scene.selection_shape);
+            let selections = Self::selection_voxels(
+                &scene.selection_position,
+                scene.selection_radius as i32,
+                scene.selection_shape,
+            );
 
             let value: bool = scene.model.all_voxels_active(&selections);
 
             if value {
                 log::info!("Toggle all voxels active: TRUE");
             } else {
-                log::info!("Toggle all voxels active: FALSE");    
+                log::info!("Toggle all voxels active: FALSE");
             }
             for selection in selections {
-                scene.model.toggle_voxel(selection, !value, scene.material_color);
+                scene
+                    .model
+                    .toggle_voxel(selection, !value, scene.material_color);
             }
             scene.model.save();
         }
@@ -207,7 +236,7 @@ pub mod scene {
             scene.selection_cube.translate([0.0, 0.0, -1.0]);
             scene.selection_position[2] -= 1;
         }
-        
+
         pub fn handle_move_selection_up(scene: &mut Scene) {
             scene.selection_cube.translate([0.0, 1.0, 0.0]);
             scene.selection_position[1] += 1;
@@ -218,9 +247,8 @@ pub mod scene {
             scene.selection_position[1] -= 1;
         }
 
-        pub fn handle_toggle_selection_shape(scene: & mut Scene) {
-            scene.selection_shape = 
-            if scene.selection_shape == SelectionShape::Sphere {
+        pub fn handle_toggle_selection_shape(scene: &mut Scene) {
+            scene.selection_shape = if scene.selection_shape == SelectionShape::Sphere {
                 SelectionShape::Cube
             } else {
                 SelectionShape::Sphere
@@ -241,20 +269,20 @@ pub mod scene {
 
         pub fn handle_key_down(command: &Command, scene: &mut Scene) {
             let key = command.data1;
-            
+
             match key {
                 // E
                 69 => Self::handle_move_up(scene),
                 // C
                 67 => Self::handle_move_down(scene),
                 // A or LEFT
-                65|37 => Self::handle_move_left(scene),
+                65 | 37 => Self::handle_move_left(scene),
                 // D or RIGHT
-                68|39 => Self::handle_move_right(scene),
+                68 | 39 => Self::handle_move_right(scene),
                 // W or UP
-                87|38 => Self::handle_move_forward(scene),
+                87 | 38 => Self::handle_move_forward(scene),
                 // S or X or DOWN
-                83|88|40 => Self::handle_move_backward(scene),
+                83 | 88 | 40 => Self::handle_move_backward(scene),
                 // SPACEBAR
                 32 => Self::handle_toggle_voxel(scene),
                 // 4
@@ -271,13 +299,13 @@ pub mod scene {
                 99 => Self::handle_move_selection_down(scene),
                 // T
                 84 => Self::handle_toggle_selection_shape(scene),
-                _ => log::info!("Unhandled key press: {}", key)
+                _ => log::info!("Unhandled key press: {}", key),
             }
         }
 
         pub fn process_commands() {
             let mut scene = Self::access();
-            
+
             let mut command_opt = scene.command_input.next();
 
             loop {
@@ -300,10 +328,10 @@ pub mod scene {
                                 Self::handle_mouse_scroll(&command, &mut scene);
                             }
                         }
-                        
+
                         command_opt = scene.command_input.next();
                     }
-                    None => break
+                    None => break,
                 }
             }
         }
@@ -336,60 +364,81 @@ pub mod scene {
             self.grid_xy.rotate([(90.0 as f32).to_radians(), 0.0, 0.0]);
             self.grid_yz.init();
             self.grid_yz.rotate([0.0, (90.0 as f32).to_radians(), 0.0]);
-            
+
             self.model.init();
-            
+
             let document = web_sys::window().unwrap().document().unwrap();
             let canvas_element = document.get_element_by_id(canvas_id).unwrap();
-            let canvas: web_sys::HtmlCanvasElement = match canvas_element.dyn_into::<web_sys::HtmlCanvasElement>() {
-                Ok(canvas) => {
-                    canvas
-                }
-                Err(_) => {
-                    panic!("Could not find the canvas element");
-                }
-            };
+            let canvas: web_sys::HtmlCanvasElement =
+                match canvas_element.dyn_into::<web_sys::HtmlCanvasElement>() {
+                    Ok(canvas) => canvas,
+                    Err(_) => {
+                        panic!("Could not find the canvas element");
+                    }
+                };
 
-            let key_down_closure = EventListener::new(&canvas, "keydown", move | event| {
+            let key_down_closure = EventListener::new(&canvas, "keydown", move |event| {
                 let key_event = event.clone().dyn_into::<web_sys::KeyboardEvent>().unwrap();
                 log::info!("Key down");
-                Scene::queue_command(Command {command_type: CommandType::KeyDown, data1: key_event.key_code() as u32, data2: key_event.key_code() as u32});
-             });
+                Scene::queue_command(Command {
+                    command_type: CommandType::KeyDown,
+                    data1: key_event.key_code() as u32,
+                    data2: key_event.key_code() as u32,
+                });
+            });
 
             key_down_closure.forget();
 
-            let mouse_move_closure = EventListener::new(&canvas, "mousemove", move | event| {
+            let mouse_move_closure = EventListener::new(&canvas, "mousemove", move |event| {
                 let move_event = event.clone().dyn_into::<web_sys::MouseEvent>().unwrap();
 
-                // The contents of the closure are only run when the 
-                // closure is called by the JS event handler. 
-                // The code inside the closures is the only part of this 
+                // The contents of the closure are only run when the
+                // closure is called by the JS event handler.
+                // The code inside the closures is the only part of this
                 // program that runs repeatedly.
-                
-                Scene::queue_command(Command {command_type: CommandType::MouseMoved, data1: move_event.offset_x() as u32, data2: move_event.offset_y() as u32});
+
+                Scene::queue_command(Command {
+                    command_type: CommandType::MouseMoved,
+                    data1: move_event.offset_x() as u32,
+                    data2: move_event.offset_y() as u32,
+                });
             });
 
             mouse_move_closure.forget();
 
-            let wheel_closure = EventListener::new(&canvas, "wheel", move | event | {
+            let wheel_closure = EventListener::new(&canvas, "wheel", move |event| {
                 let wheel_event = event.clone().dyn_into::<web_sys::WheelEvent>().unwrap();
 
-                let direction = if wheel_event.delta_y() < 0.0 { 1 as u32 } else { 0 as u32};
-                Scene::queue_command(Command {command_type: CommandType::MouseScroll, data1: direction, data2: 1});
+                let direction = if wheel_event.delta_y() < 0.0 {
+                    1 as u32
+                } else {
+                    0 as u32
+                };
+                Scene::queue_command(Command {
+                    command_type: CommandType::MouseScroll,
+                    data1: direction,
+                    data2: 1,
+                });
             });
 
             wheel_closure.forget();
 
-            let mouse_down_closure = EventListener::new(&canvas, "mousedown", move | _event| {
-                
-                Scene::queue_command(Command {command_type: CommandType::MouseDown, data1: 1, data2: 1});
+            let mouse_down_closure = EventListener::new(&canvas, "mousedown", move |_event| {
+                Scene::queue_command(Command {
+                    command_type: CommandType::MouseDown,
+                    data1: 1,
+                    data2: 1,
+                });
             });
 
             mouse_down_closure.forget();
 
-            let mouse_up_closure = EventListener::new(&canvas, "mouseup", move | _event| {
-                
-                Scene::queue_command(Command {command_type: CommandType::MouseUp, data1: 1, data2: 1});
+            let mouse_up_closure = EventListener::new(&canvas, "mouseup", move |_event| {
+                Scene::queue_command(Command {
+                    command_type: CommandType::MouseUp,
+                    data1: 1,
+                    data2: 1,
+                });
             });
 
             mouse_up_closure.forget();
@@ -399,7 +448,11 @@ pub mod scene {
             (from[0] - to[0]).pow(2) + (from[1] - to[1]).pow(2) + (from[2] - to[2]).pow(2)
         }
 
-        pub fn selection_voxels(center: &[i32; 3], radius: i32, shape: SelectionShape) -> Vec<[i32; 3]> {
+        pub fn selection_voxels(
+            center: &[i32; 3],
+            radius: i32,
+            shape: SelectionShape,
+        ) -> Vec<[i32; 3]> {
             let mut voxels = Vec::new();
             let range: i32 = 16;
             let radius_squared: i32 = radius.pow(2);
@@ -409,12 +462,13 @@ pub mod scene {
                     for y in -range..range {
                         for z in -range..range {
                             let voxel_position = [x, y, z];
-                            let distance: i32 = Self::calculate_distance_squared(center, &voxel_position);
+                            let distance: i32 =
+                                Self::calculate_distance_squared(center, &voxel_position);
 
                             if distance < radius_squared {
                                 voxels.push([x, y, z]);
                             }
-                        }                        
+                        }
                     }
                 }
             } else {
@@ -422,12 +476,13 @@ pub mod scene {
                     for y in -range..range {
                         for z in -range..range {
                             let voxel_position = [x, y, z];
-                            if (center[0] - voxel_position[0]).abs() < radius && 
-                                (center[1] - voxel_position[1]).abs() < radius && 
-                                (center[2] - voxel_position[2]).abs() < radius {
+                            if (center[0] - voxel_position[0]).abs() < radius
+                                && (center[1] - voxel_position[1]).abs() < radius
+                                && (center[2] - voxel_position[2]).abs() < radius
+                            {
                                 voxels.push([x, y, z]);
                             }
-                        }                        
+                        }
                     }
                 }
             }
@@ -435,20 +490,32 @@ pub mod scene {
             voxels
         }
 
-        pub fn draw(context: Context, shader: &WebGlProgram) {
+        pub fn draw(graphics: &Graphics) {
             let mut scene = Self::access();
-            let selections = Self::selection_voxels(&scene.selection_position, scene.selection_radius as i32, scene.selection_shape);
+            let selections = Self::selection_voxels(
+                &scene.selection_position,
+                scene.selection_radius as i32,
+                scene.selection_shape,
+            );
 
             for selection in selections {
-                scene.selection_cube.translation = [selection[0] as f32, selection[1] as f32, selection[2] as f32];
-                context.draw(&scene.selection_cube, shader, WebGlRenderingContext::TRIANGLES, scene.camera);
+                scene.selection_cube.translation = [
+                    selection[0] as f32,
+                    selection[1] as f32,
+                    selection[2] as f32,
+                ];
+                graphics.draw(
+                    &scene.selection_cube,
+                    WebGlRenderingContext::TRIANGLES,
+                    scene.camera,
+                );
             }
-            context.draw(&scene.grid_xz, shader, WebGlRenderingContext::LINES, scene.camera);
-            context.draw(&scene.grid_xy, shader, WebGlRenderingContext::LINES, scene.camera);
-            context.draw(&scene.grid_yz, shader, WebGlRenderingContext::LINES, scene.camera);
+            graphics.draw(&scene.grid_xz, WebGlRenderingContext::LINES, scene.camera);
+            graphics.draw(&scene.grid_xy, WebGlRenderingContext::LINES, scene.camera);
+            graphics.draw(&scene.grid_yz, WebGlRenderingContext::LINES, scene.camera);
 
             for voxel in scene.model.drawables().iter() {
-                context.draw(voxel, shader, WebGlRenderingContext::TRIANGLES, scene.camera);
+                graphics.draw(voxel, WebGlRenderingContext::TRIANGLES, scene.camera);
             }
         }
     }
