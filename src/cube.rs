@@ -42,29 +42,29 @@ pub mod cube {
             self.vertices[increment()] = floor;
             self.vertices[increment()] = floor;
             self.vertices[increment()] = floor;
-            self.vertices[increment()] = floor;
-            self.vertices[increment()] = floor;
-            self.vertices[increment()] = scale;
             self.vertices[increment()] = scale;
             self.vertices[increment()] = floor;
             self.vertices[increment()] = floor;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = floor;
+            self.vertices[increment()] = scale;
 
             self.vertices[increment()] = floor;
             self.vertices[increment()] = floor;
-            self.vertices[increment()] = scale;
+            self.vertices[increment()] = floor;
             self.vertices[increment()] = scale;
             self.vertices[increment()] = floor;
             self.vertices[increment()] = scale;
+            self.vertices[increment()] = floor;
+            self.vertices[increment()] = floor;
             self.vertices[increment()] = scale;
-            self.vertices[increment()] = floor;
-            self.vertices[increment()] = floor;
             // Left
             self.vertices[increment()] = floor;
             self.vertices[increment()] = floor;
             self.vertices[increment()] = floor;
             self.vertices[increment()] = floor;
-            self.vertices[increment()] = scale;
             self.vertices[increment()] = floor;
+            self.vertices[increment()] = scale;
             self.vertices[increment()] = floor;
             self.vertices[increment()] = scale;
             self.vertices[increment()] = scale;
@@ -76,25 +76,25 @@ pub mod cube {
             self.vertices[increment()] = scale;
             self.vertices[increment()] = scale;
             self.vertices[increment()] = floor;
-            self.vertices[increment()] = floor;
             self.vertices[increment()] = scale;
+            self.vertices[increment()] = floor;
             // Right
             self.vertices[increment()] = scale;
-            self.vertices[increment()] = scale;
+            self.vertices[increment()] = floor;
             self.vertices[increment()] = floor;
             self.vertices[increment()] = scale;
-            self.vertices[increment()] = floor;
+            self.vertices[increment()] = scale;
             self.vertices[increment()] = floor;
             self.vertices[increment()] = scale;
             self.vertices[increment()] = scale;
             self.vertices[increment()] = scale;
 
             self.vertices[increment()] = scale;
-            self.vertices[increment()] = scale;
-            self.vertices[increment()] = scale;
-            self.vertices[increment()] = scale;
             self.vertices[increment()] = floor;
             self.vertices[increment()] = floor;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
             self.vertices[increment()] = scale;
             self.vertices[increment()] = floor;
             self.vertices[increment()] = scale;
@@ -102,43 +102,43 @@ pub mod cube {
             // Front
             self.vertices[increment()] = floor;
             self.vertices[increment()] = floor;
-            self.vertices[increment()] = floor;
-            self.vertices[increment()] = scale;
-            self.vertices[increment()] = floor;
-            self.vertices[increment()] = floor;
             self.vertices[increment()] = scale;
             self.vertices[increment()] = scale;
             self.vertices[increment()] = floor;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
 
             self.vertices[increment()] = floor;
             self.vertices[increment()] = floor;
-            self.vertices[increment()] = floor;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
             self.vertices[increment()] = scale;
             self.vertices[increment()] = scale;
             self.vertices[increment()] = floor;
-            self.vertices[increment()] = floor;
             self.vertices[increment()] = scale;
-            self.vertices[increment()] = floor;
+            self.vertices[increment()] = scale;
             // Back
-            self.vertices[increment()] = scale;
+            self.vertices[increment()] = floor;
+            self.vertices[increment()] = floor;
+            self.vertices[increment()] = floor;
             self.vertices[increment()] = floor;
             self.vertices[increment()] = scale;
             self.vertices[increment()] = floor;
+            self.vertices[increment()] = scale;
+            self.vertices[increment()] = scale;
             self.vertices[increment()] = floor;
-            self.vertices[increment()] = scale;
-            self.vertices[increment()] = scale;
-            self.vertices[increment()] = scale;
-            self.vertices[increment()] = scale;
 
             self.vertices[increment()] = floor;
             self.vertices[increment()] = floor;
-            self.vertices[increment()] = scale;
-            self.vertices[increment()] = scale;
+            self.vertices[increment()] = floor;
             self.vertices[increment()] = scale;
             self.vertices[increment()] = scale;
             self.vertices[increment()] = floor;
             self.vertices[increment()] = scale;
-            self.vertices[increment()] = scale;
+            self.vertices[increment()] = floor;
+            self.vertices[increment()] = floor;
             // Top
             self.vertices[increment()] = floor;
             self.vertices[increment()] = scale;

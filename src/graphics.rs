@@ -52,7 +52,7 @@ pub mod graphics {
                 WebGlRenderingContext::ONE,
                 WebGlRenderingContext::ONE_MINUS_SRC_ALPHA,
             );
-            gl.disable(WebGlRenderingContext::CULL_FACE);
+            gl.enable(WebGlRenderingContext::CULL_FACE);
 
             Graphics {
                 gl: gl,
