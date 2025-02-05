@@ -2,7 +2,7 @@ pub mod scene {
 
     use std::cmp::{max, min};
     use std::sync::{Mutex, MutexGuard};
-    use web_sys::{WebGlProgram, WebGlRenderingContext};
+    use web_sys::WebGlRenderingContext;
 
     use crate::command::command::{Command, CommandType};
     use crate::command_queue::command_queue::CommandQueue;
@@ -28,6 +28,7 @@ pub mod scene {
 
     pub struct Scene {
         pub camera: Camera,
+        pub light: Camera,
         mouse: Mouse,
         command_input: CommandQueue,
         selection_cube: Cube,
@@ -62,6 +63,7 @@ pub mod scene {
         fn access() -> MutexGuard<'static, Scene> {
             static GLOBSTATE: Mutex<Scene> = Mutex::new(Scene {
                 camera: Camera::new(),
+                light: Camera::new(),
                 mouse: Mouse::new(),
                 command_input: CommandQueue::new(),
                 selection_cube: Cube::new(),
@@ -358,6 +360,9 @@ pub mod scene {
         }
 
         pub fn init(&mut self, canvas_id: &str) {
+            self.light.eye = Point3::new(-10.0, 100.0, 0.0);
+            self.light.target = Point3::new(0.0, 0.0, 0.0);
+
             self.selection_cube.init();
             self.grid_xz.init();
             self.grid_xy.init();
@@ -494,7 +499,9 @@ pub mod scene {
             let mut scene = Self::access();
 
             graphics.prepare_shadow_frame();
-
+            for voxel in scene.model.drawables().iter() {
+                graphics.draw_shadow(voxel, WebGlRenderingContext::TRIANGLES, scene.light);
+            }
             graphics.finish_shadow_frame();
             graphics.prepare_camera_frame();
 

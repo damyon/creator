@@ -1,5 +1,4 @@
 use wasm_bindgen::prelude::*;
-use web_sys::WebGlProgram;
 extern crate js_sys;
 
 mod camera;

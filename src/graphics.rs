@@ -357,6 +357,62 @@ pub mod graphics {
             );
         }
 
+        pub fn draw_shadow(&self, drawable: &impl Drawable, render_mode: u32, light: Camera) {
+            let shader = self.light_program.as_ref();
+            self.use_light_shader();
+            self.setup_vertices(&drawable.vertices(), shader.expect("fail"));
+
+            // We want a model / view and a projection matrix
+            // Compute the matrices
+            // Our camera looks toward the point (0.0, 0.0, 0.0).
+            // It is located at (2.0, 2.0, 2.0).
+            let eye = light.eye;
+            let target = light.target;
+            let view = Isometry3::look_at_rh(&eye, &target, &Vector3::y());
+
+            // This is translation, rotation
+            let model = Isometry3::new(
+                Vector3::from_row_slice(drawable.translation()),
+                Vector3::from_row_slice(drawable.rotation()),
+            );
+
+            let projection = Perspective3::new(1.0, 3.14 / 2.0, 0.0, 1000.0).into_inner();
+            let model_view = (view * model).to_homogeneous();
+            let u_mv_matrix_location = self
+                .gl
+                .get_uniform_location(shader.expect("fail"), "uMVMatrix")
+                .unwrap();
+
+            self.gl.uniform_matrix4fv_with_f32_array(
+                Some(&u_mv_matrix_location),
+                false,
+                model_view.as_slice(),
+            );
+
+            let u_p_matrix_location = self
+                .gl
+                .get_uniform_location(shader.expect("fail"), "uPMatrix")
+                .unwrap();
+
+            self.gl.uniform_matrix4fv_with_f32_array(
+                Some(&u_p_matrix_location),
+                false,
+                projection.as_slice(),
+            );
+
+            let chunk_size: i32 = 30;
+
+            for chunk in 0..(drawable.count_vertices() as i32) / chunk_size {
+                let count = min(
+                    chunk_size,
+                    drawable.count_vertices() as i32 - (chunk * chunk_size),
+                );
+
+                self.gl
+                    .draw_arrays(render_mode, chunk * chunk_size as i32, count);
+            }
+        }
+
         pub fn draw(&self, drawable: &impl Drawable, render_mode: u32, camera: Camera) {
             let shader = self.camera_program.as_ref();
             self.use_camera_shader();
