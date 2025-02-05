@@ -6,7 +6,6 @@ pub mod graphics {
     use crate::drawable::drawable::Drawable;
     use wasm_bindgen::prelude::*;
     use wasm_bindgen::JsCast;
-    use web_sys::WebGlBuffer;
     use web_sys::WebGlFramebuffer;
     use web_sys::WebGlTexture;
     use web_sys::{WebGlProgram, WebGlRenderingContext, WebGlShader};
@@ -25,6 +24,7 @@ pub mod graphics {
         pub light_program: Option<WebGlProgram>,
         pub shadow_frame_buffer: Option<WebGlFramebuffer>,
         pub shadow_depth_texture: Option<WebGlTexture>,
+        pub render_depth: bool,
     }
 
     impl Graphics {
@@ -67,6 +67,7 @@ pub mod graphics {
                 light_program: None,
                 shadow_frame_buffer: None,
                 shadow_depth_texture: None,
+                render_depth: false,
             }
         }
 
@@ -420,10 +421,15 @@ pub mod graphics {
             self.use_light_shader();
 
             // Draw to our off screen drawing buffer
-            self.gl.bind_framebuffer(
-                WebGlRenderingContext::FRAMEBUFFER,
-                self.shadow_frame_buffer.as_ref(),
-            );
+            if self.render_depth {
+                self.gl
+                    .bind_framebuffer(WebGlRenderingContext::FRAMEBUFFER, None);
+            } else {
+                self.gl.bind_framebuffer(
+                    WebGlRenderingContext::FRAMEBUFFER,
+                    self.shadow_frame_buffer.as_ref(),
+                );
+            }
 
             // Set the viewport to our shadow texture's size
             self.gl.viewport(0, 0, 8192, 8192);
@@ -441,8 +447,22 @@ pub mod graphics {
 
         pub fn prepare_camera_frame(&self) {
             self.use_camera_shader();
+            if self.render_depth {
+                self.gl.bind_framebuffer(
+                    WebGlRenderingContext::FRAMEBUFFER,
+                    self.shadow_frame_buffer.as_ref(),
+                );
+            } else {
+                self.gl
+                    .bind_framebuffer(WebGlRenderingContext::FRAMEBUFFER, None);
+            }
             self.gl
                 .viewport(0, 0, self.canvas_width, self.canvas_height);
+            self.gl.clear_color(0.0, 0.0, 0.0, 1.0);
+            self.gl.clear_depth(1.0);
+            self.gl.clear(
+                WebGlRenderingContext::COLOR_BUFFER_BIT | WebGlRenderingContext::DEPTH_BUFFER_BIT,
+            );
         }
 
         pub fn finish_camera_frame(&self) {}
