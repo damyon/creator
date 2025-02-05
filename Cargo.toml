@@ -8,7 +8,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 gloo = "0.11.0"
-nalgebra-glm = "0.19.0" 
+nalgebra-glm = "0.19.0"
 nalgebra = "0.33.2"
 wasm-bindgen = "0.2.99"
 js-sys = "0.3.76"
@@ -18,14 +18,17 @@ serde_json = "1.0.134"
 [dependencies.web-sys]
 version = "0.3.74"
 features = [
-  'Document', 
-  'Window', 
+  'Document',
+  'Window',
   'HtmlCanvasElement' ,
-  'WebGlRenderingContext', 
-  'WebGl2RenderingContext', 
-  'WebGlProgram', 
-  'WebGlShader', 
-  'WebGlBuffer', 
+  'WebGlRenderingContext',
+  'WebGl2RenderingContext',
+  'WebGlFramebuffer',
+  'WebGlRenderbuffer',
+  'WebGlTexture',
+  'WebGlProgram',
+  'WebGlShader',
+  'WebGlBuffer',
   'WebGlUniformLocation',
   'MouseEvent',
   'KeyboardEvent',

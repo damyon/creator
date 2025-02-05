@@ -492,6 +492,12 @@ pub mod scene {
 
         pub fn draw(graphics: &Graphics) {
             let mut scene = Self::access();
+
+            graphics.prepare_shadow_frame();
+
+            graphics.finish_shadow_frame();
+            graphics.prepare_camera_frame();
+
             let selections = Self::selection_voxels(
                 &scene.selection_position,
                 scene.selection_radius as i32,
@@ -517,6 +523,8 @@ pub mod scene {
             for voxel in scene.model.drawables().iter() {
                 graphics.draw(voxel, WebGlRenderingContext::TRIANGLES, scene.camera);
             }
+
+            graphics.finish_camera_frame();
         }
     }
 }

@@ -6,6 +6,9 @@ pub mod graphics {
     use crate::drawable::drawable::Drawable;
     use wasm_bindgen::prelude::*;
     use wasm_bindgen::JsCast;
+    use web_sys::WebGlBuffer;
+    use web_sys::WebGlFramebuffer;
+    use web_sys::WebGlTexture;
     use web_sys::{WebGlProgram, WebGlRenderingContext, WebGlShader};
 
     extern crate nalgebra as na;
@@ -20,6 +23,8 @@ pub mod graphics {
         pub canvas_height: i32,
         pub camera_program: Option<WebGlProgram>,
         pub light_program: Option<WebGlProgram>,
+        pub shadow_frame_buffer: Option<WebGlFramebuffer>,
+        pub shadow_depth_texture: Option<WebGlTexture>,
     }
 
     impl Graphics {
@@ -60,6 +65,8 @@ pub mod graphics {
                 canvas_height: canvas_height,
                 camera_program: None,
                 light_program: None,
+                shadow_frame_buffer: None,
+                shadow_depth_texture: None,
             }
         }
 
@@ -115,6 +122,87 @@ pub mod graphics {
             }
         }
 
+        pub fn create_shadow_depth_texture(&mut self) {
+            self.shadow_frame_buffer = self.gl.create_framebuffer();
+
+            self.gl.bind_framebuffer(
+                WebGlRenderingContext::FRAMEBUFFER,
+                self.shadow_frame_buffer.as_ref(),
+            );
+
+            self.shadow_depth_texture = self.gl.create_texture();
+
+            self.gl.bind_texture(
+                WebGlRenderingContext::TEXTURE_2D,
+                self.shadow_depth_texture.as_ref(),
+            );
+
+            self.gl.tex_parameteri(
+                WebGlRenderingContext::TEXTURE_2D,
+                WebGlRenderingContext::TEXTURE_MAG_FILTER,
+                WebGlRenderingContext::NEAREST as i32,
+            );
+            self.gl.tex_parameteri(
+                WebGlRenderingContext::TEXTURE_2D,
+                WebGlRenderingContext::TEXTURE_MIN_FILTER,
+                WebGlRenderingContext::NEAREST as i32,
+            );
+
+            let result = self
+                .gl
+                .tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_js_u8_array(
+                    WebGlRenderingContext::TEXTURE_2D,
+                    0,
+                    WebGlRenderingContext::RGBA as i32,
+                    8192,
+                    8192,
+                    0,
+                    WebGlRenderingContext::RGBA,
+                    WebGlRenderingContext::UNSIGNED_BYTE,
+                    None,
+                );
+
+            if result.is_err() {
+                log::error!("Could not create shadow texture");
+                panic!("exit");
+            }
+
+            let render_buffer = self.gl.create_renderbuffer();
+            self.gl
+                .bind_renderbuffer(WebGlRenderingContext::RENDERBUFFER, render_buffer.as_ref());
+
+            self.gl.renderbuffer_storage(
+                WebGlRenderingContext::RENDERBUFFER,
+                WebGlRenderingContext::DEPTH_COMPONENT16,
+                8192,
+                8192,
+            );
+            self.gl.framebuffer_texture_2d(
+                WebGlRenderingContext::FRAMEBUFFER,
+                WebGlRenderingContext::COLOR_ATTACHMENT0,
+                WebGlRenderingContext::TEXTURE_2D,
+                self.shadow_depth_texture.as_ref(),
+                0,
+            );
+
+            self.gl.framebuffer_renderbuffer(
+                WebGlRenderingContext::FRAMEBUFFER,
+                WebGlRenderingContext::DEPTH_ATTACHMENT,
+                WebGlRenderingContext::RENDERBUFFER,
+                render_buffer.as_ref(),
+            );
+
+            // Unbind now the buffers are created
+            self.gl
+                .bind_texture(WebGlRenderingContext::TEXTURE_2D, None);
+
+            self.gl
+                .bind_renderbuffer(WebGlRenderingContext::RENDERBUFFER, None);
+
+            self.gl
+                .bind_framebuffer(WebGlRenderingContext::FRAMEBUFFER, None);
+        }
+
         pub fn setup_vertices(&self, vertices: &[f32], shader_program: &WebGlProgram) {
             let vertices_array = unsafe { js_sys::Float32Array::view(&vertices) };
             let vertex_buffer = self.gl.create_buffer().unwrap();
@@ -145,6 +233,7 @@ pub mod graphics {
         pub fn setup_shaders(&mut self) {
             self.light_program = Some(self.setup_light_shaders());
             self.camera_program = Some(self.setup_camera_shaders());
+            self.create_shadow_depth_texture();
         }
 
         pub fn setup_light_shaders(&mut self) -> WebGlProgram {
@@ -326,5 +415,36 @@ pub mod graphics {
                     .draw_arrays(render_mode, chunk * chunk_size as i32, count);
             }
         }
+
+        pub fn prepare_shadow_frame(&self) {
+            self.use_light_shader();
+
+            // Draw to our off screen drawing buffer
+            self.gl.bind_framebuffer(
+                WebGlRenderingContext::FRAMEBUFFER,
+                self.shadow_frame_buffer.as_ref(),
+            );
+
+            // Set the viewport to our shadow texture's size
+            self.gl.viewport(0, 0, 8192, 8192);
+            self.gl.clear_color(0.0, 0.0, 0.0, 1.0);
+            self.gl.clear_depth(1.0);
+            self.gl.clear(
+                WebGlRenderingContext::COLOR_BUFFER_BIT | WebGlRenderingContext::DEPTH_BUFFER_BIT,
+            );
+        }
+
+        pub fn finish_shadow_frame(&self) {
+            self.gl
+                .bind_framebuffer(WebGlRenderingContext::FRAMEBUFFER, None);
+        }
+
+        pub fn prepare_camera_frame(&self) {
+            self.use_camera_shader();
+            self.gl
+                .viewport(0, 0, self.canvas_width, self.canvas_height);
+        }
+
+        pub fn finish_camera_frame(&self) {}
     }
 }
