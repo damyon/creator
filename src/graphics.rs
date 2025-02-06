@@ -51,7 +51,8 @@ pub mod graphics {
                 }
             };
 
-            gl.disable(WebGlRenderingContext::DEPTH_TEST);
+            gl.enable(WebGlRenderingContext::DEPTH_TEST);
+            gl.depth_func(WebGlRenderingContext::LEQUAL);
             gl.enable(WebGlRenderingContext::BLEND);
             gl.blend_func(
                 WebGlRenderingContext::ONE,
@@ -67,7 +68,7 @@ pub mod graphics {
                 light_program: None,
                 shadow_frame_buffer: None,
                 shadow_depth_texture: None,
-                render_depth: false,
+                render_depth: true,
             }
         }
 
@@ -204,7 +205,7 @@ pub mod graphics {
                 .bind_framebuffer(WebGlRenderingContext::FRAMEBUFFER, None);
         }
 
-        pub fn setup_vertices(&self, vertices: &[f32], shader_program: &WebGlProgram) {
+        pub fn setup_vertices(&self, vertices: &[f32], shader_program: &WebGlProgram, light: bool) {
             let vertices_array = unsafe { js_sys::Float32Array::view(&vertices) };
             let vertex_buffer = self.gl.create_buffer().unwrap();
 
@@ -215,8 +216,12 @@ pub mod graphics {
                 &vertices_array,
                 WebGlRenderingContext::STATIC_DRAW,
             );
-
-            let a_position = self.gl.get_attrib_location(&shader_program, "a_position");
+            let attrib_name = if light {
+                "aVertexPosition"
+            } else {
+                "a_position"
+            };
+            let a_position = self.gl.get_attrib_location(&shader_program, attrib_name);
 
             self.gl
                 .bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&vertex_buffer));
@@ -238,36 +243,26 @@ pub mod graphics {
         }
 
         pub fn setup_light_shaders(&mut self) -> WebGlProgram {
+            // TODO: Depth shader only render to black
+
             let vertex_shader_source = "
                 attribute vec3 aVertexPosition;
 
-                      uniform mat4 uPMatrix;
-                      uniform mat4 uMVMatrix;
+                uniform mat4 uPMatrix;
+                uniform mat4 uMVMatrix;
 
-                      void main (void) {
-                        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
-                      }
-                ";
+                void main (void) {
+                    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+                }
+            ";
 
             let fragment_shader_source = "
                 precision mediump float;
 
-                vec4 encodeFloat (float depth) {
-                    const vec4 bitShift = vec4(
-                        256 * 256 * 256,
-                        256 * 256,
-                        256,
-                        1.0
-                    );
-                    const vec4 bitMask = vec4(
-                        0,
-                        1.0 / 256.0,
-                        1.0 / 256.0,
-                        1.0 / 256.0
-                    );
-                    vec4 comp = fract(depth * bitShift);
-                    comp -= comp.xxyz * bitMask;
-                    return comp;
+                float normalize_from_perspective (float depth) {
+                    float near = 1.0;
+                    float far = 1000.0;
+                    return (depth - near) / (far - near);
                 }
 
                 void main (void) {
@@ -275,19 +270,25 @@ pub mod graphics {
                     // We'll later decode this when rendering from our camera's
                     // perspective and use this number to know whether the fragment
                     // that our camera is seeing is inside of our outside of the shadow
-                    gl_FragColor = encodeFloat(gl_FragCoord.z);
+                    gl_FragColor.r = normalize_from_perspective(gl_FragCoord.z);
+                    gl_FragColor.g = 255.0;
+                    gl_FragColor.b = normalize_from_perspective(gl_FragCoord.z);
+                    gl_FragColor.a = 1.0;
                 }
                 ";
 
             let vertex_shader = self
                 .create_shader(WebGlRenderingContext::VERTEX_SHADER, vertex_shader_source)
                 .unwrap();
-            let fragment_shader = self
-                .create_shader(
-                    WebGlRenderingContext::FRAGMENT_SHADER,
-                    fragment_shader_source,
-                )
-                .unwrap();
+            let fragment_shader_opt = self.create_shader(
+                WebGlRenderingContext::FRAGMENT_SHADER,
+                fragment_shader_source,
+            );
+            if fragment_shader_opt.is_err() {
+                log::error!("Could not compile shader: {:?}", fragment_shader_opt.err());
+                panic!("Fail");
+            }
+            let fragment_shader = fragment_shader_opt.unwrap();
 
             let program = self.create_program(&vertex_shader, &fragment_shader);
 
@@ -360,7 +361,7 @@ pub mod graphics {
         pub fn draw_shadow(&self, drawable: &impl Drawable, render_mode: u32, light: Camera) {
             let shader = self.light_program.as_ref();
             self.use_light_shader();
-            self.setup_vertices(&drawable.vertices(), shader.expect("fail"));
+            self.setup_vertices(&drawable.vertices(), shader.expect("fail"), true);
 
             // We want a model / view and a projection matrix
             // Compute the matrices
@@ -376,7 +377,7 @@ pub mod graphics {
                 Vector3::from_row_slice(drawable.rotation()),
             );
 
-            let projection = Perspective3::new(1.0, 3.14 / 2.0, 0.0, 1000.0).into_inner();
+            let projection = Perspective3::new(1.0, 3.14 / 2.0, 1.0, 1000.0).into_inner();
             let model_view = (view * model).to_homogeneous();
             let u_mv_matrix_location = self
                 .gl
@@ -416,7 +417,7 @@ pub mod graphics {
         pub fn draw(&self, drawable: &impl Drawable, render_mode: u32, camera: Camera) {
             let shader = self.camera_program.as_ref();
             self.use_camera_shader();
-            self.setup_vertices(&drawable.vertices(), shader.expect("fail"));
+            self.setup_vertices(&drawable.vertices(), shader.expect("fail"), false);
 
             let color_location = self
                 .gl
@@ -442,7 +443,7 @@ pub mod graphics {
             let projection = Perspective3::new(
                 self.canvas_width as f32 / self.canvas_height as f32,
                 3.14 / 2.0,
-                0.0,
+                1.0,
                 1000.0,
             );
             let model_view_projection = projection.into_inner() * (view * model).to_homogeneous();

@@ -360,9 +360,10 @@ pub mod scene {
         }
 
         pub fn init(&mut self, canvas_id: &str) {
-            self.light.eye = Point3::new(-10.0, 100.0, 0.0);
-            self.light.target = Point3::new(0.0, 0.0, 0.0);
-
+            // self.light.eye = Point3::new(-10.0, 100.0, 0.0);
+            // self.light.target = Point3::new(0.0, 0.0, 0.0);
+            self.light.eye = Point3::new(8.0, 6.0, 20.0);
+            self.light.target = Point3::new(1.0, 0.0, 10.0);
             self.selection_cube.init();
             self.grid_xz.init();
             self.grid_xy.init();
