@@ -360,10 +360,10 @@ pub mod scene {
         }
 
         pub fn init(&mut self, canvas_id: &str) {
-            // self.light.eye = Point3::new(-10.0, 100.0, 0.0);
-            // self.light.target = Point3::new(0.0, 0.0, 0.0);
-            self.light.eye = Point3::new(8.0, 6.0, 20.0);
-            self.light.target = Point3::new(1.0, 0.0, 10.0);
+            self.light.eye = Point3::new(-30.0, 50.0, 10.0);
+            self.light.target = Point3::new(0.0, 0.0, 0.0);
+            //self.light.eye = Point3::new(8.0, 6.0, 20.0);
+            //self.light.target = Point3::new(1.0, 0.0, 10.0);
             self.selection_cube.init();
             self.grid_xz.init();
             self.grid_xy.init();
@@ -500,12 +500,22 @@ pub mod scene {
             let mut scene = Self::access();
 
             graphics.prepare_shadow_frame();
+            let light = if !graphics.swap_cameras {
+                scene.light
+            } else {
+                scene.camera
+            };
             for voxel in scene.model.drawables().iter() {
-                graphics.draw_shadow(voxel, WebGlRenderingContext::TRIANGLES, scene.light);
+                graphics.draw_shadow(voxel, WebGlRenderingContext::TRIANGLES, light);
             }
             graphics.finish_shadow_frame();
             graphics.prepare_camera_frame();
 
+            let camera = if !graphics.swap_cameras {
+                scene.camera
+            } else {
+                scene.light
+            };
             let selections = Self::selection_voxels(
                 &scene.selection_position,
                 scene.selection_radius as i32,
@@ -521,15 +531,15 @@ pub mod scene {
                 graphics.draw(
                     &scene.selection_cube,
                     WebGlRenderingContext::TRIANGLES,
-                    scene.camera,
+                    camera,
                 );
             }
-            graphics.draw(&scene.grid_xz, WebGlRenderingContext::LINES, scene.camera);
-            graphics.draw(&scene.grid_xy, WebGlRenderingContext::LINES, scene.camera);
-            graphics.draw(&scene.grid_yz, WebGlRenderingContext::LINES, scene.camera);
+            graphics.draw(&scene.grid_xz, WebGlRenderingContext::LINES, camera);
+            graphics.draw(&scene.grid_xy, WebGlRenderingContext::LINES, camera);
+            graphics.draw(&scene.grid_yz, WebGlRenderingContext::LINES, camera);
 
             for voxel in scene.model.drawables().iter() {
-                graphics.draw(voxel, WebGlRenderingContext::TRIANGLES, scene.camera);
+                graphics.draw(voxel, WebGlRenderingContext::TRIANGLES, camera);
             }
 
             graphics.finish_camera_frame();

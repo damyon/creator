@@ -21,8 +21,8 @@ pub mod cube {
                 translation: [0.0; 3],
                 rotation: [0.0; 3],
                 color: [0.6, 0.6, 0.2, 0.6],
-                scale: 0.95,
-                floor: 0.05,
+                scale: 0.9999,
+                floor: 0.0001,
             }
         }
     }
