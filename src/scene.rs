@@ -505,9 +505,12 @@ pub mod scene {
             } else {
                 scene.camera
             };
-            for voxel in scene.model.drawables().iter() {
-                graphics.draw_shadow(voxel, WebGlRenderingContext::TRIANGLES, light);
+            if !graphics.swap_shaders {
+                for voxel in scene.model.drawables().iter() {
+                    graphics.draw_shadow(voxel, WebGlRenderingContext::TRIANGLES, light);
+                }
             }
+
             graphics.finish_shadow_frame();
             graphics.prepare_camera_frame();
 
@@ -532,14 +535,15 @@ pub mod scene {
                     &scene.selection_cube,
                     WebGlRenderingContext::TRIANGLES,
                     camera,
+                    light,
                 );
             }
-            graphics.draw(&scene.grid_xz, WebGlRenderingContext::LINES, camera);
-            graphics.draw(&scene.grid_xy, WebGlRenderingContext::LINES, camera);
-            graphics.draw(&scene.grid_yz, WebGlRenderingContext::LINES, camera);
+            graphics.draw(&scene.grid_xz, WebGlRenderingContext::LINES, camera, light);
+            graphics.draw(&scene.grid_xy, WebGlRenderingContext::LINES, camera, light);
+            graphics.draw(&scene.grid_yz, WebGlRenderingContext::LINES, camera, light);
 
             for voxel in scene.model.drawables().iter() {
-                graphics.draw(voxel, WebGlRenderingContext::TRIANGLES, camera);
+                graphics.draw(voxel, WebGlRenderingContext::TRIANGLES, camera, light);
             }
 
             graphics.finish_camera_frame();

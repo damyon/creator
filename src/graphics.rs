@@ -240,27 +240,24 @@ pub mod graphics {
         }
 
         pub fn setup_light_shaders(&mut self) -> WebGlProgram {
-            // TODO: Depth shader only render to black
-
             let vertex_shader_source = "
                 attribute vec4 a_position;
 
                 uniform mat4 uPMatrix;
                 uniform mat4 uMVMatrix;
+                uniform mat4 u_light_PMatrix;
+                uniform mat4 u_light_MVMatrix;
 
                 void main (void) {
                     gl_Position = uPMatrix * uMVMatrix * a_position;
                 }
             ";
-
             let fragment_shader_source = "
                 precision mediump float;
-                float near = 1.0;
-                float far  = 2.0;
 
                 float LinearizeDepth(float depth)
                 {
-                    return depth * depth * depth;
+                    return depth > 0.9855 ? 1.0 : 0.5;
                 }
 
                 void main()
@@ -269,18 +266,29 @@ pub mod graphics {
                 }
                 ";
 
-            let vertex_shader = self
-                .create_shader(WebGlRenderingContext::VERTEX_SHADER, vertex_shader_source)
-                .unwrap();
+            let vertex_shader_opt =
+                self.create_shader(WebGlRenderingContext::VERTEX_SHADER, vertex_shader_source);
+
+            if vertex_shader_opt.is_err() {
+                log::error!(
+                    "Could not compile light vertex shader: {:?}",
+                    vertex_shader_opt.err()
+                );
+                panic!("Fail");
+            }
+            let vertex_shader = vertex_shader_opt.expect("Fail");
             let fragment_shader_opt = self.create_shader(
                 WebGlRenderingContext::FRAGMENT_SHADER,
                 fragment_shader_source,
             );
             if fragment_shader_opt.is_err() {
-                log::error!("Could not compile shader: {:?}", fragment_shader_opt.err());
+                log::error!(
+                    "Could not compile light fragment shader: {:?}",
+                    fragment_shader_opt.err()
+                );
                 panic!("Fail");
             }
-            let fragment_shader = fragment_shader_opt.unwrap();
+            let fragment_shader = fragment_shader_opt.expect("Fail");
 
             let program = self.create_program(&vertex_shader, &fragment_shader);
 
@@ -299,30 +307,56 @@ pub mod graphics {
                 attribute vec4 a_position;
                 uniform mat4 uPMatrix;
                 uniform mat4 uMVMatrix;
+                uniform mat4 u_light_PMatrix;
+                uniform mat4 u_light_MVMatrix;
+                varying vec4 positionFromLightPov;
 
                 void main(void) {
                     // Multiply the position by the matrix.
                     gl_Position = uPMatrix * uMVMatrix * a_position;
+
+                    positionFromLightPov = u_light_PMatrix * u_light_MVMatrix * a_position;
                 }
                 ";
 
             let fragment_shader_source = "
                 precision mediump float;
                 uniform vec4 u_color;
+                uniform sampler2D shadowMap;
+                varying vec4 positionFromLightPov;
+
                 void main(void) {
-                    gl_FragColor = u_color;
+                    float ambientLight = 0.5;
+                    vec4 positionFromLightPovInTexture = positionFromLightPov * 0.5 + 0.5;
+                    float depthValue = texture2D(shadowMap, positionFromLightPovInTexture.xy).r;
+                    float shadow = positionFromLightPovInTexture.z < depthValue ? 1.0 : ambientLight;
+
+                    gl_FragColor = vec4(vec3(depthValue), 1.0);
                 }
                 ";
 
-            let vertex_shader = self
-                .create_shader(WebGlRenderingContext::VERTEX_SHADER, vertex_shader_source)
-                .unwrap();
-            let fragment_shader = self
-                .create_shader(
-                    WebGlRenderingContext::FRAGMENT_SHADER,
-                    fragment_shader_source,
-                )
-                .unwrap();
+            let vertex_shader_opt =
+                self.create_shader(WebGlRenderingContext::VERTEX_SHADER, vertex_shader_source);
+            if vertex_shader_opt.is_err() {
+                log::error!(
+                    "Could not compile camera vertex shader: {:?}",
+                    vertex_shader_opt.err()
+                );
+                panic!("Fail");
+            }
+            let vertex_shader = vertex_shader_opt.expect("Fail");
+            let fragment_shader_opt = self.create_shader(
+                WebGlRenderingContext::FRAGMENT_SHADER,
+                fragment_shader_source,
+            );
+            if fragment_shader_opt.is_err() {
+                log::error!(
+                    "Could not compile camera fragment shader: {:?}",
+                    fragment_shader_opt.err()
+                );
+                panic!("Fail");
+            }
+            let fragment_shader = fragment_shader_opt.expect("Fail");
 
             let program = self.create_program(&vertex_shader, &fragment_shader);
 
@@ -386,25 +420,26 @@ pub mod graphics {
             let model_view = (view * model).to_homogeneous();
             let u_mv_matrix_location = self
                 .gl
-                .get_uniform_location(shader.expect("fail"), "uMVMatrix")
-                .unwrap();
-
-            self.gl.uniform_matrix4fv_with_f32_array(
-                Some(&u_mv_matrix_location),
-                false,
-                model_view.as_slice(),
-            );
+                .get_uniform_location(shader.expect("fail"), "uMVMatrix");
+            if u_mv_matrix_location.is_some() {
+                self.gl.uniform_matrix4fv_with_f32_array(
+                    Some(&u_mv_matrix_location.expect("Fail")),
+                    false,
+                    model_view.as_slice(),
+                );
+            }
 
             let u_p_matrix_location = self
                 .gl
-                .get_uniform_location(shader.expect("fail"), "uPMatrix")
-                .unwrap();
+                .get_uniform_location(shader.expect("fail"), "uPMatrix");
 
-            self.gl.uniform_matrix4fv_with_f32_array(
-                Some(&u_p_matrix_location),
-                false,
-                projection.as_slice(),
-            );
+            if u_p_matrix_location.is_some() {
+                self.gl.uniform_matrix4fv_with_f32_array(
+                    Some(&u_p_matrix_location.expect("Fail")),
+                    false,
+                    projection.as_slice(),
+                );
+            }
 
             let chunk_size: i32 = 30;
 
@@ -419,7 +454,13 @@ pub mod graphics {
             }
         }
 
-        pub fn draw(&self, drawable: &impl Drawable, render_mode: u32, camera: Camera) {
+        pub fn draw(
+            &self,
+            drawable: &impl Drawable,
+            render_mode: u32,
+            camera: Camera,
+            light: Camera,
+        ) {
             let shader = if self.swap_shaders {
                 self.light_program.as_ref()
             } else {
@@ -462,7 +503,6 @@ pub mod graphics {
                 .gl
                 .get_uniform_location(shader.expect("fail"), "uMVMatrix")
                 .unwrap();
-
             self.gl.uniform_matrix4fv_with_f32_array(
                 Some(&u_mv_matrix_location),
                 false,
@@ -479,6 +519,38 @@ pub mod graphics {
                 false,
                 projection_matrix.as_slice(),
             );
+
+            // Repeat these shenanigans for the light matrices.
+            let light_eye = light.eye;
+            let light_target = light.target;
+            let light_view = Isometry3::look_at_rh(&light_eye, &light_target, &Vector3::y());
+
+            // This is translation, rotation
+            let light_model_view = (light_view * model).to_homogeneous();
+
+            let u_light_mv_matrix_location = self
+                .gl
+                .get_uniform_location(shader.expect("fail"), "u_light_MVMatrix");
+
+            if u_light_mv_matrix_location.is_some() {
+                self.gl.uniform_matrix4fv_with_f32_array(
+                    Some(&u_light_mv_matrix_location.expect("Fail")),
+                    false,
+                    light_model_view.as_slice(),
+                );
+            }
+
+            let u_light_p_matrix_location = self
+                .gl
+                .get_uniform_location(shader.expect("fail"), "u_light_PMatrix");
+
+            if u_light_p_matrix_location.is_some() {
+                self.gl.uniform_matrix4fv_with_f32_array(
+                    Some(&u_light_p_matrix_location.expect("Fail")),
+                    false,
+                    projection_matrix.as_slice(),
+                );
+            }
 
             self.gl.line_width(2.0);
 
