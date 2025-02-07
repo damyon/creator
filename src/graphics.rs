@@ -257,7 +257,7 @@ pub mod graphics {
 
                 float LinearizeDepth(float depth)
                 {
-                    return depth;
+                    return depth; // > 0.985 ? 0.9 : 0.3;
                 }
 
                 void main()
@@ -327,14 +327,30 @@ pub mod graphics {
 
                 void main(void) {
                     float ambientLight = 0.5;
-                    vec4 positionFromLightPovInTexture = positionFromLightPov * 0.5 + 0.5;
+                    vec3 positionFromLightPovInTexture = positionFromLightPov.xyz/positionFromLightPov.w * 0.5 + 0.5;
                     float depthValue = texture2D(shadowMap, positionFromLightPovInTexture.xy).r;
-                    float shadow = positionFromLightPovInTexture.z < depthValue ? 1.0 : ambientLight;
 
                     // Gives a view of the distance from the light.
-                    //gl_FragColor = vec4(vec3(1.0 - (positionFromLightPov.z / 100.0) ), 1.0);
-                    gl_FragColor = vec4(vec3((depthValue) ), 1.0);
+                    // gl_FragColor = vec4(vec3(1.0 - (positionFromLightPov.z / 100.0) ), 1.0);
+                    // Gives a view of the Shadow map values
+                    // gl_FragColor = vec4(vec3(depthValue > 0.983 ? 0.9 : 0.3 ), 1.0);
 
+                    // This shows the range for the z coord is in world distance units
+                    // gl_FragColor = vec4(vec3(positionFromLightPov.z  > 50.0 ? 1.0 : 0.5), 1.0);
+
+                    float near = 1.0;
+                    float far = 200.0;
+                    float normal = (2.0 * near * far) / (far + near - depthValue * (far - near));
+
+                    // Show the range of the shadow map
+                    // This shows that the range is a ledge - values are 0 or 78.1
+                    // This is useless.
+                    // gl_FragColor = vec4(vec3(normal  > 78.10106 ? 1.0 : 0.5), 1.0);
+
+                    float shadow = (positionFromLightPovInTexture.z > normal + 0.005) ? ambientLight : 1.0;
+
+                    // Final
+                    gl_FragColor = vec4(u_color.rgb * shadow, u_color.a);
                 }
                 ";
 
