@@ -257,7 +257,7 @@ pub mod graphics {
 
                 float LinearizeDepth(float depth)
                 {
-                    return depth > 0.9855 ? 1.0 : 0.5;
+                    return depth;
                 }
 
                 void main()
@@ -331,7 +331,10 @@ pub mod graphics {
                     float depthValue = texture2D(shadowMap, positionFromLightPovInTexture.xy).r;
                     float shadow = positionFromLightPovInTexture.z < depthValue ? 1.0 : ambientLight;
 
-                    gl_FragColor = vec4(vec3(depthValue), 1.0);
+                    // Gives a view of the distance from the light.
+                    //gl_FragColor = vec4(vec3(1.0 - (positionFromLightPov.z / 100.0) ), 1.0);
+                    gl_FragColor = vec4(vec3((depthValue) ), 1.0);
+
                 }
                 ";
 
@@ -526,7 +529,9 @@ pub mod graphics {
             let light_view = Isometry3::look_at_rh(&light_eye, &light_target, &Vector3::y());
 
             // This is translation, rotation
+            let light_projection = Perspective3::new(1.0, 3.14 / 2.0, 1.0, 200.0);
             let light_model_view = (light_view * model).to_homogeneous();
+            let light_projection_matrix = light_projection.into_inner();
 
             let u_light_mv_matrix_location = self
                 .gl
@@ -548,7 +553,7 @@ pub mod graphics {
                 self.gl.uniform_matrix4fv_with_f32_array(
                     Some(&u_light_p_matrix_location.expect("Fail")),
                     false,
-                    projection_matrix.as_slice(),
+                    light_projection_matrix.as_slice(),
                 );
             }
 
@@ -602,6 +607,17 @@ pub mod graphics {
             self.gl.clear(
                 WebGlRenderingContext::COLOR_BUFFER_BIT | WebGlRenderingContext::DEPTH_BUFFER_BIT,
             );
+            // Bind the shadow texture
+            self.gl.bind_texture(
+                WebGlRenderingContext::TEXTURE_2D,
+                self.shadow_depth_texture.as_ref(),
+            );
+            let u_shadow_map = self
+                .gl
+                .get_uniform_location(self.camera_program.as_ref().expect("Fail"), "shadowMap");
+            if u_shadow_map.is_some() {
+                self.gl.uniform1i(u_shadow_map.as_ref(), 0);
+            }
         }
 
         pub fn finish_camera_frame(&self) {}
