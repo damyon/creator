@@ -13,7 +13,7 @@ pub mod graphics {
     extern crate nalgebra as na;
     extern crate nalgebra_glm as glm;
 
-    use na::{Isometry3, Perspective3, Vector3};
+    use na::{Isometry3, Matrix4, Orthographic3, Perspective3, Vector3};
 
     extern crate js_sys;
     pub struct Graphics {
@@ -154,16 +154,16 @@ pub mod graphics {
 
             let result = self
                 .gl
-                .tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_js_u8_array(
-                    WebGlRenderingContext::TEXTURE_2D,
-                    0,
-                    WebGlRenderingContext::RGBA as i32,
-                    8192,
-                    8192,
-                    0,
-                    WebGlRenderingContext::RGBA,
-                    WebGlRenderingContext::UNSIGNED_BYTE,
-                    None,
+                .tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_u8_array(
+                    WebGlRenderingContext::TEXTURE_2D,    // target
+                    0,                                    // level
+                    WebGlRenderingContext::RGBA as i32,   // internal format
+                    1024,                                 // width
+                    1024,                                 // height
+                    0,                                    // border
+                    WebGlRenderingContext::RGBA,          // format
+                    WebGlRenderingContext::UNSIGNED_BYTE, // type
+                    None,                                 // pixels
                 );
 
             if result.is_err() {
@@ -178,8 +178,8 @@ pub mod graphics {
             self.gl.renderbuffer_storage(
                 WebGlRenderingContext::RENDERBUFFER,
                 WebGlRenderingContext::DEPTH_COMPONENT16,
-                8192,
-                8192,
+                1024,
+                1024,
             );
             self.gl.framebuffer_texture_2d(
                 WebGlRenderingContext::FRAMEBUFFER,
@@ -202,12 +202,37 @@ pub mod graphics {
 
             self.gl
                 .bind_renderbuffer(WebGlRenderingContext::RENDERBUFFER, None);
-
-            self.gl
-                .bind_framebuffer(WebGlRenderingContext::FRAMEBUFFER, None);
         }
 
-        pub fn setup_vertices(&self, vertices: &[f32], shader_program: &WebGlProgram, light: bool) {
+        pub fn build_light_projection(&self) -> Matrix4<f32> {
+            if self.swap_cameras {
+                Perspective3::new(
+                    self.canvas_width as f32 / self.canvas_height as f32,
+                    3.14 / 4.0, // 45 degrees
+                    1.0,
+                    200.0,
+                )
+                .into_inner()
+            } else {
+                Orthographic3::new(-40.0, 40.0, -40.0, 40.0, 0.1, 80.0).into_inner()
+            }
+        }
+
+        pub fn build_camera_projection(&self) -> Matrix4<f32> {
+            if self.swap_cameras {
+                Orthographic3::new(-40.0, 40.0, -40.0, 40.0, 0.1, 80.0).into_inner()
+            } else {
+                Perspective3::new(
+                    self.canvas_width as f32 / self.canvas_height as f32,
+                    3.14 / 4.0, // 45 degrees
+                    1.0,
+                    200.0,
+                )
+                .into_inner()
+            }
+        }
+
+        pub fn setup_vertices(&self, vertices: &[f32], shader_program: &WebGlProgram) {
             let vertices_array = unsafe { js_sys::Float32Array::view(&vertices) };
             let vertex_buffer = self.gl.create_buffer().unwrap();
 
@@ -326,7 +351,7 @@ pub mod graphics {
                 varying vec4 positionFromLightPov;
 
                 void main(void) {
-                    float ambientLight = 0.5;
+                    float ambientLight = 0.7;
                     vec3 positionFromLightPovInTexture = positionFromLightPov.xyz/positionFromLightPov.w * 0.5 + 0.5;
                     float depthValue = texture2D(shadowMap, positionFromLightPovInTexture.xy).r;
 
@@ -336,18 +361,18 @@ pub mod graphics {
                     // gl_FragColor = vec4(vec3(depthValue > 0.983 ? 0.9 : 0.3 ), 1.0);
 
                     // This shows the range for the z coord is in world distance units
-                    // gl_FragColor = vec4(vec3(positionFromLightPov.z  > 50.0 ? 1.0 : 0.5), 1.0);
+                    //gl_FragColor = vec4(vec3(positionFromLightPov.z  > 0.81 ? 1.0 : 0.5), 1.0);
 
-                    float near = 1.0;
-                    float far = 200.0;
-                    float normal = (2.0 * near * far) / (far + near - depthValue * (far - near));
+                    float near = 0.1;
+                    float far = 80.0;
+                    float normal = 1.4 * (2.0 * near * far) / (far + near - depthValue * (far - near));
 
                     // Show the range of the shadow map
                     // This shows that the range is a ledge - values are 0 or 78.1
                     // This is useless.
-                    // gl_FragColor = vec4(vec3(normal  > 78.10106 ? 1.0 : 0.5), 1.0);
+                    //gl_FragColor = vec4(vec3(normal  > 0.81 ? 1.0 : 0.5), 1.0);
 
-                    float shadow = (positionFromLightPovInTexture.z > normal + 0.005) ? ambientLight : 1.0;
+                    float shadow = (positionFromLightPovInTexture.z > normal + 0.005) ? ambientLight : 0.9;
 
                     // Final
                     gl_FragColor = vec4(u_color.rgb * shadow, u_color.a);
@@ -419,7 +444,7 @@ pub mod graphics {
                 self.light_program.as_ref()
             };
             self.use_light_shader();
-            self.setup_vertices(&drawable.vertices(), shader.expect("fail"), true);
+            self.setup_vertices(&drawable.vertices(), shader.expect("fail"));
 
             // We want a model / view and a projection matrix
             // Compute the matrices
@@ -435,7 +460,7 @@ pub mod graphics {
                 Vector3::from_row_slice(drawable.rotation()),
             );
 
-            let projection = Perspective3::new(1.0, 3.14 / 2.0, 1.0, 200.0).into_inner();
+            let projection = self.build_light_projection();
             let model_view = (view * model).to_homogeneous();
             let u_mv_matrix_location = self
                 .gl
@@ -486,7 +511,7 @@ pub mod graphics {
                 self.camera_program.as_ref()
             };
             self.use_camera_shader();
-            self.setup_vertices(&drawable.vertices(), shader.expect("fail"), false);
+            self.setup_vertices(&drawable.vertices(), shader.expect("fail"));
 
             let color_location_opt = self
                 .gl
@@ -510,14 +535,8 @@ pub mod graphics {
                 Vector3::from_row_slice(drawable.rotation()),
             );
 
-            let projection = Perspective3::new(
-                self.canvas_width as f32 / self.canvas_height as f32,
-                3.14 / 4.0, // 45 degrees
-                1.0,
-                200.0,
-            );
+            let projection_matrix = self.build_camera_projection();
             let model_view = (view * model).to_homogeneous();
-            let projection_matrix = projection.into_inner();
             let u_mv_matrix_location = self
                 .gl
                 .get_uniform_location(shader.expect("fail"), "uMVMatrix")
@@ -545,9 +564,8 @@ pub mod graphics {
             let light_view = Isometry3::look_at_rh(&light_eye, &light_target, &Vector3::y());
 
             // This is translation, rotation
-            let light_projection = Perspective3::new(1.0, 3.14 / 2.0, 1.0, 200.0);
+            let light_projection_matrix = self.build_light_projection();
             let light_model_view = (light_view * model).to_homogeneous();
-            let light_projection_matrix = light_projection.into_inner();
 
             let u_light_mv_matrix_location = self
                 .gl
@@ -598,7 +616,7 @@ pub mod graphics {
             );
 
             // Set the viewport to our shadow texture's size
-            self.gl.viewport(0, 0, 8192, 8192);
+            self.gl.viewport(0, 0, 1024, 1024);
             self.gl.clear_color(0.0, 0.0, 0.0, 1.0);
             self.gl.clear_depth(1.0);
             self.gl.clear(
