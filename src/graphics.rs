@@ -353,29 +353,31 @@ pub mod graphics {
                 void main(void) {
                     float ambientLight = 0.7;
                     vec3 positionFromLightPovInTexture = positionFromLightPov.xyz/positionFromLightPov.w * 0.5 + 0.5;
-                    float depthValue = texture2D(shadowMap, positionFromLightPovInTexture.xy).r;
+                    float shadowNess = 0.0;
 
-                    // Gives a view of the distance from the light.
-                    // gl_FragColor = vec4(vec3(1.0 - (positionFromLightPov.z / 100.0) ), 1.0);
-                    // Gives a view of the Shadow map values
-                    // gl_FragColor = vec4(vec3(depthValue > 0.983 ? 0.9 : 0.3 ), 1.0);
+                    float texelSize = 1.0 / 1024.0;
+                    const int blendRange = 5;
 
-                    // This shows the range for the z coord is in world distance units
-                    //gl_FragColor = vec4(vec3(positionFromLightPov.z  > 0.81 ? 1.0 : 0.5), 1.0);
+                    for (int x = -blendRange; x <= blendRange; x++) {
+                        for (int y = -blendRange; y <= blendRange; y++) {
 
-                    float near = 0.1;
-                    float far = 80.0;
-                    float normal = 1.4 * (2.0 * near * far) / (far + near - depthValue * (far - near));
+                            float depthValue = texture2D(shadowMap, positionFromLightPovInTexture.xy + (vec2(x, y) * texelSize)).r;
+                            float near = 0.1;
+                            float far = 80.0;
+                            float normal = 1.4 * (2.0 * near * far) / (far + near - depthValue * (far - near));
 
-                    // Show the range of the shadow map
-                    // This shows that the range is a ledge - values are 0 or 78.1
-                    // This is useless.
-                    //gl_FragColor = vec4(vec3(normal  > 0.81 ? 1.0 : 0.5), 1.0);
+                            bool shadow = (positionFromLightPovInTexture.z <= normal + 0.005);
+                            if (shadow) {
+                                shadowNess += 1.0;
+                            }
+                        }
+                    }
 
-                    float shadow = (positionFromLightPovInTexture.z > normal + 0.005) ? ambientLight : 0.9;
-
+                    shadowNess /= (float(blendRange) + 1.0) * (float(blendRange) + 1.0);
                     // Final
-                    gl_FragColor = vec4(u_color.rgb * shadow, u_color.a);
+                    shadowNess /= 4.0;
+                    shadowNess += 0.3;
+                    gl_FragColor = vec4(u_color.rgb * shadowNess, u_color.a);
                 }
                 ";
 
