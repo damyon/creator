@@ -24,6 +24,7 @@ pub mod graphics {
         pub light_program: Option<WebGlProgram>,
         pub shadow_frame_buffer: Option<WebGlFramebuffer>,
         pub shadow_depth_texture: Option<WebGlTexture>,
+        pub shadow_texture_size: i32,
         pub swap_shaders: bool,
         pub swap_cameras: bool,
     }
@@ -69,6 +70,7 @@ pub mod graphics {
                 light_program: None,
                 shadow_frame_buffer: None,
                 shadow_depth_texture: None,
+                shadow_texture_size: 4096,
                 swap_shaders: false,
                 swap_cameras: false,
             }
@@ -158,8 +160,8 @@ pub mod graphics {
                     WebGlRenderingContext::TEXTURE_2D,    // target
                     0,                                    // level
                     WebGlRenderingContext::RGBA as i32,   // internal format
-                    1024,                                 // width
-                    1024,                                 // height
+                    self.shadow_texture_size,             // width
+                    self.shadow_texture_size,             // height
                     0,                                    // border
                     WebGlRenderingContext::RGBA,          // format
                     WebGlRenderingContext::UNSIGNED_BYTE, // type
@@ -178,8 +180,8 @@ pub mod graphics {
             self.gl.renderbuffer_storage(
                 WebGlRenderingContext::RENDERBUFFER,
                 WebGlRenderingContext::DEPTH_COMPONENT16,
-                1024,
-                1024,
+                self.shadow_texture_size,
+                self.shadow_texture_size,
             );
             self.gl.framebuffer_texture_2d(
                 WebGlRenderingContext::FRAMEBUFFER,
@@ -347,6 +349,7 @@ pub mod graphics {
             let fragment_shader_source = "
                 precision mediump float;
                 uniform vec4 u_color;
+                uniform int u_shadow_texture_size;
                 uniform sampler2D shadowMap;
                 varying vec4 positionFromLightPov;
 
@@ -355,8 +358,8 @@ pub mod graphics {
                     vec3 positionFromLightPovInTexture = positionFromLightPov.xyz/positionFromLightPov.w * 0.5 + 0.5;
                     float shadowNess = 0.0;
 
-                    float texelSize = 1.0 / 1024.0;
-                    const int blendRange = 5;
+                    float texelSize = 1.0 / float(u_shadow_texture_size);
+                    const int blendRange = 7;
 
                     for (int x = -blendRange; x <= blendRange; x++) {
                         for (int y = -blendRange; y <= blendRange; y++) {
@@ -366,7 +369,7 @@ pub mod graphics {
                             float far = 80.0;
                             float normal = 1.4 * (2.0 * near * far) / (far + near - depthValue * (far - near));
 
-                            bool shadow = (positionFromLightPovInTexture.z <= normal + 0.005);
+                            bool shadow = (positionFromLightPovInTexture.z < normal);
                             if (shadow) {
                                 shadowNess += 1.0;
                             }
@@ -376,7 +379,7 @@ pub mod graphics {
                     shadowNess /= (float(blendRange) + 1.0) * (float(blendRange) + 1.0);
                     // Final
                     shadowNess /= 4.0;
-                    shadowNess += 0.3;
+                    shadowNess += 0.6;
                     gl_FragColor = vec4(u_color.rgb * shadowNess, u_color.a);
                 }
                 ";
@@ -523,6 +526,16 @@ pub mod graphics {
                     .uniform4fv_with_f32_array(color_location_opt.as_ref(), drawable.color());
             }
 
+            let u_shadow_texture_size_location_opt = self
+                .gl
+                .get_uniform_location(shader.expect("fail"), "u_shadow_texture_size");
+            if u_shadow_texture_size_location_opt.is_some() {
+                self.gl.uniform1i(
+                    u_shadow_texture_size_location_opt.as_ref(),
+                    self.shadow_texture_size,
+                );
+            }
+
             // We want a model / view / projection matrix
             // Compute the matrices
             // Our camera looks toward the point (0.0, 0.0, 0.0).
@@ -618,7 +631,8 @@ pub mod graphics {
             );
 
             // Set the viewport to our shadow texture's size
-            self.gl.viewport(0, 0, 1024, 1024);
+            self.gl
+                .viewport(0, 0, self.shadow_texture_size, self.shadow_texture_size);
             self.gl.clear_color(0.0, 0.0, 0.0, 1.0);
             self.gl.clear_depth(1.0);
             self.gl.clear(

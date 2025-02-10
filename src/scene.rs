@@ -360,7 +360,7 @@ pub mod scene {
         }
 
         pub fn init(&mut self, canvas_id: &str) {
-            self.light.eye = Point3::new(-30.0, 50.0, 10.0);
+            self.light.eye = Point3::new(5.0, 30.0, 5.0);
             self.light.target = Point3::new(0.0, 0.0, 0.0);
             //self.light.eye = Point3::new(8.0, 6.0, 20.0);
             //self.light.target = Point3::new(1.0, 0.0, 10.0);
