@@ -1,6 +1,3 @@
-
-
-
 pub mod grid {
 
     #[derive(Copy, Clone)]
@@ -8,11 +5,11 @@ pub mod grid {
         pub scale: u16,
         pub square_count: u16,
         pub vertices_count: u16,
-        pub vertices: [f32; 396 ],
+        pub vertices: [f32; 396],
         pub max_scale: u16,
         pub translation: [f32; 3],
         pub rotation: [f32; 3],
-        pub color: [f32; 4]
+        pub color: [f32; 4],
     }
 
     use crate::drawable::drawable::Drawable;
@@ -21,7 +18,7 @@ pub mod grid {
         pub const fn new() -> Grid {
             Grid {
                 scale: 32,
-                square_count: 1024, // self.scale * self.scale
+                square_count: 1024,  // self.scale * self.scale
                 vertices_count: 396, // 2 * (6 * (self.scale+1))
                 vertices: [0.0; 396],
                 max_scale: 40,
@@ -35,7 +32,11 @@ pub mod grid {
     impl Drawable for Grid {
         fn init(&mut self) {
             let mut index = 0;
-            let mut increment = || -> usize {let result = index; index += 1; result};
+            let mut increment = || -> usize {
+                let result = index;
+                index += 1;
+                result
+            };
 
             let row_vertices: [f32; 6] = [
                 -1.0, 1.0, 0.0, // top left
@@ -49,7 +50,7 @@ pub mod grid {
             if self.scale > self.max_scale {
                 panic!("Scale for grid is out of bounds");
             }
-             // We want one pair of vertices for each row +1 and one for each column + 1
+            // We want one pair of vertices for each row +1 and one for each column + 1
 
             let scale_f = self.scale as f32;
             for row in 0..=self.scale {
@@ -69,15 +70,15 @@ pub mod grid {
                 self.vertices[increment()] = (col_vertices[4]) * scale_f / 2.0;
                 self.vertices[increment()] = (col_vertices[5]) * scale_f / 2.0;
             }
-            
+
             self.square_count = self.scale * self.scale;
-            self.vertices_count = 2 * (6 * (self.scale+1));
+            self.vertices_count = 2 * (6 * (self.scale + 1));
         }
 
         fn count_vertices(&self) -> u16 {
             self.vertices_count
         }
-        
+
         fn translation(&self) -> &[f32; 3] {
             &self.translation
         }
@@ -106,5 +107,8 @@ pub mod grid {
             &self.color
         }
 
+        fn normals(&self) -> &[f32] {
+            &[]
+        }
     }
 }

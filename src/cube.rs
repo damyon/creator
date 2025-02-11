@@ -4,6 +4,7 @@ pub mod cube {
     pub struct Cube {
         pub vertices_count: u16,
         pub vertices: [f32; 108],
+        pub normals: [f32; 108],
         pub translation: [f32; 3],
         pub rotation: [f32; 3],
         pub color: [f32; 4],
@@ -18,6 +19,7 @@ pub mod cube {
             Cube {
                 vertices_count: 108,
                 vertices: [0.0; 108],
+                normals: [0.0; 108],
                 translation: [0.0; 3],
                 rotation: [0.0; 3],
                 color: [0.6, 0.6, 0.2, 0.6],
@@ -34,6 +36,12 @@ pub mod cube {
                 let result = index;
                 index += 1;
                 result
+            };
+            let mut normal_index: usize = 0;
+            let mut normal_increment = || -> usize {
+                let normal_result = normal_index;
+                normal_index += 1;
+                normal_result
             };
             let scale: f32 = self.scale;
             let floor: f32 = self.floor;
@@ -161,6 +169,128 @@ pub mod cube {
             self.vertices[increment()] = floor;
 
             self.vertices_count = self.vertices.len() as u16;
+
+            // Bottom - UPDATE TO NORMALS FROM VERTS
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            // Left
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = floor;
+            // Right
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+
+            // Front
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+            // Back
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = floor;
+
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            // Top
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = floor;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = scale;
+            self.normals[normal_increment()] = floor;
         }
 
         fn count_vertices(&self) -> u16 {
@@ -193,6 +323,10 @@ pub mod cube {
 
         fn vertices(&self) -> &[f32] {
             &self.vertices
+        }
+
+        fn normals(&self) -> &[f32] {
+            &self.normals
         }
     }
 }
