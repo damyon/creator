@@ -234,7 +234,12 @@ pub mod graphics {
             }
         }
 
-        pub fn setup_vertices(&self, vertices: &[f32], shader_program: &WebGlProgram) {
+        pub fn setup_vertices(
+            &self,
+            vertices: &[f32],
+            normals: &[f32],
+            shader_program: &WebGlProgram,
+        ) {
             let vertices_array = unsafe { js_sys::Float32Array::view(&vertices) };
             let vertex_buffer = self.gl.create_buffer().unwrap();
 
@@ -258,6 +263,31 @@ pub mod graphics {
                 0,
             );
             self.gl.enable_vertex_attrib_array(a_position as u32);
+
+            // Normals
+            let normals_array = unsafe { js_sys::Float32Array::view(&normals) };
+            let normal_buffer = self.gl.create_buffer().unwrap();
+
+            self.gl
+                .bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&normal_buffer));
+            self.gl.buffer_data_with_array_buffer_view(
+                WebGlRenderingContext::ARRAY_BUFFER,
+                &normals_array,
+                WebGlRenderingContext::STATIC_DRAW,
+            );
+            let a_normal = self.gl.get_attrib_location(&shader_program, "a_normal");
+
+            self.gl
+                .bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&normal_buffer));
+            self.gl.vertex_attrib_pointer_with_i32(
+                a_normal as u32,
+                3,
+                WebGlRenderingContext::FLOAT,
+                false,
+                0,
+                0,
+            );
+            self.gl.enable_vertex_attrib_array(a_normal as u32);
         }
 
         pub fn setup_shaders(&mut self) {
@@ -332,17 +362,20 @@ pub mod graphics {
         pub fn setup_camera_shaders(&mut self) -> WebGlProgram {
             let vertex_shader_source = "
                 attribute vec4 a_position;
+                attribute vec3 a_normal;
                 uniform mat4 uPMatrix;
                 uniform mat4 uMVMatrix;
                 uniform mat4 u_light_PMatrix;
                 uniform mat4 u_light_MVMatrix;
                 varying vec4 positionFromLightPov;
+                varying vec3 v_normal;
 
                 void main(void) {
                     // Multiply the position by the matrix.
                     gl_Position = uPMatrix * uMVMatrix * a_position;
 
                     positionFromLightPov = u_light_PMatrix * u_light_MVMatrix * a_position;
+                    v_normal = a_normal;
                 }
                 ";
 
@@ -352,6 +385,8 @@ pub mod graphics {
                 uniform int u_shadow_texture_size;
                 uniform sampler2D shadowMap;
                 varying vec4 positionFromLightPov;
+                varying vec4 positionFromLightMV;
+                varying vec3 v_normal;
 
                 void main(void) {
                     float ambientLight = 0.7;
@@ -377,10 +412,16 @@ pub mod graphics {
                     }
 
                     shadowNess /= (float(blendRange) + 1.0) * (float(blendRange) + 1.0);
-                    // Final
-                    shadowNess /= 4.0;
-                    shadowNess += 0.6;
-                    gl_FragColor = vec4(u_color.rgb * shadowNess, u_color.a);
+                    shadowNess = 1.0 - shadowNess;
+                    // Diffuse
+                    vec3 lightDir = normalize(-(vec3(-3.0, -10.0, 5.0)));
+                    vec3 normal = normalize(v_normal);
+                    float shade = max(dot(normal, lightDir), 0.0);
+
+                    shadowNess /= 9.0;
+                    float combined = 0.9 * shade - shadowNess;
+
+                    gl_FragColor = vec4(u_color.rgb * combined, u_color.a);
                 }
                 ";
 
@@ -449,7 +490,11 @@ pub mod graphics {
                 self.light_program.as_ref()
             };
             self.use_light_shader();
-            self.setup_vertices(&drawable.vertices(), shader.expect("fail"));
+            self.setup_vertices(
+                &drawable.vertices(),
+                &drawable.normals(),
+                shader.expect("fail"),
+            );
 
             // We want a model / view and a projection matrix
             // Compute the matrices
@@ -516,7 +561,11 @@ pub mod graphics {
                 self.camera_program.as_ref()
             };
             self.use_camera_shader();
-            self.setup_vertices(&drawable.vertices(), shader.expect("fail"));
+            self.setup_vertices(
+                &drawable.vertices(),
+                &drawable.normals(),
+                shader.expect("fail"),
+            );
 
             let color_location_opt = self
                 .gl
