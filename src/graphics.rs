@@ -55,7 +55,7 @@ pub mod graphics {
 
             gl.enable(WebGlRenderingContext::DEPTH_TEST);
             gl.depth_func(WebGlRenderingContext::LEQUAL);
-            //gl.enable(WebGlRenderingContext::BLEND);
+            gl.enable(WebGlRenderingContext::BLEND);
             gl.blend_func(
                 WebGlRenderingContext::ONE,
                 WebGlRenderingContext::ONE_MINUS_SRC_ALPHA,
@@ -216,13 +216,13 @@ pub mod graphics {
                 )
                 .into_inner()
             } else {
-                Orthographic3::new(-40.0, 40.0, -40.0, 40.0, 0.1, 80.0).into_inner()
+                Orthographic3::new(-40.0, 40.0, -40.0, 40.0, 0.1, 40.0).into_inner()
             }
         }
 
         pub fn build_camera_projection(&self) -> Matrix4<f32> {
             if self.swap_cameras {
-                Orthographic3::new(-40.0, 40.0, -40.0, 40.0, 0.1, 80.0).into_inner()
+                Orthographic3::new(-40.0, 40.0, -40.0, 40.0, 0.1, 40.0).into_inner()
             } else {
                 Perspective3::new(
                     self.canvas_width as f32 / self.canvas_height as f32,
@@ -314,7 +314,7 @@ pub mod graphics {
 
                 float LinearizeDepth(float depth)
                 {
-                    return depth; // > 0.985 ? 0.9 : 0.3;
+                    return depth;
                 }
 
                 void main()
@@ -401,8 +401,8 @@ pub mod graphics {
 
                             float depthValue = texture2D(shadowMap, positionFromLightPovInTexture.xy + (vec2(x, y) * texelSize)).r;
                             float near = 0.1;
-                            float far = 80.0;
-                            float normal = 1.4 * (2.0 * near * far) / (far + near - depthValue * (far - near));
+                            float far = 40.0;
+                            float normal = 1.05 * (2.0 * near * far) / (far + near - depthValue * (far - near));
 
                             bool shadow = (positionFromLightPovInTexture.z < normal);
                             if (shadow) {
@@ -701,7 +701,7 @@ pub mod graphics {
 
             self.gl
                 .viewport(0, 0, self.canvas_width, self.canvas_height);
-            self.gl.clear_color(0.0, 0.0, 0.0, 1.0);
+            self.gl.clear_color(0.5, 0.5, 0.7, 1.0);
             self.gl.clear_depth(1.0);
             self.gl.clear(
                 WebGlRenderingContext::COLOR_BUFFER_BIT | WebGlRenderingContext::DEPTH_BUFFER_BIT,
