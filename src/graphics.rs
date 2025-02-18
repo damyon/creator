@@ -70,7 +70,7 @@ pub mod graphics {
                 light_program: None,
                 shadow_frame_buffer: None,
                 shadow_depth_texture: None,
-                shadow_texture_size: 1024,
+                shadow_texture_size: 4096,
                 swap_shaders: false,
                 swap_cameras: false,
             }
@@ -326,7 +326,7 @@ pub mod graphics {
 
                 void main()
                 {
-                    gl_FragColor = vec4(vec3(LinearizeDepth(gl_FragCoord.z + 0.01)), 1.0);
+                    gl_FragColor = vec4(vec3(LinearizeDepth(gl_FragCoord.z + 0.0005)), 1.0);
                 }
                 ";
 
@@ -395,10 +395,14 @@ pub mod graphics {
                 varying vec4 positionFromLightMV;
                 varying vec3 v_normal;
 
+                float rand(vec2 co){
+                    return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+                }
+
                 void main(void) {
-                    float ambientLight = 0.7;
+                    float ambientLight = 0.3;
                     vec3 positionFromLightPovInTexture = positionFromLightPov.xyz/positionFromLightPov.w * 0.5 + 0.5;
-                    float shadowNess = 1.0;
+                    float shadowNess = rand(positionFromLightPovInTexture.xy);
 
                     float depthValue = texture2D(shadowMap, positionFromLightPovInTexture.xy).x;
                     bool shadow = (positionFromLightPovInTexture.z < depthValue);
@@ -419,7 +423,7 @@ pub mod graphics {
                     //shadowNess /= 9.0;
                     //shade = 1.0;
                     //shadowNess = 0.0;
-                    float combined = 0.5 * shade - 0.5 * shadowNess;
+                    float combined = ambientLight + 0.6 * shade - 0.1 * shadowNess;
 
                     gl_FragColor = vec4(u_color.rgb * combined, u_color.a);
                 }
