@@ -70,7 +70,7 @@ pub mod graphics {
                 light_program: None,
                 shadow_frame_buffer: None,
                 shadow_depth_texture: None,
-                shadow_texture_size: 4096,
+                shadow_texture_size: 1024,
                 swap_shaders: false,
                 swap_cameras: false,
             }
@@ -129,6 +129,10 @@ pub mod graphics {
         }
 
         pub fn create_shadow_depth_texture(&mut self) {
+            if self.gl.get_extension("OES_texture_float").is_err() {
+                panic!("Webgl extension error.");
+            }
+
             self.shadow_frame_buffer = self.gl.create_framebuffer();
 
             self.gl.bind_framebuffer(
@@ -157,15 +161,15 @@ pub mod graphics {
             let result = self
                 .gl
                 .tex_image_2d_with_i32_and_i32_and_i32_and_format_and_type_and_opt_u8_array(
-                    WebGlRenderingContext::TEXTURE_2D,    // target
-                    0,                                    // level
-                    WebGlRenderingContext::RGBA as i32,   // internal format
-                    self.shadow_texture_size,             // width
-                    self.shadow_texture_size,             // height
-                    0,                                    // border
-                    WebGlRenderingContext::RGBA,          // format
-                    WebGlRenderingContext::UNSIGNED_BYTE, // type
-                    None,                                 // pixels
+                    WebGlRenderingContext::TEXTURE_2D,  // target
+                    0,                                  // level
+                    WebGlRenderingContext::RGBA as i32, // internal format
+                    self.shadow_texture_size,           // width
+                    self.shadow_texture_size,           // height
+                    0,                                  // border
+                    WebGlRenderingContext::RGBA,        // format
+                    WebGlRenderingContext::FLOAT,       // type
+                    None,                               // pixels
                 );
 
             if result.is_err() {
@@ -216,13 +220,13 @@ pub mod graphics {
                 )
                 .into_inner()
             } else {
-                Orthographic3::new(-40.0, 40.0, -40.0, 40.0, 0.1, 40.0).into_inner()
+                Orthographic3::new(-32.0, 32.0, -32.0, 32.0, 1.0, 240.0).into_inner()
             }
         }
 
         pub fn build_camera_projection(&self) -> Matrix4<f32> {
             if self.swap_cameras {
-                Orthographic3::new(-40.0, 40.0, -40.0, 40.0, 0.1, 40.0).into_inner()
+                Orthographic3::new(-32.0, 32.0, -32.0, 32.0, 0.1, 120.0).into_inner()
             } else {
                 Perspective3::new(
                     self.canvas_width as f32 / self.canvas_height as f32,
@@ -239,6 +243,7 @@ pub mod graphics {
             vertices: &[f32],
             normals: &[f32],
             shader_program: &WebGlProgram,
+            is_camera: bool,
         ) {
             let vertices_array = unsafe { js_sys::Float32Array::view(&vertices) };
             let vertex_buffer = self.gl.create_buffer().unwrap();
@@ -265,29 +270,31 @@ pub mod graphics {
             self.gl.enable_vertex_attrib_array(a_position as u32);
 
             // Normals
-            let normals_array = unsafe { js_sys::Float32Array::view(&normals) };
-            let normal_buffer = self.gl.create_buffer().unwrap();
+            if is_camera {
+                let normals_array = unsafe { js_sys::Float32Array::view(&normals) };
+                let normal_buffer = self.gl.create_buffer().unwrap();
 
-            self.gl
-                .bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&normal_buffer));
-            self.gl.buffer_data_with_array_buffer_view(
-                WebGlRenderingContext::ARRAY_BUFFER,
-                &normals_array,
-                WebGlRenderingContext::STATIC_DRAW,
-            );
-            let a_normal = self.gl.get_attrib_location(&shader_program, "a_normal");
+                self.gl
+                    .bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&normal_buffer));
+                self.gl.buffer_data_with_array_buffer_view(
+                    WebGlRenderingContext::ARRAY_BUFFER,
+                    &normals_array,
+                    WebGlRenderingContext::STATIC_DRAW,
+                );
+                let a_normal = self.gl.get_attrib_location(&shader_program, "a_normal");
 
-            self.gl
-                .bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&normal_buffer));
-            self.gl.vertex_attrib_pointer_with_i32(
-                a_normal as u32,
-                3,
-                WebGlRenderingContext::FLOAT,
-                false,
-                0,
-                0,
-            );
-            self.gl.enable_vertex_attrib_array(a_normal as u32);
+                self.gl
+                    .bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&normal_buffer));
+                self.gl.vertex_attrib_pointer_with_i32(
+                    a_normal as u32,
+                    3,
+                    WebGlRenderingContext::FLOAT,
+                    false,
+                    0,
+                    0,
+                );
+                self.gl.enable_vertex_attrib_array(a_normal as u32);
+            }
         }
 
         pub fn setup_shaders(&mut self) {
@@ -319,7 +326,7 @@ pub mod graphics {
 
                 void main()
                 {
-                    gl_FragColor = vec4(vec3(LinearizeDepth(gl_FragCoord.z)), 1.0);
+                    gl_FragColor = vec4(vec3(LinearizeDepth(gl_FragCoord.z + 0.01)), 1.0);
                 }
                 ";
 
@@ -391,35 +398,28 @@ pub mod graphics {
                 void main(void) {
                     float ambientLight = 0.7;
                     vec3 positionFromLightPovInTexture = positionFromLightPov.xyz/positionFromLightPov.w * 0.5 + 0.5;
-                    float shadowNess = 0.0;
+                    float shadowNess = 1.0;
 
-                    float texelSize = 1.0 / float(u_shadow_texture_size);
-                    const int blendRange = 7;
+                    float depthValue = texture2D(shadowMap, positionFromLightPovInTexture.xy).x;
+                    bool shadow = (positionFromLightPovInTexture.z < depthValue);
 
-                    for (int x = -blendRange; x <= blendRange; x++) {
-                        for (int y = -blendRange; y <= blendRange; y++) {
+                    // Range for positionFromLightPovInTexture.z is about 0.24 to 0.31
+                    //shadow = positionFromLightPovInTexture.z < 0.31;
 
-                            float depthValue = texture2D(shadowMap, positionFromLightPovInTexture.xy + (vec2(x, y) * texelSize)).r;
-                            float near = 0.1;
-                            float far = 40.0;
-                            float normal = 1.05 * (2.0 * near * far) / (far + near - depthValue * (far - near));
-
-                            bool shadow = (positionFromLightPovInTexture.z < normal);
-                            if (shadow) {
-                                shadowNess += 1.0;
-                            }
-                        }
+                    // Range for depthValue is about 0.21 to 0.31
+                    //shadow = depthValue < 0.21;
+                    if (shadow) {
+                        shadowNess = 0.0;
                     }
-
-                    shadowNess /= (float(blendRange) + 1.0) * (float(blendRange) + 1.0);
-                    shadowNess = 1.0 - shadowNess;
                     // Diffuse
                     vec3 lightDir = normalize(-(vec3(-3.0, -10.0, 5.0)));
                     vec3 normal = normalize(v_normal);
                     float shade = max(dot(normal, lightDir), 0.0);
 
-                    shadowNess /= 9.0;
-                    float combined = 0.9 * shade - shadowNess;
+                    //shadowNess /= 9.0;
+                    //shade = 1.0;
+                    //shadowNess = 0.0;
+                    float combined = 0.5 * shade - 0.5 * shadowNess;
 
                     gl_FragColor = vec4(u_color.rgb * combined, u_color.a);
                 }
@@ -461,6 +461,8 @@ pub mod graphics {
         }
 
         pub fn use_light_shader(&self) {
+            self.gl.disable(WebGlRenderingContext::BLEND);
+
             if !self.swap_shaders {
                 self.gl.use_program(self.light_program.as_ref());
             } else {
@@ -469,6 +471,7 @@ pub mod graphics {
         }
 
         pub fn use_camera_shader(&self) {
+            self.gl.enable(WebGlRenderingContext::BLEND);
             if !self.swap_shaders {
                 self.gl.use_program(self.camera_program.as_ref());
             } else {
@@ -494,12 +497,11 @@ pub mod graphics {
                 &drawable.vertices(),
                 &drawable.normals(),
                 shader.expect("fail"),
+                false,
             );
 
             // We want a model / view and a projection matrix
             // Compute the matrices
-            // Our camera looks toward the point (0.0, 0.0, 0.0).
-            // It is located at (2.0, 2.0, 2.0).
             let eye = light.eye;
             let target = light.target;
             let view = Isometry3::look_at_rh(&eye, &target, &Vector3::y());
@@ -565,6 +567,7 @@ pub mod graphics {
                 &drawable.vertices(),
                 &drawable.normals(),
                 shader.expect("fail"),
+                true,
             );
 
             let color_location_opt = self

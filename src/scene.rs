@@ -40,6 +40,7 @@ pub mod scene {
         selection_radius: u32,
         selection_shape: SelectionShape,
         material_color: [f32; 4],
+        initialized: bool,
     }
 
     impl Scene {
@@ -75,6 +76,7 @@ pub mod scene {
                 selection_radius: 1,
                 selection_shape: SelectionShape::Sphere,
                 material_color: [0.8, 0.8, 0.8, 1.0],
+                initialized: false,
             });
             GLOBSTATE.lock().unwrap()
         }
@@ -360,7 +362,7 @@ pub mod scene {
         }
 
         pub fn init(&mut self, canvas_id: &str) {
-            self.light.eye = Point3::new(5.0, 30.0, 5.0);
+            self.light.eye = Point3::new(5.0, 60.0, 5.0);
             self.light.target = Point3::new(0.0, 0.0, 0.0);
             //self.light.eye = Point3::new(8.0, 6.0, 20.0);
             //self.light.target = Point3::new(1.0, 0.0, 10.0);
@@ -448,6 +450,7 @@ pub mod scene {
             });
 
             mouse_up_closure.forget();
+            self.initialized = true;
         }
 
         pub fn calculate_distance_squared(from: &[i32; 3], to: &[i32; 3]) -> i32 {
@@ -498,12 +501,20 @@ pub mod scene {
 
         pub fn draw(graphics: &Graphics) {
             let mut scene = Self::access();
+            if !scene.initialized {
+                return;
+            }
 
             graphics.prepare_shadow_frame();
             let light = if !graphics.swap_cameras {
                 scene.light
             } else {
                 scene.camera
+            };
+            let camera = if !graphics.swap_cameras {
+                scene.camera
+            } else {
+                scene.light
             };
             if !graphics.swap_shaders {
                 for voxel in scene.model.drawables().iter() {
@@ -514,11 +525,6 @@ pub mod scene {
             graphics.finish_shadow_frame();
             graphics.prepare_camera_frame();
 
-            let camera = if !graphics.swap_cameras {
-                scene.camera
-            } else {
-                scene.light
-            };
             let selections = Self::selection_voxels(
                 &scene.selection_position,
                 scene.selection_radius as i32,
