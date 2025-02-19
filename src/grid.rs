@@ -24,7 +24,7 @@ pub mod grid {
                 max_scale: 40,
                 translation: [0.0; 3],
                 rotation: [0.0; 3],
-                color: [0.2, 0.2, 0.2, 0.1],
+                color: [0.5, 0.5, 0.5, 0.2],
             }
         }
     }
