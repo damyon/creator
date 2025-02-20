@@ -33,8 +33,6 @@ pub mod scene {
         command_input: CommandQueue,
         selection_cube: Cube,
         grid_xz: Grid,
-        grid_xy: Grid,
-        grid_yz: Grid,
         model: Model,
         selection_position: [i32; 3],
         selection_radius: u32,
@@ -69,8 +67,6 @@ pub mod scene {
                 command_input: CommandQueue::new(),
                 selection_cube: Cube::new(),
                 grid_xz: Grid::new(),
-                grid_xy: Grid::new(),
-                grid_yz: Grid::new(),
                 model: Model::new(),
                 selection_position: [0, 0, 0],
                 selection_radius: 1,
@@ -368,10 +364,7 @@ pub mod scene {
             //self.light.target = Point3::new(1.0, 0.0, 10.0);
             self.selection_cube.init();
             self.grid_xz.init();
-            self.grid_xy.init();
-            self.grid_xy.rotate([(90.0 as f32).to_radians(), 0.0, 0.0]);
-            self.grid_yz.init();
-            self.grid_yz.rotate([0.0, (90.0 as f32).to_radians(), 0.0]);
+            self.grid_xz.rotate([(90.0 as f32).to_radians(), 0.0, 0.0]);
 
             self.model.init();
 
@@ -545,8 +538,6 @@ pub mod scene {
                 );
             }
             graphics.draw(&scene.grid_xz, WebGlRenderingContext::LINES, camera, light);
-            graphics.draw(&scene.grid_xy, WebGlRenderingContext::LINES, camera, light);
-            graphics.draw(&scene.grid_yz, WebGlRenderingContext::LINES, camera, light);
 
             for voxel in scene.model.drawables().iter() {
                 graphics.draw(voxel, WebGlRenderingContext::TRIANGLES, camera, light);

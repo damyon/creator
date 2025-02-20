@@ -400,7 +400,7 @@ pub mod graphics {
                 }
 
                 void main(void) {
-                    float ambientLight = 0.3;
+                    float ambientLight = 0.5;
                     vec3 positionFromLightPovInTexture = positionFromLightPov.xyz/positionFromLightPov.w * 0.5 + 0.5;
                     float shadowNess = rand(positionFromLightPovInTexture.xy) / 1.6 + 0.4;
                     shadowNess = 0.0;
