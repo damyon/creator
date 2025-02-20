@@ -402,28 +402,47 @@ pub mod graphics {
                 void main(void) {
                     float ambientLight = 0.3;
                     vec3 positionFromLightPovInTexture = positionFromLightPov.xyz/positionFromLightPov.w * 0.5 + 0.5;
-                    float shadowNess = rand(positionFromLightPovInTexture.xy);
+                    float shadowNess = rand(positionFromLightPovInTexture.xy) / 1.6 + 0.4;
+                    shadowNess = 0.0;
+                    float texelSize = 2.0 / 4096.0;
 
-                    float depthValue = texture2D(shadowMap, positionFromLightPovInTexture.xy).x;
-                    bool shadow = (positionFromLightPovInTexture.z < depthValue);
+                    const int blend = 5;
 
-                    // Range for positionFromLightPovInTexture.z is about 0.24 to 0.31
-                    //shadow = positionFromLightPovInTexture.z < 0.31;
+                    float blendLength = float(blend) * 2.0 + 1.0;
+                    blendLength = blendLength * blendLength;
 
-                    // Range for depthValue is about 0.21 to 0.31
-                    //shadow = depthValue < 0.21;
-                    if (shadow) {
-                        shadowNess = 0.0;
+                    for (int x = -blend; x <= blend; x++) {
+
+                        for (int y = -blend; y <= blend; y++) {
+                            int bigx = 1 * x;
+                            int bigy = 1 * y;
+                            float depth = texture2D(shadowMap, positionFromLightPovInTexture.xy + vec2(bigx, bigy) * texelSize).x;
+
+                            // Range for positionFromLightPovInTexture.z is about 0.24 to 0.31
+                            //shadow = positionFromLightPovInTexture.z < 0.31;
+
+                            // Range for depthValue is about 0.21 to 0.31
+                            // false is black?
+                            if (depth < positionFromLightPovInTexture.z) {
+                                shadowNess += 1.0;
+                            }
+
+                        }
                     }
+
+                    shadowNess /= blendLength;
+
+                    //if (shadow) {
+                    //    shadowNess = 0.0;
+                    //}
                     // Diffuse
                     vec3 lightDir = normalize(-(vec3(-3.0, -10.0, 5.0)));
                     vec3 normal = normalize(v_normal);
                     float shade = max(dot(normal, lightDir), 0.0);
 
-                    //shadowNess /= 9.0;
-                    //shade = 1.0;
                     //shadowNess = 0.0;
-                    float combined = ambientLight + 0.6 * shade - 0.1 * shadowNess;
+                    //shade = 0.0;
+                    float combined = ambientLight + 0.6 * shade - 0.2 * shadowNess;
 
                     gl_FragColor = vec4(u_color.rgb * combined, u_color.a);
                 }
