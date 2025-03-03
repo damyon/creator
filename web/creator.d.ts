@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export function init_scene(canvas_id: string): boolean;
+export function first_scene_name(): string;
 export function draw_scene(canvas_id: string): boolean;
 export function set_material_color(red: string, green: string, blue: string): boolean;
 
@@ -9,6 +10,7 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly init_scene: (a: number, b: number, c: number) => void;
+  readonly first_scene_name: (a: number) => void;
   readonly draw_scene: (a: number, b: number, c: number) => void;
   readonly set_material_color: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
   readonly __wbindgen_exn_store: (a: number) => void;
@@ -16,7 +18,9 @@ export interface InitOutput {
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_export_3: WebAssembly.Table;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
-  readonly _dyn_core__ops__function__FnMut___A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__ha394a085ed463adf: (a: number, b: number, c: number) => void;
+  readonly __wbindgen_free: (a: number, b: number, c: number) => void;
+  readonly _dyn_core__ops__function__FnMut___A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hce84db393c2f8650: (a: number, b: number, c: number) => void;
+  readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h5656f935c734b6fc: (a: number, b: number, c: number) => void;
 }
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;

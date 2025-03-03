@@ -1,4 +1,4 @@
-import init, { draw_scene, init_scene, set_material_color } from "./creator.js";
+import init, { draw_scene, init_scene, set_material_color, first_scene_name } from "./creator.js";
 
 const CANVAS_ID = "scene";
 var other = 10;
@@ -7,6 +7,10 @@ async function run() {
   draw_scene(CANVAS_ID);
 
   setTimeout(run, 100);
+}
+
+async function get_first_scene_name() {
+  console.log(first_scene_name());
 }
 
 function hex_to_rgb(hex) {
@@ -31,3 +35,5 @@ await init();
 await init_scene(CANVAS_ID);
 
 run();
+
+setTimeout(get_first_scene_name, 2000);
