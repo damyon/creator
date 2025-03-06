@@ -1,6 +1,6 @@
 pub mod storage {
     use js_sys::Array;
-    use std::sync::Mutex;
+    use std::sync::{LazyLock, Mutex};
     use wasm_bindgen::prelude::Closure;
     use wasm_bindgen::{JsCast, JsValue};
     use web_sys::{Event, IdbTransaction};
@@ -13,7 +13,7 @@ pub mod storage {
         noop: f32,
     }
 
-    pub static MY_STRING: Mutex<String> = Mutex::new(String::new());
+    pub static SCENE_NAMES: Mutex<Vec<String>> = Mutex::new(vec![]);
 
     impl Storage {
         pub fn new() -> Storage {
@@ -21,8 +21,9 @@ pub mod storage {
         }
 
         pub fn first_scene_name(self: Self) -> String {
-            let result = MY_STRING.lock().unwrap();
-            result.clone()
+            let result = SCENE_NAMES.lock().unwrap();
+            log::debug!("Result is {:?}", result[0]);
+            result[0].clone()
         }
 
         pub fn list_scenes(self: Self) {
@@ -42,9 +43,13 @@ pub mod storage {
                 let target: IdbRequest = event.target().unwrap().dyn_into().unwrap();
                 log::debug!("We got a target: {:?}", target.result().unwrap().is_array());
                 let scenes: Array = target.result().unwrap().dyn_into().unwrap();
-                *MY_STRING.lock().unwrap() =
-                    scenes.at(0).as_string().expect("Got first scene name");
-                log::debug!("Here is the first: {:?}", MY_STRING);
+                let mut glob_scenes = SCENE_NAMES.lock().unwrap();
+                for (_index, name) in scenes.iter().enumerate() {
+                    let name_string: String =
+                        name.as_string().expect("Did not get value").to_owned();
+                    let b = name_string.to_owned();
+                    glob_scenes.push(b);
+                }
             }));
 
             let open_success = Closure::once(Box::new(move |event: Event| {
@@ -82,7 +87,7 @@ pub mod storage {
 
                 log::debug!("We made a store with an index");
 
-                let request = object_store
+                let _request = object_store
                     .add_with_key(
                         JsValue::from_str("").as_ref(),
                         JsValue::from_str("Default").as_ref(),
