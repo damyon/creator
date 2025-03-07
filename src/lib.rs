@@ -1,3 +1,4 @@
+use js_sys::Array;
 use wasm_bindgen::prelude::*;
 extern crate js_sys;
 
@@ -27,6 +28,29 @@ pub fn init_scene(canvas_id: &str) -> Result<bool, JsValue> {
     let storage: Storage = Storage::new();
     storage.list_scenes();
     Ok(true)
+}
+
+pub async fn later() -> Vec<String> {
+    vec!["sumfun".to_string(), "sumfunelse".to_string()]
+}
+
+#[wasm_bindgen]
+pub async fn threads() -> Result<JsValue, JsValue> {
+    let hmmm = later().await;
+
+    let converted: Array = hmmm.into_iter().map(JsValue::from).collect();
+
+    Ok(JsValue::from(converted))
+}
+
+#[wasm_bindgen]
+pub async fn scene_names() -> Result<JsValue, JsValue> {
+    let storage = Storage::new();
+
+    let names = storage.list_scenes().await;
+    let js_names: Array = names.into_iter().map(JsValue::from).collect();
+
+    Ok(JsValue::from(js_names))
 }
 
 #[wasm_bindgen]

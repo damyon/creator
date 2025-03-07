@@ -1,4 +1,4 @@
-import init, { draw_scene, init_scene, set_material_color, first_scene_name } from "./creator.js";
+import init, { threads, draw_scene, init_scene, set_material_color, first_scene_name } from "./creator.js";
 
 const CANVAS_ID = "scene";
 var other = 10;
@@ -33,6 +33,13 @@ document.getElementById(CANVAS_ID).height = window.innerHeight;
 await init();
 
 await init_scene(CANVAS_ID);
+
+let huh = threads();
+console.log(huh);
+
+huh.then((value) => {
+  console.log(value);
+});
 
 run();
 

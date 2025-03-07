@@ -1,8 +1,9 @@
 pub mod storage {
-    use js_sys::Array;
-    use std::sync::{LazyLock, Mutex};
+    use js_sys::{Array, Promise};
+    use std::sync::Mutex;
     use wasm_bindgen::prelude::Closure;
     use wasm_bindgen::{JsCast, JsValue};
+    use wasm_bindgen_futures::spawn_local;
     use web_sys::{Event, IdbTransaction};
     use web_sys::{
         IdbDatabase, IdbFactory, IdbObjectStore, IdbOpenDbRequest, IdbRequest, IdbTransactionMode,
@@ -26,7 +27,7 @@ pub mod storage {
             result[0].clone()
         }
 
-        pub fn list_scenes(self: Self) {
+        pub async fn list_scenes(self: Self) -> Vec<String> {
             let window: Window = web_sys::window().expect("no global `window` exists");
             let factory: IdbFactory = window
                 .indexed_db()
@@ -99,6 +100,9 @@ pub mod storage {
                 .set_onupgradeneeded(Some(upgrade_required.into_js_value().dyn_ref().unwrap()));
 
             open_request.set_onsuccess(Some(open_success.into_js_value().dyn_ref().unwrap()));
+
+            open_success.await;
+            vec![]
         }
     }
 }
