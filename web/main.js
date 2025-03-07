@@ -38,7 +38,7 @@ let huh = threads();
 console.log(huh);
 
 huh.then((value) => {
-  console.log(value);
+  console.log("Back in js land" + value);
 });
 
 run();

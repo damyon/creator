@@ -90,7 +90,7 @@ pub mod storage {
 
                 let _request = object_store
                     .add_with_key(
-                        JsValue::from_str("").as_ref(),
+                        JsValue::from_str("a fing").as_ref(),
                         JsValue::from_str("Default").as_ref(),
                     )
                     .expect("Could not store default value");
@@ -101,7 +101,6 @@ pub mod storage {
 
             open_request.set_onsuccess(Some(open_success.into_js_value().dyn_ref().unwrap()));
 
-            open_success.await;
             vec![]
         }
     }
