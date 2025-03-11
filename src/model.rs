@@ -1,19 +1,17 @@
-
-
-
 pub mod model {
 
     use crate::cube::cube::Cube;
     use crate::octree::octree::OcTree;
+    use crate::storage::storage::Storage;
 
     pub struct Model {
-        pub voxels: OcTree
+        pub voxels: OcTree,
     }
 
     impl Model {
         pub const fn new() -> Model {
             Model {
-                voxels: OcTree::new()
+                voxels: OcTree::new(),
             }
         }
 
@@ -33,8 +31,15 @@ pub mod model {
             self.voxels.all_voxels_active(positions)
         }
 
-        pub fn save(&self) {
-            self.voxels.save();
+        pub async fn save(&self) {
+            log::debug!("We save the things");
+            let storage = Storage::new();
+            log::debug!("Got storage");
+
+            let serial = self.voxels.prepare();
+            log::debug!("Prepared the scene");
+            _ = storage.save(serial).await;
+            log::debug!("We wrote it");
         }
     }
 }

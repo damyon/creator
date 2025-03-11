@@ -18,7 +18,7 @@ serde_json = "1.0.134"
 wasm-bindgen-futures = "0.4.50"
 [dependencies.indexed_db_futures]
 version = "0.6.0"
-features = ['cursors']
+features = ['cursors', 'indices', 'serde']
 [dependencies.web-sys]
 version = "0.3.74"
 features = [

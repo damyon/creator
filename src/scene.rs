@@ -2,6 +2,7 @@ pub mod scene {
 
     use std::cmp::{max, min};
     use std::sync::{Mutex, MutexGuard};
+    use wasm_bindgen_futures::spawn_local;
     use web_sys::WebGlRenderingContext;
 
     use crate::command::command::{Command, CommandType};
@@ -214,7 +215,11 @@ pub mod scene {
                     .model
                     .toggle_voxel(selection, !value, scene.material_color);
             }
-            scene.model.save();
+            spawn_local(async move {
+                let scene = Self::access();
+
+                scene.model.save().await;
+            });
         }
 
         pub fn handle_move_selection_left(scene: &mut Scene) {

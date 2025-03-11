@@ -1,34 +1,120 @@
 pub mod storage {
-    use js_sys::{Array, Promise};
-    use std::sync::Mutex;
-    use wasm_bindgen::prelude::Closure;
-    use wasm_bindgen::{JsCast, JsValue};
-    use wasm_bindgen_futures::spawn_local;
-    use web_sys::{Event, IdbTransaction};
-    use web_sys::{
-        IdbDatabase, IdbFactory, IdbObjectStore, IdbOpenDbRequest, IdbRequest, IdbTransactionMode,
-        Window,
-    };
+    use crate::octree::octree::StoredOcTree;
+    use indexed_db_futures::database::Database;
+    use indexed_db_futures::transaction::TransactionMode;
+    use indexed_db_futures::{prelude::*, KeyPath};
+    use serde::{Deserialize, Serialize};
 
-    pub struct Storage {
-        noop: f32,
+    #[derive(Serialize, Deserialize)]
+    struct UserRef {
+        id: u32,
+        name: String,
     }
 
-    pub static SCENE_NAMES: Mutex<Vec<String>> = Mutex::new(vec![]);
+    pub struct Storage {
+        _noop: f32,
+    }
 
     impl Storage {
         pub fn new() -> Storage {
-            Storage { noop: 0.0 }
+            Storage { _noop: 0.0 }
         }
 
-        pub fn first_scene_name(self: Self) -> String {
-            let result = SCENE_NAMES.lock().unwrap();
-            log::debug!("Result is {:?}", result[0]);
-            result[0].clone()
+        pub async fn save(self: Self, data: StoredOcTree) {
+            let db = Database::open("creation")
+                .with_version(1u8)
+                .with_on_upgrade_needed(|_event, db| {
+                    let _create = db
+                        .create_object_store("scenes")
+                        .with_auto_increment(true)
+                        .with_key_path(KeyPath::One("name"))
+                        .build()?;
+
+                    Ok(())
+                })
+                .await
+                .expect("Database could not open");
+
+            log::debug!("We made a DB");
+
+            // Populate some data
+            let transaction = db
+                .transaction("scenes")
+                .with_mode(TransactionMode::Readwrite)
+                .build()
+                .expect("Transaction could not start");
+
+            let store = transaction
+                .object_store("scenes")
+                .expect("Could not get object store");
+
+            _ = store.put(data).serde();
+
+            _ = transaction.commit().await;
         }
 
         pub async fn list_scenes(self: Self) -> Vec<String> {
-            let window: Window = web_sys::window().expect("no global `window` exists");
+            let db = Database::open("creation")
+                .with_version(1u8)
+                .with_on_upgrade_needed(|_event, db| {
+                    let _create = db
+                        .create_object_store("scenes")
+                        .with_auto_increment(true)
+                        .with_key_path(KeyPath::One("name"))
+                        .build()?;
+
+                    Ok(())
+                })
+                .await
+                .expect("Database could not open");
+
+            log::debug!("We made a DB");
+
+            // Populate some data
+            let transaction = db
+                .transaction("scenes")
+                .with_mode(TransactionMode::Readwrite)
+                .build()
+                .expect("Transaction could not start");
+
+            let store = transaction
+                .object_store("scenes")
+                .expect("Could not get object store");
+
+            let data = UserRef {
+                id: 4,
+                name: "Toby".into(),
+            };
+            _ = store.put(data).serde();
+
+            _ = transaction.commit().await;
+
+            let transaction = db
+                .transaction("scenes")
+                .with_mode(TransactionMode::Readwrite)
+                .build()
+                .expect("Transaction could not start");
+
+            let store = transaction
+                .object_store("scenes")
+                .expect("Could not get object store");
+
+            let cursor_opt = store.open_cursor().await.expect("Got a cursor");
+            let mut names: Vec<String> = vec![];
+
+            if cursor_opt.is_some() {
+                let mut cursor = cursor_opt.unwrap();
+                // This should loop.
+                let mut next: Option<String> = cursor.next_key().await.expect("odd");
+                // let mut next: Option<String> = cursor.next_record().await.expect("At least one");
+                while next.is_some() {
+                    names.push(next.unwrap().to_string());
+                    next = cursor.next_key().await.expect("At least one");
+                }
+            }
+
+            names
+            /*let window: Window = web_sys::window().expect("no global `window` exists");
             let factory: IdbFactory = window
                 .indexed_db()
                 .expect("no global `indexedDB` exists")
@@ -101,7 +187,7 @@ pub mod storage {
 
             open_request.set_onsuccess(Some(open_success.into_js_value().dyn_ref().unwrap()));
 
-            vec![]
+            vec![]*/
         }
     }
 }
