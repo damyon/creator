@@ -38,9 +38,9 @@ pub mod model {
 
         pub async fn delete_scene(&mut self) {
             let storage = Storage::new();
-            log::debug!("load_first_scene");
-
-            _ = storage.delete_scene(self.voxels.name.to_string()).await;
+            if self.voxels.name != "Default" {
+                _ = storage.delete_scene(self.voxels.name.to_string()).await;
+            }
             self.voxels.clear();
         }
 
