@@ -46,13 +46,13 @@ pub mod model {
 
         pub async fn load_scene(&mut self) {
             let storage = Storage::new();
-            log::debug!("load_first_scene");
+            log::debug!("load_scene");
 
             let serial: Option<StoredOcTree> =
                 storage.load_scene(self.voxels.name.to_string()).await;
-            log::debug!("We got the scene {:?}", serial.is_some());
+            log::debug!("load_scene: We got the scene {:?}", serial.is_some());
             if serial.is_some() {
-                log::debug!("serial is some");
+                log::debug!("load_scene: serial is some");
                 self.voxels.load_from_serial(serial.unwrap());
             }
         }

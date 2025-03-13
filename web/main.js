@@ -11,30 +11,43 @@ import init, {
 } from "./creator.js";
 
 const CANVAS_ID = "scene";
-var other = 10;
+var processing = true;
 
 async function run() {
-  draw_scene(CANVAS_ID);
-
-  requestAnimationFrame(run);
+  if (!processing) {
+    draw_scene(CANVAS_ID);
+  }
+  setTimeout(run, 400);
 }
 
 document.getElementById("save").onclick = function () {
+  processing = true;
   save_scene();
   load_scene_names();
+  processing = false;
 };
 
 document.getElementById("delete").onclick = function () {
+  processing = true;
   delete_scene();
   load_scene_names();
+  processing = false;
 };
 
-document.getElementById("load").onclick = function () {
+function load_deferred() {
   load_scene();
+  processing = false;
+}
+
+document.getElementById("load").onclick = function () {
+  processing = true;
+  setTimeout(load_deferred, 500);
 };
 
 document.getElementById("name").onchange = function (e) {
+  processing = true;
   set_scene_name(e.target.value);
+  processing = false;
 };
 
 function hex_to_rgb(hex) {
@@ -73,5 +86,5 @@ async function load_scene_names() {
 }
 
 await load_scene_names();
-
-requestAnimationFrame(run);
+processing = false;
+setTimeout(run, 2000);
