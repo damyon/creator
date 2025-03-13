@@ -16,7 +16,7 @@ var other = 10;
 async function run() {
   draw_scene(CANVAS_ID);
 
-  setTimeout(run, 100);
+  requestAnimationFrame(run);
 }
 
 document.getElementById("save").onclick = function () {
@@ -74,4 +74,4 @@ async function load_scene_names() {
 
 await load_scene_names();
 
-run();
+requestAnimationFrame(run);
