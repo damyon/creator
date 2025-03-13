@@ -2,7 +2,6 @@ pub mod scene {
 
     use std::cmp::{max, min};
     use std::sync::{Mutex, MutexGuard};
-    use wasm_bindgen_futures::spawn_local;
     use web_sys::WebGlRenderingContext;
 
     use crate::command::command::{Command, CommandType};
@@ -82,6 +81,16 @@ pub mod scene {
             let mut scene = Self::access();
 
             scene.command_input.queue_command(command);
+        }
+
+        pub fn set_scene_name(name: String) {
+            let mut scene = Self::access();
+
+            scene.set_name(name);
+        }
+
+        pub fn set_name(&mut self, name: String) {
+            self.model.set_name(name);
         }
 
         pub fn handle_mouse_down(scene: &mut Scene) {
@@ -215,11 +224,11 @@ pub mod scene {
                     .model
                     .toggle_voxel(selection, !value, scene.material_color);
             }
-            spawn_local(async move {
-                let scene = Self::access();
+        }
 
-                scene.model.save().await;
-            });
+        pub async fn save_scene() {
+            let scene = Self::access();
+            scene.model.save().await;
         }
 
         pub fn handle_move_selection_left(scene: &mut Scene) {
@@ -362,9 +371,18 @@ pub mod scene {
             self.material_color = [red_f32, green_f32, blue_f32, 1.0];
         }
 
+        pub async fn load_scene() {
+            let mut scene = Self::access();
+            scene.model.load_scene().await;
+        }
+
+        pub async fn delete_scene() {
+            let mut scene = Self::access();
+            scene.model.delete_scene().await;
+        }
+
         pub async fn load_first_scene() {
             let mut scene = Self::access();
-            log::debug!("We are loading from space");
             scene.model.load_first_scene().await;
         }
 

@@ -2,6 +2,10 @@
 /* eslint-disable */
 export function init_scene(canvas_id: string): boolean;
 export function scene_names(): Promise<any>;
+export function save_scene(): Promise<any>;
+export function load_scene(): Promise<boolean>;
+export function delete_scene(): Promise<boolean>;
+export function set_scene_name(name: string): boolean;
 export function load_first_scene(): Promise<any>;
 export function draw_scene(canvas_id: string): boolean;
 export function set_material_color(red: string, green: string, blue: string): boolean;
@@ -12,6 +16,10 @@ export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly init_scene: (a: number, b: number, c: number) => void;
   readonly scene_names: () => number;
+  readonly save_scene: () => number;
+  readonly load_scene: () => number;
+  readonly delete_scene: () => number;
+  readonly set_scene_name: (a: number, b: number, c: number) => void;
   readonly load_first_scene: () => number;
   readonly draw_scene: (a: number, b: number, c: number) => void;
   readonly set_material_color: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;

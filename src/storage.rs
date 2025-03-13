@@ -53,7 +53,32 @@ pub mod storage {
             _ = transaction.commit().await;
         }
 
-        pub async fn load_first_scene(self: Self) -> Option<StoredOcTree> {
+        pub async fn delete_scene(self: Self, name: String) {
+            let db = Database::open("creation")
+                .with_version(1u8)
+                .await
+                .expect("Database could not open");
+
+            log::debug!("delete_scene The DB was loaded");
+            let transaction = db
+                .transaction("scenes")
+                .with_mode(TransactionMode::Readwrite)
+                .build()
+                .expect("Transaction could not start");
+
+            log::debug!("delete_scene The transaction was started");
+            let store = transaction
+                .object_store("scenes")
+                .expect("Could not get object store");
+
+            log::debug!("delete_scene We got the store");
+            _ = store.delete(name).await.expect("Was not deleted");
+            log::debug!("delete_scene We loaded the nuts");
+            _ = transaction.commit().await;
+            log::debug!("delete_scene We committed the transaction");
+        }
+
+        pub async fn load_scene(self: Self, name: String) -> Option<StoredOcTree> {
             let db = Database::open("creation")
                 .with_version(1u8)
                 .await
@@ -73,7 +98,7 @@ pub mod storage {
 
             log::debug!("load_first_scene We got the store");
             let serial: Option<StoredOcTree> = store
-                .get("Default")
+                .get(name)
                 .serde()
                 .expect("broken")
                 .await
@@ -83,7 +108,10 @@ pub mod storage {
             serial
         }
 
-        /*
+        pub async fn load_first_scene(self: Self) -> Option<StoredOcTree> {
+            self.load_scene("Default".to_string()).await
+        }
+
         pub async fn list_scenes(self: Self) -> Vec<String> {
             let db = Database::open("creation")
                 .with_version(1u8)
@@ -125,6 +153,6 @@ pub mod storage {
             }
 
             names
-        }*/
+        }
     }
 }

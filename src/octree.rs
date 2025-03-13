@@ -3,7 +3,7 @@ pub mod octree {
     use serde::{Deserialize, Serialize};
 
     pub struct OcTree {
-        name: String,
+        pub name: String,
         root: OcNode,
         depth: u32,
     }
@@ -30,14 +30,24 @@ pub mod octree {
             self.root.active_nodes()
         }
 
+        pub fn clear(&mut self) {
+            self.root.clear();
+        }
+
         pub fn init(&mut self) {
             // The 5 here is important. It defines the number of sub-divisions
             // so it exponentially increases the number of nodes.
             self.decimate(5);
         }
 
+        pub fn set_name(&mut self, name: String) {
+            self.name = name;
+        }
+
         pub fn load_from_serial(&mut self, source: StoredOcTree) {
             self.name = source.name;
+
+            self.root.clear();
 
             for node in source.active_nodes {
                 self.root.apply(&node);
@@ -143,6 +153,21 @@ pub mod octree {
             }
 
             found
+        }
+
+        pub fn clear(&mut self) {
+            self.active = false;
+
+            let squirts = self.children.each_mut();
+
+            for index in 0..8 {
+                match squirts[index] {
+                    None => {}
+                    Some(squirt) => {
+                        squirt.clear();
+                    }
+                };
+            }
         }
 
         pub fn apply(&mut self, node: &OcNode) {

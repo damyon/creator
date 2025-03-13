@@ -63,7 +63,7 @@
                 background: none;
                 border: none;
                 position: absolute;
-                left: 90px;
+                left: 130px;
                 top: 10px;
                 cursor: pointer;
             "
@@ -71,8 +71,10 @@
             <i class="fa fa-question"></i>
         </button>
         <input
+            id="name"
             list="scene-list"
             placeholder="Scene name..."
+            value="Default"
             style="
                 position: absolute;
                 left: 10px;
@@ -81,13 +83,15 @@
                 font-size: 1em;
                 font-weight: 700;
                 background: none;
-                border: none;
+                border: 2px solid black;
+                border-radius: 4px;
             "
         />
         <datalist id="scene-list">
             <option>New Scene...</option>
         </datalist>
         <button
+            id="save"
             style="
                 position: absolute;
                 left: 10px;
@@ -102,6 +106,7 @@
             <i class="fa fa-save"></i>
         </button>
         <button
+            id="load"
             style="
                 position: absolute;
                 left: 50px;
@@ -114,6 +119,21 @@
             "
         >
             <i class="fa fa-rotate-right"></i>
+        </button>
+        <button
+            id="delete"
+            style="
+                position: absolute;
+                left: 90px;
+                top: 10px;
+                z-index: 10;
+                font-size: 2em;
+                background: none;
+                border: none;
+                cursor: pointer;
+            "
+        >
+            <i class="fa fa-trash"></i>
         </button>
     </body>
 </html>

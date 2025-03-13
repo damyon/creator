@@ -3,6 +3,10 @@
 export const memory: WebAssembly.Memory;
 export const init_scene: (a: number, b: number, c: number) => void;
 export const scene_names: () => number;
+export const save_scene: () => number;
+export const load_scene: () => number;
+export const delete_scene: () => number;
+export const set_scene_name: (a: number, b: number, c: number) => void;
 export const load_first_scene: () => number;
 export const draw_scene: (a: number, b: number, c: number) => void;
 export const set_material_color: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
