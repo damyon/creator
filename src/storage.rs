@@ -53,6 +53,37 @@ pub mod storage {
             _ = transaction.commit().await;
         }
 
+        pub async fn load_first_scene(self: Self) -> Option<StoredOcTree> {
+            let db = Database::open("creation")
+                .with_version(1u8)
+                .await
+                .expect("Database could not open");
+
+            log::debug!("load_first_scene The DB was loaded");
+            let transaction = db
+                .transaction("scenes")
+                .with_mode(TransactionMode::Readonly)
+                .build()
+                .expect("Transaction could not start");
+
+            log::debug!("load_first_scene The transaction was started");
+            let store = transaction
+                .object_store("scenes")
+                .expect("Could not get object store");
+
+            log::debug!("load_first_scene We got the store");
+            let serial: Option<StoredOcTree> = store
+                .get("Default")
+                .serde()
+                .expect("broken")
+                .await
+                .expect("waited");
+            log::debug!("load_first_scene We loaded the nuts");
+
+            serial
+        }
+
+        /*
         pub async fn list_scenes(self: Self) -> Vec<String> {
             let db = Database::open("creation")
                 .with_version(1u8)
@@ -69,25 +100,6 @@ pub mod storage {
                 .expect("Database could not open");
 
             log::debug!("We made a DB");
-
-            // Populate some data
-            let transaction = db
-                .transaction("scenes")
-                .with_mode(TransactionMode::Readwrite)
-                .build()
-                .expect("Transaction could not start");
-
-            let store = transaction
-                .object_store("scenes")
-                .expect("Could not get object store");
-
-            let data = UserRef {
-                id: 4,
-                name: "Toby".into(),
-            };
-            _ = store.put(data).serde();
-
-            _ = transaction.commit().await;
 
             let transaction = db
                 .transaction("scenes")
@@ -106,7 +118,6 @@ pub mod storage {
                 let mut cursor = cursor_opt.unwrap();
                 // This should loop.
                 let mut next: Option<String> = cursor.next_key().await.expect("odd");
-                // let mut next: Option<String> = cursor.next_record().await.expect("At least one");
                 while next.is_some() {
                     names.push(next.unwrap().to_string());
                     next = cursor.next_key().await.expect("At least one");
@@ -114,80 +125,6 @@ pub mod storage {
             }
 
             names
-            /*let window: Window = web_sys::window().expect("no global `window` exists");
-            let factory: IdbFactory = window
-                .indexed_db()
-                .expect("no global `indexedDB` exists")
-                .unwrap()
-                .clone();
-
-            let open_request: IdbOpenDbRequest = factory
-                .open_with_u32("creator", 1)
-                .expect("Failed to open db");
-
-            let request_success = Closure::once(Box::new(move |event: Event| {
-                log::debug!("We got a list of keys");
-                let target: IdbRequest = event.target().unwrap().dyn_into().unwrap();
-                log::debug!("We got a target: {:?}", target.result().unwrap().is_array());
-                let scenes: Array = target.result().unwrap().dyn_into().unwrap();
-                let mut glob_scenes = SCENE_NAMES.lock().unwrap();
-                for (_index, name) in scenes.iter().enumerate() {
-                    let name_string: String =
-                        name.as_string().expect("Did not get value").to_owned();
-                    let b = name_string.to_owned();
-                    glob_scenes.push(b);
-                }
-            }));
-
-            let open_success = Closure::once(Box::new(move |event: Event| {
-                let target: IdbOpenDbRequest = event.target().unwrap().dyn_into().unwrap();
-                let db: IdbDatabase = target.result().unwrap().dyn_into().unwrap();
-
-                log::debug!("We opened it from listing. What is it? {:?}", db);
-
-                let transaction: IdbTransaction = db
-                    .transaction_with_str_and_mode("scenes", IdbTransactionMode::Readonly)
-                    .expect("Could not open transaction");
-                let object_store: IdbObjectStore = transaction
-                    .object_store("scenes")
-                    .expect("Could not open object store");
-
-                let request = object_store
-                    .get_all_keys()
-                    .expect("Could not get scene list");
-
-                request.set_onsuccess(Some(request_success.into_js_value().dyn_ref().unwrap()));
-            }) as Box<dyn FnOnce(Event)>);
-
-            let upgrade_required = Closure::once(Box::new(move |event: Event| {
-                let target: IdbOpenDbRequest = event.target().unwrap().dyn_into().unwrap();
-                let db: IdbDatabase = target.result().unwrap().dyn_into().unwrap();
-                log::debug!("We need to build the thing");
-
-                let object_store: IdbObjectStore = db
-                    .create_object_store("scenes")
-                    .expect("Could not create object store");
-
-                let _index = object_store
-                    .create_index_with_str("name", "name")
-                    .expect("Could not create index");
-
-                log::debug!("We made a store with an index");
-
-                let _request = object_store
-                    .add_with_key(
-                        JsValue::from_str("a fing").as_ref(),
-                        JsValue::from_str("Default").as_ref(),
-                    )
-                    .expect("Could not store default value");
-            }) as Box<dyn FnOnce(Event)>);
-
-            open_request
-                .set_onupgradeneeded(Some(upgrade_required.into_js_value().dyn_ref().unwrap()));
-
-            open_request.set_onsuccess(Some(open_success.into_js_value().dyn_ref().unwrap()));
-
-            vec![]*/
-        }
+        }*/
     }
 }

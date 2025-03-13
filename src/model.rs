@@ -2,6 +2,7 @@ pub mod model {
 
     use crate::cube::cube::Cube;
     use crate::octree::octree::OcTree;
+    use crate::octree::octree::StoredOcTree;
     use crate::storage::storage::Storage;
 
     pub struct Model {
@@ -29,6 +30,18 @@ pub mod model {
 
         pub fn all_voxels_active(&self, positions: &Vec<[i32; 3]>) -> bool {
             self.voxels.all_voxels_active(positions)
+        }
+
+        pub async fn load_first_scene(&mut self) {
+            let storage = Storage::new();
+            log::debug!("load_first_scene");
+
+            let serial: Option<StoredOcTree> = storage.load_first_scene().await;
+            log::debug!("We got the scene {:?}", serial.is_some());
+            if serial.is_some() {
+                log::debug!("serial is some");
+                self.voxels.load_from_serial(serial.unwrap());
+            }
         }
 
         pub async fn save(&self) {

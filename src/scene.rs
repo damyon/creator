@@ -362,6 +362,12 @@ pub mod scene {
             self.material_color = [red_f32, green_f32, blue_f32, 1.0];
         }
 
+        pub async fn load_first_scene() {
+            let mut scene = Self::access();
+            log::debug!("We are loading from space");
+            scene.model.load_first_scene().await;
+        }
+
         pub fn init(&mut self, canvas_id: &str) {
             self.light.eye = Point3::new(15.0, 60.0, 14.0);
             self.light.target = Point3::new(0.0, 0.0, 0.0);

@@ -1,4 +1,3 @@
-use js_sys::Array;
 use wasm_bindgen::prelude::*;
 
 extern crate js_sys;
@@ -18,39 +17,42 @@ mod storage;
 
 use crate::graphics::graphics::Graphics;
 use crate::scene::scene::Scene;
-use crate::storage::storage::Storage;
 extern crate nalgebra as na;
 
 #[wasm_bindgen]
 pub fn init_scene(canvas_id: &str) -> Result<bool, JsValue> {
     wasm_logger::init(wasm_logger::Config::default());
+    log::debug!("Init scene");
     Scene::init_scene(canvas_id);
-
+    log::debug!("Init done");
     Ok(true)
 }
 
 #[wasm_bindgen]
 pub async fn scene_names() -> Result<JsValue, JsValue> {
-    let storage = Storage::new();
+    //let storage = Storage::new();
 
     log::debug!("Get scene_names");
-    let names = storage.list_scenes().await;
+    // let names = storage.list_scenes().await;
     log::debug!("Got scene_names");
-    let js_names: Array = names.into_iter().map(JsValue::from).collect();
+    //let js_names: Array = names.into_iter().map(JsValue::from).collect();
+    Ok(JsValue::from(5))
+    //Ok(JsValue::from(js_names))
+}
 
-    Ok(JsValue::from(js_names))
+#[wasm_bindgen]
+pub async fn load_first_scene() -> Result<JsValue, JsValue> {
+    Scene::load_first_scene().await;
+    Ok(JsValue::from(true))
 }
 
 #[wasm_bindgen]
 pub fn draw_scene(canvas_id: &str) -> Result<bool, JsValue> {
     let mut graphics: Graphics = Graphics::new(canvas_id);
     graphics.setup_shaders();
-
     Scene::process_commands();
-
     graphics.clear();
     Scene::draw(&graphics);
-
     Ok(true)
 }
 

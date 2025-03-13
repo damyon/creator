@@ -1,7 +1,6 @@
 pub mod octree {
     use crate::{cube::cube::Cube, drawable::drawable::Drawable};
     use serde::{Deserialize, Serialize};
-    use serde_json;
 
     pub struct OcTree {
         name: String,
@@ -32,17 +31,16 @@ pub mod octree {
         }
 
         pub fn init(&mut self) {
+            // The 5 here is important. It defines the number of sub-divisions
+            // so it exponentially increases the number of nodes.
             self.decimate(5);
+        }
 
-            let saved_value = Self::local_storage().get_item(&"creator_model").unwrap();
+        pub fn load_from_serial(&mut self, source: StoredOcTree) {
+            self.name = source.name;
 
-            if saved_value.is_some() {
-                let str = saved_value.unwrap();
-                let unflattened: Vec<OcNode> = serde_json::from_str(&str).unwrap();
-
-                for node in unflattened {
-                    self.root.apply(&node);
-                }
+            for node in source.active_nodes {
+                self.root.apply(&node);
             }
         }
 
@@ -55,16 +53,12 @@ pub mod octree {
             self.root.decimate(sub_division_level);
         }
 
-        pub fn local_storage() -> web_sys::Storage {
-            let window = web_sys::window();
-            window.unwrap().local_storage().unwrap().unwrap()
-        }
-
         pub fn toggle_voxel(&mut self, position: [i32; 3], value: bool, color: [f32; 4]) {
             self.root.toggle_voxel(position, value, color);
         }
 
         pub fn prepare(&self) -> StoredOcTree {
+            log::debug!("Save with name: {:?}", self.name);
             StoredOcTree {
                 name: String::from(self.name.as_str()),
                 active_nodes: self.active_nodes(),
