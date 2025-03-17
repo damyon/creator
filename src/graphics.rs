@@ -27,6 +27,7 @@ pub mod graphics {
         pub shadow_texture_size: i32,
         pub swap_shaders: bool,
         pub swap_cameras: bool,
+        vertex_buffer_limit: i32,
     }
 
     impl Graphics {
@@ -73,6 +74,7 @@ pub mod graphics {
                 shadow_texture_size: 4096,
                 swap_shaders: false,
                 swap_cameras: false,
+                vertex_buffer_limit: 256,
             }
         }
 
@@ -560,9 +562,9 @@ pub mod graphics {
                 );
             }
 
-            let chunk_size: i32 = 30;
-
-            for chunk in 0..(drawable.count_vertices() as i32) / chunk_size {
+            let chunk_size: i32 = self.vertex_buffer_limit;
+            let upper: i32 = ((drawable.count_vertices() as i32) + (chunk_size - 1)) / chunk_size;
+            for chunk in 0i32..upper {
                 let count = min(
                     chunk_size,
                     drawable.count_vertices() as i32 - (chunk * chunk_size),
@@ -683,9 +685,10 @@ pub mod graphics {
 
             self.gl.line_width(2.0);
 
-            let chunk_size: i32 = 30;
+            let chunk_size: i32 = self.vertex_buffer_limit;
+            let upper = ((drawable.count_vertices() as i32) + (chunk_size - 1)) / chunk_size;
 
-            for chunk in 0..(drawable.count_vertices() as i32) / chunk_size {
+            for chunk in 0..upper {
                 let count = min(
                     chunk_size,
                     drawable.count_vertices() as i32 - (chunk * chunk_size),

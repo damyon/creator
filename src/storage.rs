@@ -81,29 +81,38 @@ pub mod storage {
         pub async fn load_scene(self: Self, name: String) -> Option<StoredOcTree> {
             let db = Database::open("creation")
                 .with_version(1u8)
+                .with_on_upgrade_needed(|_event, db| {
+                    let _create = db
+                        .create_object_store("scenes")
+                        .with_auto_increment(true)
+                        .with_key_path(KeyPath::One("name"))
+                        .build()?;
+
+                    Ok(())
+                })
                 .await
                 .expect("Database could not open");
 
-            log::debug!("load_first_scene The DB was loaded");
+            log::debug!("load_scene The DB was loaded");
             let transaction = db
                 .transaction("scenes")
                 .with_mode(TransactionMode::Readonly)
                 .build()
                 .expect("Transaction could not start");
 
-            log::debug!("load_first_scene The transaction was started");
+            log::debug!("load_scene The transaction was started");
             let store = transaction
                 .object_store("scenes")
                 .expect("Could not get object store");
 
-            log::debug!("load_first_scene We got the store");
+            log::debug!("load_scene We got the store");
             let serial: Option<StoredOcTree> = store
                 .get(name)
                 .serde()
                 .expect("broken")
                 .await
                 .expect("waited");
-            log::debug!("load_first_scene We loaded the nuts");
+            log::debug!("load_scene We loaded the nuts");
 
             serial
         }

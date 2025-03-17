@@ -373,7 +373,10 @@ pub mod scene {
 
         pub async fn load_scene() {
             let mut scene = Self::access();
+            scene.initialized = false;
             scene.model.load_scene().await;
+
+            scene.initialized = true;
         }
 
         pub async fn delete_scene() {
@@ -383,7 +386,9 @@ pub mod scene {
 
         pub async fn load_first_scene() {
             let mut scene = Self::access();
+            scene.initialized = false;
             scene.model.load_first_scene().await;
+            scene.initialized = true;
         }
 
         pub fn init(&mut self, canvas_id: &str) {
@@ -528,6 +533,7 @@ pub mod scene {
             }
 
             graphics.prepare_shadow_frame();
+
             let light = if !graphics.swap_cameras {
                 scene.light
             } else {
@@ -538,6 +544,7 @@ pub mod scene {
             } else {
                 scene.light
             };
+
             if !graphics.swap_shaders {
                 for voxel in scene.model.drawables().iter() {
                     graphics.draw_shadow(voxel, WebGlRenderingContext::TRIANGLES, light);
@@ -545,6 +552,7 @@ pub mod scene {
             }
 
             graphics.finish_shadow_frame();
+
             graphics.prepare_camera_frame();
 
             let selections = Self::selection_voxels(

@@ -76,7 +76,9 @@ pub fn draw_scene(canvas_id: &str) -> Result<bool, JsValue> {
     graphics.setup_shaders();
     Scene::process_commands();
     graphics.clear();
+
     Scene::draw(&graphics);
+
     Ok(true)
 }
 
