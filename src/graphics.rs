@@ -577,13 +577,9 @@ pub mod graphics {
                     chunk_size,
                     drawable.count_vertices() as i32 - (chunk * chunk_size),
                 );
-                let reduced_count = if render_mode == WebGlRenderingContext::TRIANGLES {
-                    count / 3
-                } else {
-                    count
-                };
-                //self.gl
-                //  .draw_arrays(render_mode, chunk * chunk_size as i32, reduced_count);
+                let reduced_count = count / 3;
+                self.gl
+                    .draw_arrays(render_mode, chunk * chunk_size as i32, reduced_count);
             }
             self.gl.flush();
         }
@@ -707,12 +703,7 @@ pub mod graphics {
                     drawable.count_vertices() as i32 - (chunk * chunk_size),
                 );
 
-                let reduced_count = if render_mode == WebGlRenderingContext::TRIANGLES {
-                    count / 3
-                } else {
-                    log::debug!("We draw lines");
-                    count / 3
-                };
+                let reduced_count = count / 3;
                 self.gl.draw_arrays(render_mode, 0, reduced_count);
             }
             self.gl.flush();
