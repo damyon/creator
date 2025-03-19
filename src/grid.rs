@@ -6,6 +6,7 @@ pub mod grid {
         pub square_count: u16,
         pub vertices_count: u16,
         pub vertices: [f32; 396],
+        pub normals: [f32; 396],
         pub max_scale: u16,
         pub translation: [f32; 3],
         pub rotation: [f32; 3],
@@ -21,6 +22,7 @@ pub mod grid {
                 square_count: 1024,  // self.scale * self.scale
                 vertices_count: 396, // 2 * (6 * (self.scale+1))
                 vertices: [0.0; 396],
+                normals: [0.0; 396],
                 max_scale: 40,
                 translation: [0.0; 3],
                 rotation: [0.0; 3],
@@ -36,6 +38,12 @@ pub mod grid {
                 let result = index;
                 index += 1;
                 result
+            };
+            let mut normal_index: usize = 0;
+            let mut normal_increment = || -> usize {
+                let normal_result = normal_index;
+                normal_index += 1;
+                normal_result
             };
 
             let row_vertices: [f32; 6] = [
@@ -60,6 +68,13 @@ pub mod grid {
                 self.vertices[increment()] = (row_vertices[3]) * scale_f / 2.0;
                 self.vertices[increment()] = (-scale_f) / 2.0 + row as f32;
                 self.vertices[increment()] = (row_vertices[5]) * scale_f / 2.0;
+
+                self.normals[normal_increment()] = 0.0;
+                self.normals[normal_increment()] = 1.0;
+                self.normals[normal_increment()] = 0.0;
+                self.normals[normal_increment()] = 0.0;
+                self.normals[normal_increment()] = 1.0;
+                self.normals[normal_increment()] = 0.0;
             }
 
             for col in 0..=self.scale {
@@ -69,6 +84,12 @@ pub mod grid {
                 self.vertices[increment()] = (-scale_f) / 2.0 + col as f32;
                 self.vertices[increment()] = (col_vertices[4]) * scale_f / 2.0;
                 self.vertices[increment()] = (col_vertices[5]) * scale_f / 2.0;
+                self.normals[normal_increment()] = 0.0;
+                self.normals[normal_increment()] = 1.0;
+                self.normals[normal_increment()] = 0.0;
+                self.normals[normal_increment()] = 0.0;
+                self.normals[normal_increment()] = 1.0;
+                self.normals[normal_increment()] = 0.0;
             }
 
             self.square_count = self.scale * self.scale;
@@ -108,7 +129,7 @@ pub mod grid {
         }
 
         fn normals(&self) -> &[f32] {
-            &[]
+            &self.normals
         }
     }
 }

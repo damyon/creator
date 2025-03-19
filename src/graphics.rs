@@ -74,7 +74,7 @@ pub mod graphics {
                 shadow_texture_size: 4096,
                 swap_shaders: false,
                 swap_cameras: false,
-                vertex_buffer_limit: 256,
+                vertex_buffer_limit: 512,
             }
         }
 
@@ -247,55 +247,63 @@ pub mod graphics {
             shader_program: &WebGlProgram,
             is_camera: bool,
         ) {
-            let vertices_array = unsafe { js_sys::Float32Array::view(&vertices) };
-            let vertex_buffer = self.gl.create_buffer().unwrap();
+            let a_position: u32 = self.gl.get_attrib_location(&shader_program, "a_position") as u32;
 
+            let vertex_buffer = self.gl.create_buffer().unwrap();
             self.gl
                 .bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&vertex_buffer));
-            self.gl.buffer_data_with_array_buffer_view(
-                WebGlRenderingContext::ARRAY_BUFFER,
-                &vertices_array,
-                WebGlRenderingContext::STATIC_DRAW,
-            );
-            let a_position = self.gl.get_attrib_location(&shader_program, "a_position");
+
+            unsafe {
+                let vertices_array = js_sys::Float32Array::view(&vertices);
+
+                self.gl.buffer_data_with_array_buffer_view(
+                    WebGlRenderingContext::ARRAY_BUFFER,
+                    &vertices_array,
+                    WebGlRenderingContext::STATIC_DRAW,
+                );
+            }
 
             self.gl
                 .bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&vertex_buffer));
             self.gl.vertex_attrib_pointer_with_i32(
-                a_position as u32,
+                a_position,
                 3,
                 WebGlRenderingContext::FLOAT,
                 false,
                 0,
                 0,
             );
-            self.gl.enable_vertex_attrib_array(a_position as u32);
+            self.gl.enable_vertex_attrib_array(a_position);
 
             // Normals
             if is_camera {
-                let normals_array = unsafe { js_sys::Float32Array::view(&normals) };
+                let a_normal: u32 = self.gl.get_attrib_location(&shader_program, "a_normal") as u32;
                 let normal_buffer = self.gl.create_buffer().unwrap();
 
                 self.gl
                     .bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&normal_buffer));
-                self.gl.buffer_data_with_array_buffer_view(
-                    WebGlRenderingContext::ARRAY_BUFFER,
-                    &normals_array,
-                    WebGlRenderingContext::STATIC_DRAW,
-                );
-                let a_normal = self.gl.get_attrib_location(&shader_program, "a_normal");
+
+                unsafe {
+                    let normals_array = js_sys::Float32Array::view(&normals);
+
+                    self.gl.buffer_data_with_array_buffer_view(
+                        WebGlRenderingContext::ARRAY_BUFFER,
+                        &normals_array,
+                        WebGlRenderingContext::STATIC_DRAW,
+                    );
+                }
 
                 self.gl
                     .bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&normal_buffer));
                 self.gl.vertex_attrib_pointer_with_i32(
-                    a_normal as u32,
+                    a_normal,
                     3,
                     WebGlRenderingContext::FLOAT,
                     false,
                     0,
                     0,
                 );
-                self.gl.enable_vertex_attrib_array(a_normal as u32);
+                self.gl.enable_vertex_attrib_array(a_normal);
             }
         }
 
@@ -569,10 +577,15 @@ pub mod graphics {
                     chunk_size,
                     drawable.count_vertices() as i32 - (chunk * chunk_size),
                 );
-
-                self.gl
-                    .draw_arrays(render_mode, chunk * chunk_size as i32, count);
+                let reduced_count = if render_mode == WebGlRenderingContext::TRIANGLES {
+                    count / 3
+                } else {
+                    count
+                };
+                //self.gl
+                //  .draw_arrays(render_mode, chunk * chunk_size as i32, reduced_count);
             }
+            self.gl.flush();
         }
 
         pub fn draw(
@@ -694,9 +707,15 @@ pub mod graphics {
                     drawable.count_vertices() as i32 - (chunk * chunk_size),
                 );
 
-                self.gl
-                    .draw_arrays(render_mode, chunk * chunk_size as i32, count);
+                let reduced_count = if render_mode == WebGlRenderingContext::TRIANGLES {
+                    count / 3
+                } else {
+                    log::debug!("We draw lines");
+                    count / 3
+                };
+                self.gl.draw_arrays(render_mode, 0, reduced_count);
             }
+            self.gl.flush();
         }
 
         pub fn prepare_shadow_frame(&self) {
