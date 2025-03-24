@@ -9,6 +9,7 @@ pub mod scene {
     use crate::drawable::drawable::Drawable;
     use crate::graphics::graphics::Graphics;
     use crate::grid::grid::Grid;
+    use crate::load_scene;
     use crate::model::model::Model;
     use crate::mouse::mouse::Mouse;
     use crate::{camera::camera::Camera, cube::cube::Cube};
@@ -38,7 +39,9 @@ pub mod scene {
         selection_radius: u32,
         selection_shape: SelectionShape,
         material_color: [f32; 4],
-        initialized: bool,
+        drawing: bool,
+        throttle: u32,
+        loading: bool,
     }
 
     impl Scene {
@@ -72,7 +75,9 @@ pub mod scene {
                 selection_radius: 1,
                 selection_shape: SelectionShape::Sphere,
                 material_color: [0.8, 0.8, 0.8, 1.0],
-                initialized: false,
+                drawing: false,
+                throttle: 10,
+                loading: true,
             });
             GLOBSTATE.lock().unwrap()
         }
@@ -350,9 +355,28 @@ pub mod scene {
             }
         }
 
-        pub fn init_scene(canvas_id: &str) {
+        pub fn init_scene() {
             let mut scene = Self::access();
-            scene.init(canvas_id);
+            scene.init();
+        }
+
+        pub fn throttle() -> bool {
+            let mut scene = Self::access();
+
+            if scene.loading {
+                return true;
+            }
+
+            if !scene.drawing {
+                return true;
+            }
+
+            scene.throttle -= 1;
+            if scene.throttle >= 1 {
+                return true;
+            }
+            scene.throttle = 10;
+            false
         }
 
         pub fn set_scene_material_color(red_str: &str, green_str: &str, blue_str: &str) {
@@ -373,10 +397,13 @@ pub mod scene {
 
         pub async fn load_scene() {
             let mut scene = Self::access();
-            scene.initialized = false;
+            scene.drawing = false;
+            scene.loading = true;
+
             scene.model.load_scene().await;
 
-            scene.initialized = true;
+            scene.drawing = true;
+            scene.loading = false;
         }
 
         pub async fn delete_scene() {
@@ -386,12 +413,13 @@ pub mod scene {
 
         pub async fn load_first_scene() {
             let mut scene = Self::access();
-            scene.initialized = false;
+            scene.loading = true;
             scene.model.load_first_scene().await;
-            scene.initialized = true;
+            scene.drawing = true;
+            scene.loading = false;
         }
 
-        pub fn init(&mut self, canvas_id: &str) {
+        pub fn init(&mut self) {
             self.light.eye = Point3::new(15.0, 60.0, 14.0);
             self.light.target = Point3::new(0.0, 0.0, 0.0);
             //self.light.eye = Point3::new(8.0, 6.0, 20.0);
@@ -403,7 +431,7 @@ pub mod scene {
             self.model.init();
 
             let document = web_sys::window().unwrap().document().unwrap();
-            let canvas_element = document.get_element_by_id(canvas_id).unwrap();
+            let canvas_element = document.get_element_by_id("scene").unwrap();
             let canvas: web_sys::HtmlCanvasElement =
                 match canvas_element.dyn_into::<web_sys::HtmlCanvasElement>() {
                     Ok(canvas) => canvas,
@@ -477,7 +505,6 @@ pub mod scene {
             });
 
             mouse_up_closure.forget();
-            self.initialized = true;
         }
 
         pub fn calculate_distance_squared(from: &[i32; 3], to: &[i32; 3]) -> i32 {
@@ -528,9 +555,6 @@ pub mod scene {
 
         pub fn draw(graphics: &Graphics) {
             let mut scene = Self::access();
-            if !scene.initialized {
-                return;
-            }
 
             graphics.prepare_shadow_frame();
 

@@ -31,7 +31,8 @@ pub mod graphics {
     }
 
     impl Graphics {
-        pub fn new(canvas_id: &str) -> Graphics {
+        pub fn new() -> Graphics {
+            let canvas_id = "scene";
             let document = web_sys::window().unwrap().document().unwrap();
             let canvas_element = document.get_element_by_id(canvas_id).unwrap();
             let canvas: web_sys::HtmlCanvasElement =

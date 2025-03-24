@@ -1,3 +1,5 @@
+use std::cell::RefCell;
+use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 
 extern crate js_sys;
@@ -21,10 +23,10 @@ use crate::storage::storage::Storage;
 extern crate nalgebra as na;
 
 #[wasm_bindgen]
-pub fn init_scene(canvas_id: &str) -> Result<bool, JsValue> {
+pub fn init_scene() -> Result<bool, JsValue> {
     wasm_logger::init(wasm_logger::Config::default());
     log::debug!("Init scene");
-    Scene::init_scene(canvas_id);
+    Scene::init_scene();
     log::debug!("Init done");
     Ok(true)
 }
@@ -67,19 +69,38 @@ pub fn set_scene_name(name: &str) -> Result<bool, JsValue> {
 #[wasm_bindgen]
 pub async fn load_first_scene() -> Result<JsValue, JsValue> {
     Scene::load_first_scene().await;
+
+    let f: Rc<RefCell<Option<Closure<dyn FnMut()>>>> = Rc::new(RefCell::new(None));
+    let outer_f = f.clone();
+
+    let window = web_sys::window().unwrap();
+    *outer_f.borrow_mut() = Some(Closure::wrap(Box::new(move || {
+        draw_scene();
+
+        window
+            .request_animation_frame(f.borrow().as_ref().unwrap().as_ref().unchecked_ref())
+            .expect("failed requesting animation frame");
+    }) as Box<dyn FnMut()>));
+
+    let window = web_sys::window().unwrap();
+    window
+        .request_animation_frame(outer_f.borrow().as_ref().unwrap().as_ref().unchecked_ref())
+        .expect("failed requesting animation frame");
+
     Ok(JsValue::from(true))
 }
 
-#[wasm_bindgen]
-pub fn draw_scene(canvas_id: &str) -> Result<bool, JsValue> {
-    let mut graphics: Graphics = Graphics::new(canvas_id);
-    graphics.setup_shaders();
-    Scene::process_commands();
-    graphics.clear();
+pub fn draw_scene() {
+    if !Scene::throttle() {
+        let mut graphics: Graphics = Graphics::new();
+        graphics.setup_shaders();
+        Scene::process_commands();
+        graphics.clear();
 
-    Scene::draw(&graphics);
+        Scene::draw(&graphics);
+    }
 
-    Ok(true)
+    ()
 }
 
 #[wasm_bindgen]

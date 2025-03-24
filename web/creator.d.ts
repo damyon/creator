@@ -1,27 +1,25 @@
 /* tslint:disable */
 /* eslint-disable */
-export function init_scene(canvas_id: string): boolean;
+export function init_scene(): boolean;
 export function scene_names(): Promise<any>;
 export function save_scene(): Promise<any>;
 export function load_scene(): Promise<boolean>;
 export function delete_scene(): Promise<boolean>;
 export function set_scene_name(name: string): boolean;
 export function load_first_scene(): Promise<any>;
-export function draw_scene(canvas_id: string): boolean;
 export function set_material_color(red: string, green: string, blue: string): boolean;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly init_scene: (a: number, b: number, c: number) => void;
+  readonly init_scene: (a: number) => void;
   readonly scene_names: () => number;
   readonly save_scene: () => number;
   readonly load_scene: () => number;
   readonly delete_scene: () => number;
   readonly set_scene_name: (a: number, b: number, c: number) => void;
   readonly load_first_scene: () => number;
-  readonly draw_scene: (a: number, b: number, c: number) => void;
   readonly set_material_color: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
@@ -29,6 +27,7 @@ export interface InitOutput {
   readonly __wbindgen_export_3: WebAssembly.Table;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly _dyn_core__ops__function__FnMut___A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hedcc73ecab3756fa: (a: number, b: number, c: number) => void;
+  readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h784d03aac28c6ce7: (a: number, b: number) => void;
   readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__heac17eb4c1dae63e: (a: number, b: number, c: number, d: number) => void;
   readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h660e6c10043db219: (a: number, b: number) => void;
   readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h96d32d8e879cf7f9: (a: number, b: number, c: number) => void;
