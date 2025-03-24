@@ -9,7 +9,6 @@ pub mod scene {
     use crate::drawable::drawable::Drawable;
     use crate::graphics::graphics::Graphics;
     use crate::grid::grid::Grid;
-    use crate::load_scene;
     use crate::model::model::Model;
     use crate::mouse::mouse::Mouse;
     use crate::{camera::camera::Camera, cube::cube::Cube};
