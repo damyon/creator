@@ -516,7 +516,7 @@ pub mod scene {
             shape: SelectionShape,
         ) -> Vec<[i32; 3]> {
             let mut voxels = Vec::new();
-            let range: i32 = 16;
+            let range: i32 = 32;
             let radius_squared: i32 = radius.pow(2);
 
             if shape == SelectionShape::Sphere {

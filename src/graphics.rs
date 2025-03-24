@@ -75,7 +75,7 @@ pub mod graphics {
                 shadow_texture_size: 4096,
                 swap_shaders: false,
                 swap_cameras: false,
-                vertex_buffer_limit: 512,
+                vertex_buffer_limit: 2048,
             }
         }
 
@@ -223,7 +223,7 @@ pub mod graphics {
                 )
                 .into_inner()
             } else {
-                Orthographic3::new(-32.0, 32.0, -32.0, 32.0, 1.0, 240.0).into_inner()
+                Orthographic3::new(-64.0, 64.0, -64.0, 64.0, 1.0, 240.0).into_inner()
             }
         }
 

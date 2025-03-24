@@ -5,8 +5,8 @@ pub mod grid {
         pub scale: u16,
         pub square_count: u16,
         pub vertices_count: u16,
-        pub vertices: [f32; 396],
-        pub normals: [f32; 396],
+        pub vertices: [f32; 780],
+        pub normals: [f32; 780],
         pub max_scale: u16,
         pub translation: [f32; 3],
         pub rotation: [f32; 3],
@@ -18,12 +18,12 @@ pub mod grid {
     impl Grid {
         pub const fn new() -> Grid {
             Grid {
-                scale: 32,
-                square_count: 1024,  // self.scale * self.scale
-                vertices_count: 396, // 2 * (6 * (self.scale+1))
-                vertices: [0.0; 396],
-                normals: [0.0; 396],
-                max_scale: 40,
+                scale: 64,
+                square_count: 4096,  // self.scale * self.scale
+                vertices_count: 780, // 2 * (6 * (self.scale+1))
+                vertices: [0.0; 780],
+                normals: [0.0; 780],
+                max_scale: 200,
                 translation: [0.0; 3],
                 rotation: [0.0; 3],
                 color: [0.5, 0.5, 0.5, 0.2],
@@ -84,6 +84,7 @@ pub mod grid {
                 self.vertices[increment()] = (-scale_f) / 2.0 + col as f32;
                 self.vertices[increment()] = (col_vertices[4]) * scale_f / 2.0;
                 self.vertices[increment()] = (col_vertices[5]) * scale_f / 2.0;
+
                 self.normals[normal_increment()] = 0.0;
                 self.normals[normal_increment()] = 1.0;
                 self.normals[normal_increment()] = 0.0;

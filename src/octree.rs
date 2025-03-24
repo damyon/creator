@@ -35,9 +35,9 @@ pub mod octree {
         }
 
         pub fn init(&mut self) {
-            // The 5 here is important. It defines the number of sub-divisions
+            // The 6 here is important. It defines the number of sub-divisions
             // so it exponentially increases the number of nodes.
-            self.decimate(5);
+            self.decimate(6);
         }
 
         pub fn set_name(&mut self, name: String) {
