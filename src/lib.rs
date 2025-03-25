@@ -1,6 +1,8 @@
 use std::cell::RefCell;
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
+extern crate console_error_panic_hook;
+use std::panic;
 
 extern crate js_sys;
 
@@ -25,6 +27,7 @@ extern crate nalgebra as na;
 #[wasm_bindgen]
 pub fn init_scene() -> Result<bool, JsValue> {
     wasm_logger::init(wasm_logger::Config::default());
+    panic::set_hook(Box::new(console_error_panic_hook::hook));
     log::debug!("Init scene");
     Scene::init_scene();
     log::debug!("Init done");
