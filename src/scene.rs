@@ -26,6 +26,7 @@ pub mod scene {
     pub enum SelectionShape {
         Sphere,
         Cube,
+        Square,
     }
 
     pub struct Scene {
@@ -275,6 +276,8 @@ pub mod scene {
         pub fn handle_toggle_selection_shape(scene: &mut Scene) {
             scene.selection_shape = if scene.selection_shape == SelectionShape::Sphere {
                 SelectionShape::Cube
+            } else if scene.selection_shape == SelectionShape::Cube {
+                SelectionShape::Square
             } else {
                 SelectionShape::Sphere
             }
@@ -553,7 +556,7 @@ pub mod scene {
                         }
                     }
                 }
-            } else {
+            } else if shape == SelectionShape::Cube {
                 for x in -range..range {
                     for y in -range..range {
                         for z in -range..range {
@@ -564,6 +567,18 @@ pub mod scene {
                             {
                                 voxels.push([x, y, z]);
                             }
+                        }
+                    }
+                }
+            } else {
+                // Square
+                for x in -range..range {
+                    for z in -range..range {
+                        let voxel_position = [x, center[1], z];
+                        if (center[0] - voxel_position[0]).abs() < radius
+                            && (center[2] - voxel_position[2]).abs() < radius
+                        {
+                            voxels.push([x, center[1], z]);
                         }
                     }
                 }
