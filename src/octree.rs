@@ -2,6 +2,7 @@ pub mod octree {
     use crate::{cube::cube::Cube, drawable::drawable::Drawable};
     use serde::{Deserialize, Serialize};
 
+    #[derive(Clone)]
     pub struct OcTree {
         pub name: String,
         root: OcNode,

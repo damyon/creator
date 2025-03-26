@@ -11,6 +11,8 @@ pub mod scene {
     use crate::grid::grid::Grid;
     use crate::model::model::Model;
     use crate::mouse::mouse::Mouse;
+    use crate::octree::octree::StoredOcTree;
+    use crate::storage::storage::Storage;
     use crate::{camera::camera::Camera, cube::cube::Cube};
     use gloo::events::EventListener;
     use wasm_bindgen::JsCast;
@@ -231,8 +233,13 @@ pub mod scene {
         }
 
         pub async fn save_scene() {
-            let scene = Self::access();
-            scene.model.save().await;
+            // The point of this scope shananigens is the model save operation is slow
+            // and doesn't need access to anything from scope outside of the model.
+            let model: Model = {
+                let scene = Self::access();
+                scene.model.clone()
+            };
+            model.save().await;
         }
 
         pub fn handle_move_selection_left(scene: &mut Scene) {
@@ -395,34 +402,47 @@ pub mod scene {
         }
 
         pub async fn load_scene() {
-            let mut scene = Self::access();
-            scene.drawing = false;
-            scene.loading = true;
+            let name = {
+                let mut scene = Self::access();
+                scene.drawing = false;
+                scene.loading = true;
+                scene.model.voxels.name.clone()
+            };
 
-            scene.model.load_scene().await;
-
-            scene.drawing = true;
-            scene.loading = false;
+            let storage = Storage::new();
+            let serial: Option<StoredOcTree> = storage.load_scene(name).await;
+            if serial.is_some() {
+                let mut scene = Self::access();
+                scene.model.voxels.load_from_serial(serial.unwrap());
+                scene.drawing = true;
+                scene.loading = false;
+            }
         }
 
         pub async fn delete_scene() {
-            let mut scene = Self::access();
-            scene.model.delete_scene().await;
+            let model = {
+                let mut scene = Self::access();
+
+                scene.model.voxels.clear();
+                scene.model.clone()
+            };
+            model.delete_scene().await;
         }
 
         pub async fn load_first_scene() {
-            let mut scene = Self::access();
-            scene.loading = true;
-            scene.model.load_first_scene().await;
-            scene.drawing = true;
-            scene.loading = false;
+            let storage = Storage::new();
+            let serial: Option<StoredOcTree> = storage.load_first_scene().await;
+            if serial.is_some() {
+                let mut scene = Self::access();
+                scene.model.voxels.load_from_serial(serial.unwrap());
+                scene.drawing = true;
+                scene.loading = false;
+            }
         }
 
         pub fn init(&mut self) {
             self.light.eye = Point3::new(15.0, 60.0, 14.0);
             self.light.target = Point3::new(0.0, 0.0, 0.0);
-            //self.light.eye = Point3::new(8.0, 6.0, 20.0);
-            //self.light.target = Point3::new(1.0, 0.0, 10.0);
             self.selection_cube.init();
             self.grid_xz.init();
             self.grid_xz.rotate([(90.0 as f32).to_radians(), 0.0, 0.0]);

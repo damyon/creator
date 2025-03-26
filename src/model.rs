@@ -1,10 +1,9 @@
 pub mod model {
-
     use crate::cube::cube::Cube;
     use crate::octree::octree::OcTree;
-    use crate::octree::octree::StoredOcTree;
     use crate::storage::storage::Storage;
 
+    #[derive(Clone)]
     pub struct Model {
         pub voxels: OcTree,
     }
@@ -36,36 +35,10 @@ pub mod model {
             self.voxels.all_voxels_active(positions)
         }
 
-        pub async fn delete_scene(&mut self) {
+        pub async fn delete_scene(&self) {
             let storage = Storage::new();
             if self.voxels.name != "Default" {
                 _ = storage.delete_scene(self.voxels.name.to_string()).await;
-            }
-            self.voxels.clear();
-        }
-
-        pub async fn load_scene(&mut self) {
-            let storage = Storage::new();
-            log::debug!("load_scene");
-
-            let serial: Option<StoredOcTree> =
-                storage.load_scene(self.voxels.name.to_string()).await;
-            log::debug!("load_scene: We got the scene {:?}", serial.is_some());
-            if serial.is_some() {
-                log::debug!("load_scene: serial is some");
-                self.voxels.load_from_serial(serial.unwrap());
-            }
-        }
-
-        pub async fn load_first_scene(&mut self) {
-            let storage = Storage::new();
-            log::debug!("load_first_scene");
-
-            let serial: Option<StoredOcTree> = storage.load_first_scene().await;
-            log::debug!("We got the scene {:?}", serial.is_some());
-            if serial.is_some() {
-                log::debug!("serial is some");
-                self.voxels.load_from_serial(serial.unwrap());
             }
         }
 
