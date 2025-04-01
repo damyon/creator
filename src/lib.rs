@@ -70,12 +70,6 @@ pub fn set_scene_name(name: &str) -> Result<bool, JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn simplify_scene(name: &str) -> Result<bool, JsValue> {
-    Scene::simplify_scene();
-    Ok(true)
-}
-
-#[wasm_bindgen]
 pub async fn load_first_scene() -> Result<JsValue, JsValue> {
     Scene::load_first_scene().await;
 

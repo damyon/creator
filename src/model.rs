@@ -14,9 +14,6 @@ pub mod model {
                 voxels: OcTree::new(),
             }
         }
-        pub fn simplify(&mut self) {
-            self.voxels.simplify()
-        }
 
         pub fn drawables(&mut self) -> Vec<Cube> {
             self.voxels.drawables()

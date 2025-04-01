@@ -1,6 +1,5 @@
 pub mod octree {
     use crate::{cube::cube::Cube, drawable::drawable::Drawable};
-    use js_sys::Math::pow;
     use serde::{Deserialize, Serialize};
 
     #[derive(Clone)]
@@ -25,46 +24,6 @@ pub mod octree {
                     color: [0.8, 0.8, 0.8, 0.8],
                 },
                 depth: 1,
-            }
-        }
-
-        pub fn generate_surrounding_positions(node: OcNode) -> Vec<[i32; 3]> {
-            let mut bounds: Vec<[i32; 3]> = vec![];
-            let x = node.x_index;
-            let y = node.y_index;
-            let z = node.z_index;
-            let bounds = pow(2, 6);
-
-            if x > 0 && y > 0 && z > 0 {
-                bounds.push([x - 1, y - 1, z - 1]);
-            }
-            if y > 0 && z > 0 {
-                bounds.push([x, y - 1, z - 1]);
-            }
-            if x > 0 && y > 0 {
-                bounds.push([x - 1, y - 1, z]);
-            }
-            if x > 0 && z > 0 {
-                bounds.push([x - 1, y, z - 1]);
-            }
-            if x > 0 {
-                bounds.push([x - 1, y, z]);
-            }
-            if y > 0 {
-                bounds.push([x, y - 1, z]);
-            }
-            if z > 0 {
-                bounds.push([x, y, z - 1]);
-            }
-
-            bounds
-        }
-
-        pub fn simplify(&mut self) {
-            let active = self.root.active_nodes();
-
-            for node in active {
-                let surrounding = Self::generate_surrounding_positions(node);
             }
         }
 

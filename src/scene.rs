@@ -364,15 +364,6 @@ pub mod scene {
             }
         }
 
-        pub fn simplify_scene() {
-            let mut scene = Self::access();
-            scene.simplify();
-        }
-
-        pub fn simplify(&mut self) {
-            self.model.simplify();
-        }
-
         pub fn init_scene() {
             let mut scene = Self::access();
             scene.init();
