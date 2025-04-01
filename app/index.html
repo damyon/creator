@@ -1,0 +1,139 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>WebGL with Rust + WebAssembly</title>
+
+        <link rel="stylesheet" href="style.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+        />
+        <script type="module" src="creator.js"></script>
+        <script type="module" src="main.js"></script>
+    </head>
+    <body>
+        <canvas id="scene" tabindex="0" width="800" height="800" tabindex="1" autofocus> </canvas>
+
+        <div
+            id="instructions"
+            style="
+                box-shadow: 2px 2px 4px #000000;
+                position: absolute;
+                left: calc(50% - 250px);
+                top: 30%;
+                width: 500px;
+                padding: 2rem;
+            "
+            popover
+        >
+            <h2>Controls</h2>
+            <h3>Mouse</h3>
+            <div>Click and drag the mouse to rotate the camera.</div>
+            <div>Scroll the mouse wheel to make the selection bigger or smaller.</div>
+            <h3>Keyboard</h3>
+            <div>Use <b>WASD</b> keys or the arrow keys to move the camera left and right, forwards and backwards.</div>
+            <div>Use <b>E</b> and <b>C</b> keys to move the camera up and down.</div>
+            <div>
+                Use the <b>arrow</b> keys on the numpad to move the selection left and right, forwards and backwards.
+            </div>
+            <div>Use the <b>9</b> and <b>3</b> keys on the numpad to move the selection up and down.</div>
+            <div>Use the <b>spacebar</b> to toggle the selected cubes on or off.</div>
+            <div>Use <b>T</b> to toggle the selection shape.</div>
+        </div>
+        <input
+            type="color"
+            id="color"
+            style="
+                position: absolute;
+                left: 10px;
+                top: 130px;
+                z-index: 10;
+                font-size: 2em;
+                background: none;
+                border: none;
+                cursor: pointer;
+            "
+            value="#CCCCCC"
+        />
+        <button
+            popovertarget="instructions"
+            style="
+                z-index: 10;
+                font-size: 2em;
+                background: none;
+                border: none;
+                position: absolute;
+                left: 130px;
+                top: 10px;
+                cursor: pointer;
+            "
+        >
+            <i class="fa fa-question"></i>
+        </button>
+        <input
+            id="name"
+            list="scene-list"
+            placeholder="Scene name..."
+            value="Default"
+            style="
+                position: absolute;
+                left: 10px;
+                top: 70px;
+                z-index: 10;
+                font-size: 1em;
+                font-weight: 700;
+                background: none;
+                border: 2px solid black;
+                border-radius: 4px;
+            "
+        />
+        <datalist id="scene-list">
+            <option>New Scene...</option>
+        </datalist>
+        <button
+            id="save"
+            style="
+                position: absolute;
+                left: 10px;
+                top: 10px;
+                z-index: 10;
+                font-size: 2em;
+                background: none;
+                border: none;
+                cursor: pointer;
+            "
+        >
+            <i class="fa fa-save"></i>
+        </button>
+        <button
+            id="load"
+            style="
+                position: absolute;
+                left: 50px;
+                top: 10px;
+                z-index: 10;
+                font-size: 2em;
+                background: none;
+                border: none;
+                cursor: pointer;
+            "
+        >
+            <i class="fa fa-rotate-right"></i>
+        </button>
+        <button
+            id="delete"
+            style="
+                position: absolute;
+                left: 90px;
+                top: 10px;
+                z-index: 10;
+                font-size: 2em;
+                background: none;
+                border: none;
+                cursor: pointer;
+            "
+        >
+            <i class="fa fa-trash"></i>
+        </button>
+    </body>
+</html>
