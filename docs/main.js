@@ -1,6 +1,7 @@
 import init, {
   load_first_scene,
   load_scene,
+  simplify_scene,
   delete_scene,
   save_scene,
   init_scene,
@@ -16,6 +17,7 @@ document.getElementById("save").onclick = function () {
   processing = true;
   save_scene();
   load_scene_names();
+  document.getElementById(CANVAS_ID).focus();
   processing = false;
 };
 
@@ -23,6 +25,14 @@ document.getElementById("delete").onclick = function () {
   processing = true;
   delete_scene();
   load_scene_names();
+  document.getElementById(CANVAS_ID).focus();
+  processing = false;
+};
+
+document.getElementById("simplify").onclick = function () {
+  processing = true;
+  simplify_scene();
+  document.getElementById(CANVAS_ID).focus();
   processing = false;
 };
 
@@ -34,6 +44,7 @@ function load_deferred() {
 document.getElementById("load").onclick = function () {
   processing = true;
   setTimeout(load_deferred, 500);
+  document.getElementById(CANVAS_ID).focus();
 };
 
 document.getElementById("name").onchange = function (e) {
