@@ -1,5 +1,8 @@
 build:
 	wasm-pack build --target web --out-dir app
 
-dev: build
-	php -S 0.0.0.0:8080 -t app/
+view:
+	google-chrome --allow-file-access-from-files app/index.html &
+
+watch: 
+	cargo watch -i .gitignore -i "pkg/*" -s "wasm-pack build --target web --out-dir app"

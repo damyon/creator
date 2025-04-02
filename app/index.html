@@ -41,48 +41,18 @@
             <div>Use <b>T</b> to toggle the selection shape.</div>
         </div>
         <input
-            type="color"
-            id="color"
-            style="
-                position: absolute;
-                left: 10px;
-                top: 130px;
-                z-index: 10;
-                font-size: 2em;
-                background: none;
-                border: none;
-                cursor: pointer;
-            "
-            value="#CCCCCC"
-        />
-        <button
-            popovertarget="instructions"
-            style="
-                z-index: 10;
-                font-size: 2em;
-                background: none;
-                border: none;
-                position: absolute;
-                left: 130px;
-                top: 10px;
-                cursor: pointer;
-            "
-        >
-            <i class="fa fa-question"></i>
-        </button>
-        <input
             id="name"
             list="scene-list"
+            class="widget"
             placeholder="Scene name..."
             value="Default"
             style="
                 position: absolute;
                 left: 10px;
-                top: 70px;
-                z-index: 10;
+                top: 10px;
                 font-size: 1em;
                 font-weight: 700;
-                background: none;
+                cursor: text;
                 border: 2px solid black;
                 border-radius: 4px;
             "
@@ -90,50 +60,29 @@
         <datalist id="scene-list">
             <option>New Scene...</option>
         </datalist>
-        <button
-            id="save"
-            style="
-                position: absolute;
-                left: 10px;
-                top: 10px;
-                z-index: 10;
-                font-size: 2em;
-                background: none;
-                border: none;
-                cursor: pointer;
-            "
-        >
-            <i class="fa fa-save"></i>
-        </button>
-        <button
-            id="load"
-            style="
-                position: absolute;
-                left: 50px;
-                top: 10px;
-                z-index: 10;
-                font-size: 2em;
-                background: none;
-                border: none;
-                cursor: pointer;
-            "
-        >
+        <input
+            type="color"
+            id="color"
+            class="widget"
+            style="position: absolute; left: 10px; top: 70px; width: 50px; height: 50px; border: none"
+            value="#CCCCCC"
+        />
+
+        <button id="load" class="widget" style="position: absolute; left: 10px; top: 130px; border: none">
             <i class="fa fa-rotate-right"></i>
         </button>
-        <button
-            id="delete"
-            style="
-                position: absolute;
-                left: 90px;
-                top: 10px;
-                z-index: 10;
-                font-size: 2em;
-                background: none;
-                border: none;
-                cursor: pointer;
-            "
-        >
+        <button id="save" class="widget" style="position: absolute; left: 10px; top: 190px; border: none">
+            <i class="fa fa-save"></i>
+        </button>
+        <button id="delete" class="widget" style="position: absolute; left: 10px; top: 250px; border: none">
             <i class="fa fa-trash"></i>
+        </button>
+        <button
+            popovertarget="instructions"
+            class="widget"
+            style="border: none; position: absolute; left: 10px; bottom: 10px"
+        >
+            <i class="fa fa-question"></i>
         </button>
     </body>
 </html>

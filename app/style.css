@@ -24,3 +24,14 @@ canvas {
 form {
     padding: 16px;
 }
+
+.widget {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    color: white;
+    padding: 10px;
+    box-shadow: 5px 5px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+    font-size: 2em;
+    cursor: pointer;
+}
