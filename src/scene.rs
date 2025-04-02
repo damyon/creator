@@ -29,6 +29,9 @@ pub mod scene {
         SquareXZ,
         SquareXY,
         SquareYZ,
+        CircleXZ,
+        CircleXY,
+        CircleYZ,
     }
 
     pub struct Scene {
@@ -277,19 +280,20 @@ pub mod scene {
 
         pub fn handle_toggle_selection_shape(scene: &mut Scene) {
             scene.selection_shape = if scene.selection_shape == SelectionShape::Sphere {
-                log::debug!("Selection to Cube");
                 SelectionShape::Cube
             } else if scene.selection_shape == SelectionShape::Cube {
-                log::debug!("Selection to SquareXZ");
                 SelectionShape::SquareXZ
             } else if scene.selection_shape == SelectionShape::SquareXZ {
-                log::debug!("Selection to SquareXY");
                 SelectionShape::SquareXY
             } else if scene.selection_shape == SelectionShape::SquareXY {
-                log::debug!("Selection to SquareYZ");
                 SelectionShape::SquareYZ
+            } else if scene.selection_shape == SelectionShape::SquareYZ {
+                SelectionShape::CircleXZ
+            } else if scene.selection_shape == SelectionShape::CircleXZ {
+                SelectionShape::CircleXY
+            } else if scene.selection_shape == SelectionShape::CircleXY {
+                SelectionShape::CircleYZ
             } else {
-                log::debug!("Selection to Sphere");
                 SelectionShape::Sphere
             }
         }
@@ -617,6 +621,48 @@ pub mod scene {
                         let voxel_position = [center[0], y, z];
                         if (center[1] - voxel_position[1]).abs() < radius
                             && (center[2] - voxel_position[2]).abs() < radius
+                        {
+                            voxels.push([center[0], y, z]);
+                        }
+                    }
+                }
+            } else if shape == SelectionShape::CircleXZ {
+                // CircleXZ
+                for x in -range..range {
+                    for z in -range..range {
+                        let voxel_position = [x, center[1], z];
+                        if (((center[0] - voxel_position[0]).abs() as f64).powi(2)
+                            + ((center[2] - voxel_position[2]).abs() as f64).powi(2))
+                        .sqrt()
+                            < radius as f64
+                        {
+                            voxels.push([x, center[1], z]);
+                        }
+                    }
+                }
+            } else if shape == SelectionShape::CircleXY {
+                // CircleXY
+                for x in -range..range {
+                    for y in -range..range {
+                        let voxel_position = [x, y, center[2]];
+                        if (((center[0] - voxel_position[0]).abs() as f64).powi(2)
+                            + ((center[1] - voxel_position[1]).abs() as f64).powi(2))
+                        .sqrt()
+                            < radius as f64
+                        {
+                            voxels.push([x, y, center[2]]);
+                        }
+                    }
+                }
+            } else if shape == SelectionShape::CircleYZ {
+                // CircleYZ
+                for y in -range..range {
+                    for z in -range..range {
+                        let voxel_position = [center[0], y, z];
+                        if (((center[1] - voxel_position[1]).abs() as f64).powi(2)
+                            + ((center[2] - voxel_position[2]).abs() as f64).powi(2))
+                        .sqrt()
+                            < radius as f64
                         {
                             voxels.push([center[0], y, z]);
                         }
