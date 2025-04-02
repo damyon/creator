@@ -40,9 +40,7 @@ pub async fn scene_names() -> Result<JsValue, JsValue> {
 
     let names = storage.list_scenes().await;
     log::debug!("Got scene_names");
-    //let js_names: Array = names.into_iter().map(JsValue::from).collect();
     Ok(JsValue::from(names))
-    //Ok(JsValue::from(js_names))
 }
 
 #[wasm_bindgen]

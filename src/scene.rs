@@ -440,6 +440,10 @@ pub mod scene {
                 scene.model.voxels.load_from_serial(serial.unwrap());
                 scene.drawing = true;
                 scene.loading = false;
+            } else {
+                let mut scene = Self::access();
+                scene.drawing = true;
+                scene.loading = false;
             }
         }
 
