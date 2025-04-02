@@ -28,6 +28,7 @@ pub mod scene {
         Cube,
         SquareXZ,
         SquareXY,
+        SquareYZ,
     }
 
     pub struct Scene {
@@ -276,12 +277,19 @@ pub mod scene {
 
         pub fn handle_toggle_selection_shape(scene: &mut Scene) {
             scene.selection_shape = if scene.selection_shape == SelectionShape::Sphere {
+                log::debug!("Selection to Cube");
                 SelectionShape::Cube
             } else if scene.selection_shape == SelectionShape::Cube {
+                log::debug!("Selection to SquareXZ");
                 SelectionShape::SquareXZ
             } else if scene.selection_shape == SelectionShape::SquareXZ {
+                log::debug!("Selection to SquareXY");
                 SelectionShape::SquareXY
+            } else if scene.selection_shape == SelectionShape::SquareXY {
+                log::debug!("Selection to SquareYZ");
+                SelectionShape::SquareYZ
             } else {
+                log::debug!("Selection to Sphere");
                 SelectionShape::Sphere
             }
         }
@@ -578,7 +586,7 @@ pub mod scene {
                         }
                     }
                 }
-            } else if shape == SelectionShape::SquareXY {
+            } else if shape == SelectionShape::SquareXZ {
                 // SquareXZ
                 for x in -range..range {
                     for z in -range..range {
@@ -590,7 +598,7 @@ pub mod scene {
                         }
                     }
                 }
-            } else {
+            } else if shape == SelectionShape::SquareXY {
                 // SquareXY
                 for x in -range..range {
                     for y in -range..range {
@@ -599,6 +607,18 @@ pub mod scene {
                             && (center[1] - voxel_position[1]).abs() < radius
                         {
                             voxels.push([x, y, center[2]]);
+                        }
+                    }
+                }
+            } else if shape == SelectionShape::SquareYZ {
+                // SquareYZ
+                for y in -range..range {
+                    for z in -range..range {
+                        let voxel_position = [center[0], y, z];
+                        if (center[1] - voxel_position[1]).abs() < radius
+                            && (center[2] - voxel_position[2]).abs() < radius
+                        {
+                            voxels.push([center[0], y, z]);
                         }
                     }
                 }
