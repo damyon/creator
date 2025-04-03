@@ -15,9 +15,11 @@ mod graphics;
 mod grid;
 mod model;
 mod mouse;
+mod ocnode;
 mod octree;
 mod scene;
 mod storage;
+mod stored_octree;
 
 use crate::graphics::graphics::Graphics;
 use crate::scene::scene::Scene;

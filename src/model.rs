@@ -1,17 +1,17 @@
 pub mod model {
     use crate::cube::cube::Cube;
-    use crate::octree::octree::OcTree;
+    use crate::octree::octree::Octree;
     use crate::storage::storage::Storage;
 
     #[derive(Clone)]
     pub struct Model {
-        pub voxels: OcTree,
+        pub voxels: Octree,
     }
 
     impl Model {
         pub const fn new() -> Model {
             Model {
-                voxels: OcTree::new(),
+                voxels: Octree::new(),
             }
         }
 

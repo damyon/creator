@@ -13,27 +13,30 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly init_scene: (a: number) => void;
-  readonly scene_names: () => number;
-  readonly save_scene: () => number;
-  readonly load_scene: () => number;
-  readonly delete_scene: () => number;
-  readonly set_scene_name: (a: number, b: number, c: number) => void;
-  readonly load_first_scene: () => number;
-  readonly set_material_color: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
+  readonly init_scene: () => [number, number, number];
+  readonly scene_names: () => any;
+  readonly save_scene: () => any;
+  readonly load_scene: () => any;
+  readonly delete_scene: () => any;
+  readonly set_scene_name: (a: number, b: number) => [number, number, number];
+  readonly load_first_scene: () => any;
+  readonly set_material_color: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number, number];
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_exn_store: (a: number) => void;
-  readonly __wbindgen_free: (a: number, b: number, c: number) => void;
+  readonly __externref_table_alloc: () => number;
   readonly __wbindgen_export_4: WebAssembly.Table;
-  readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
-  readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h6ac027c7b4e47d5f: (a: number, b: number, c: number, d: number) => void;
-  readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h123f9824b6b43e3d: (a: number, b: number) => void;
-  readonly _dyn_core__ops__function__FnMut___A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h8553e69a8c5040fa: (a: number, b: number, c: number) => void;
-  readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h660e6c10043db219: (a: number, b: number) => void;
-  readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h96d32d8e879cf7f9: (a: number, b: number, c: number) => void;
-  readonly _dyn_core__ops__function__FnMut__A____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h6e645cd760448ecb: (a: number, b: number, c: number) => void;
-  readonly wasm_bindgen__convert__closures__invoke2_mut__he629759d72d74ba1: (a: number, b: number, c: number, d: number) => void;
+  readonly __wbindgen_free: (a: number, b: number, c: number) => void;
+  readonly __wbindgen_export_6: WebAssembly.Table;
+  readonly __externref_table_dealloc: (a: number) => void;
+  readonly closure81_externref_shim_multivalue_shim: (a: number, b: number, c: any) => [number, number];
+  readonly closure85_externref_shim: (a: number, b: number, c: any) => void;
+  readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h6163315e4ab12732: (a: number, b: number) => void;
+  readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hb953dab231bf761a: (a: number, b: number) => void;
+  readonly closure139_externref_shim: (a: number, b: number, c: any) => void;
+  readonly closure156_externref_shim: (a: number, b: number, c: any) => void;
+  readonly closure180_externref_shim: (a: number, b: number, c: any, d: any) => void;
+  readonly __wbindgen_start: () => void;
 }
 
 export type SyncInitInput = BufferSource | WebAssembly.Module;

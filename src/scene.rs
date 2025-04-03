@@ -11,8 +11,8 @@ pub mod scene {
     use crate::grid::grid::Grid;
     use crate::model::model::Model;
     use crate::mouse::mouse::Mouse;
-    use crate::octree::octree::StoredOcTree;
     use crate::storage::storage::Storage;
+    use crate::stored_octree::stored_octree::StoredOctree;
     use crate::{camera::camera::Camera, cube::cube::Cube};
     use gloo::events::EventListener;
     use wasm_bindgen::JsCast;
@@ -428,7 +428,7 @@ pub mod scene {
             };
 
             let storage = Storage::new();
-            let serial: Option<StoredOcTree> = storage.load_scene(name).await;
+            let serial: Option<StoredOctree> = storage.load_scene(name).await;
             if serial.is_some() {
                 let mut scene = Self::access();
                 scene.model.voxels.load_from_serial(serial.unwrap());
@@ -449,7 +449,7 @@ pub mod scene {
 
         pub async fn load_first_scene() {
             let storage = Storage::new();
-            let serial: Option<StoredOcTree> = storage.load_first_scene().await;
+            let serial: Option<StoredOctree> = storage.load_first_scene().await;
             if serial.is_some() {
                 let mut scene = Self::access();
                 scene.model.voxels.load_from_serial(serial.unwrap());

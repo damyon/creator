@@ -1,5 +1,5 @@
 pub mod storage {
-    use crate::octree::octree::StoredOcTree;
+    use crate::stored_octree::stored_octree::StoredOctree;
     use indexed_db_futures::database::Database;
     use indexed_db_futures::transaction::TransactionMode;
     use indexed_db_futures::{prelude::*, KeyPath};
@@ -20,7 +20,7 @@ pub mod storage {
             Storage { _noop: 0.0 }
         }
 
-        pub async fn save(self: Self, data: StoredOcTree) {
+        pub async fn save(self: Self, data: StoredOctree) {
             let db = Database::open("creation")
                 .with_version(1u8)
                 .with_on_upgrade_needed(|_event, db| {
@@ -78,7 +78,7 @@ pub mod storage {
             log::debug!("delete_scene We committed the transaction");
         }
 
-        pub async fn load_scene(self: Self, name: String) -> Option<StoredOcTree> {
+        pub async fn load_scene(self: Self, name: String) -> Option<StoredOctree> {
             let db = Database::open("creation")
                 .with_version(1u8)
                 .with_on_upgrade_needed(|_event, db| {
@@ -106,7 +106,7 @@ pub mod storage {
                 .expect("Could not get object store");
 
             log::debug!("load_scene We got the store");
-            let serial: Option<StoredOcTree> = store
+            let serial: Option<StoredOctree> = store
                 .get(name)
                 .serde()
                 .expect("broken")
@@ -117,7 +117,7 @@ pub mod storage {
             serial
         }
 
-        pub async fn load_first_scene(self: Self) -> Option<StoredOcTree> {
+        pub async fn load_first_scene(self: Self) -> Option<StoredOctree> {
             self.load_scene("Default".to_string()).await
         }
 
