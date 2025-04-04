@@ -148,6 +148,7 @@ pub mod ocnode {
                 if self.x_index == position[0]
                     && self.y_index == position[1]
                     && self.z_index == position[2]
+                    && self.sub_division_level == LEVELS
                     && !self.active
                 {
                     return false;
@@ -191,22 +192,36 @@ pub mod ocnode {
 
         pub fn drawables(&mut self) -> Vec<Cube> {
             if self.has_children {
-                let mut child_cubes: Vec<Cube> = vec![];
+                if self.active {
+                    let scale = self.resolution(self.sub_division_level) as f32;
+                    let mut cube = Cube::new();
 
-                let squirts = self.children.each_mut();
+                    cube.color = self.color;
+                    cube.scale = scale;
+                    cube.init();
 
-                for index in 0..8 {
-                    match squirts[index] {
-                        None => {}
-                        Some(node) => {
-                            let mut cube = node.drawables();
+                    let x = self.x_index as f32 * (scale);
+                    let y = self.y_index as f32 * (scale);
+                    let z = self.z_index as f32 * (scale);
 
-                            child_cubes.append(&mut cube);
-                        }
-                    };
+                    cube.translate([x, y, z]);
+                    vec![cube]
+                } else {
+                    let mut child_cubes: Vec<Cube> = vec![];
+                    let squirts = self.children.each_mut();
+
+                    for index in 0..8 {
+                        match squirts[index] {
+                            None => {}
+                            Some(node) => {
+                                let mut cube = node.drawables();
+
+                                child_cubes.append(&mut cube);
+                            }
+                        };
+                    }
+                    child_cubes
                 }
-
-                child_cubes
             } else {
                 if self.active {
                     let scale = 1.0;
