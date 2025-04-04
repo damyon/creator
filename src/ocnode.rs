@@ -6,6 +6,8 @@ pub mod ocnode {
         [None, None, None, None, None, None, None, None]
     }
 
+    pub const LEVELS: u32 = 6;
+
     #[derive(Serialize, Deserialize, Clone)]
     pub struct Ocnode {
         #[serde(rename = "x")]
@@ -30,9 +32,9 @@ pub mod ocnode {
     impl Ocnode {
         pub const fn new() -> Ocnode {
             Ocnode {
-                x_index: 0,
-                y_index: 0,
-                z_index: 0,
+                x_index: -Ocnode::range(),
+                y_index: -Ocnode::range(),
+                z_index: -Ocnode::range(),
                 sub_division_level: 1,
                 active: false,
                 children: [None, None, None, None, None, None, None, None],
@@ -41,23 +43,19 @@ pub mod ocnode {
             }
         }
 
-        pub fn decimate(&mut self, sub_division_level: u32) {
-            if sub_division_level > 0 {
-                self.subdivide();
+        /**
+         * Return the coordinate range. The actual positions go from -range to +range
+         */
+        pub const fn range() -> i32 {
+            2i32.pow(LEVELS - 1) / 2
+        }
 
-                let squirts = self.children.each_mut();
-
-                for index in 0..8 {
-                    match squirts[index] {
-                        None => {
-                            log::debug!("Should not get here")
-                        }
-                        Some(node) => {
-                            node.decimate(sub_division_level - 1);
-                        }
-                    };
-                }
-            }
+        /**
+         * Calculate the width of a cube at this subdivision level
+         */
+        pub fn resolution(&self, sub_division_level: u32) -> u32 {
+            let power = LEVELS.checked_sub(sub_division_level).expect("");
+            2u32.pow(power)
         }
 
         pub fn active_nodes(&self) -> Vec<Ocnode> {
@@ -231,174 +229,109 @@ pub mod ocnode {
             }
         }
 
+        pub fn decimate(&mut self, sub_division_level: u32) {
+            if sub_division_level - 1 > 0 {
+                self.subdivide();
+
+                let squirts = self.children.each_mut();
+
+                for index in 0..8 {
+                    match squirts[index] {
+                        None => {
+                            log::debug!("Should not get here")
+                        }
+                        Some(node) => {
+                            node.decimate(sub_division_level - 1);
+                        }
+                    };
+                }
+            }
+        }
+
         pub fn subdivide(&mut self) {
             self.has_children = true;
-            let active = false;
 
-            if self.sub_division_level < 2 {
-                self.children[0] = Some(Box::new(Ocnode {
-                    x_index: -1,
-                    y_index: -1,
-                    z_index: -1,
-                    sub_division_level: self.sub_division_level + 1,
-                    active: active,
-                    children: [None, None, None, None, None, None, None, None],
-                    has_children: false,
-                    color: self.color,
-                }));
+            self.children[0] = Some(Box::new(Ocnode {
+                x_index: self.x_index,
+                y_index: self.y_index,
+                z_index: self.z_index,
+                sub_division_level: self.sub_division_level + 1,
+                active: false,
+                children: [None, None, None, None, None, None, None, None],
+                has_children: false,
+                color: self.color,
+            }));
 
-                self.children[1] = Some(Box::new(Ocnode {
-                    x_index: 0,
-                    y_index: -1,
-                    z_index: -1,
-                    sub_division_level: self.sub_division_level + 1,
-                    active: active,
-                    children: [None, None, None, None, None, None, None, None],
-                    has_children: false,
-                    color: self.color,
-                }));
-                self.children[2] = Some(Box::new(Ocnode {
-                    x_index: -1,
-                    y_index: 0,
-                    z_index: -1,
-                    sub_division_level: self.sub_division_level + 1,
-                    active: active,
-                    children: [None, None, None, None, None, None, None, None],
-                    has_children: false,
-                    color: self.color,
-                }));
-                self.children[3] = Some(Box::new(Ocnode {
-                    x_index: -1,
-                    y_index: -1,
-                    z_index: 0,
-                    sub_division_level: self.sub_division_level + 1,
-                    active: active,
-                    children: [None, None, None, None, None, None, None, None],
-                    has_children: false,
-                    color: self.color,
-                }));
-                self.children[4] = Some(Box::new(Ocnode {
-                    x_index: 0,
-                    y_index: 0,
-                    z_index: -1,
-                    sub_division_level: self.sub_division_level + 1,
-                    active: active,
-                    children: [None, None, None, None, None, None, None, None],
-                    has_children: false,
-                    color: self.color,
-                }));
-                self.children[5] = Some(Box::new(Ocnode {
-                    x_index: -1,
-                    y_index: 0,
-                    z_index: 0,
-                    sub_division_level: self.sub_division_level + 1,
-                    active: active,
-                    children: [None, None, None, None, None, None, None, None],
-                    has_children: false,
-                    color: self.color,
-                }));
-                self.children[6] = Some(Box::new(Ocnode {
-                    x_index: 0,
-                    y_index: -1,
-                    z_index: 0,
-                    sub_division_level: self.sub_division_level + 1,
-                    active: active,
-                    children: [None, None, None, None, None, None, None, None],
-                    has_children: false,
-                    color: self.color,
-                }));
-                self.children[7] = Some(Box::new(Ocnode {
-                    x_index: 0,
-                    y_index: 0,
-                    z_index: 0,
-                    sub_division_level: self.sub_division_level + 1,
-                    active: active,
-                    children: [None, None, None, None, None, None, None, None],
-                    has_children: false,
-                    color: self.color,
-                }));
-            } else {
-                self.children[0] = Some(Box::new(Ocnode {
-                    x_index: self.x_index * 2,
-                    y_index: self.y_index * 2,
-                    z_index: self.z_index * 2,
-                    sub_division_level: self.sub_division_level + 1,
-                    active: active,
-                    children: [None, None, None, None, None, None, None, None],
-                    has_children: false,
-                    color: self.color,
-                }));
-                self.children[1] = Some(Box::new(Ocnode {
-                    x_index: self.x_index * 2 + 1,
-                    y_index: self.y_index * 2,
-                    z_index: self.z_index * 2,
-                    sub_division_level: self.sub_division_level + 1,
-                    active: active,
-                    children: [None, None, None, None, None, None, None, None],
-                    has_children: false,
-                    color: self.color,
-                }));
-                self.children[2] = Some(Box::new(Ocnode {
-                    x_index: self.x_index * 2,
-                    y_index: self.y_index * 2 + 1,
-                    z_index: self.z_index * 2,
-                    sub_division_level: self.sub_division_level + 1,
-                    active: active,
-                    children: [None, None, None, None, None, None, None, None],
-                    has_children: false,
-                    color: self.color,
-                }));
-                self.children[3] = Some(Box::new(Ocnode {
-                    x_index: self.x_index * 2,
-                    y_index: self.y_index * 2,
-                    z_index: self.z_index * 2 + 1,
-                    sub_division_level: self.sub_division_level + 1,
-                    active: active,
-                    children: [None, None, None, None, None, None, None, None],
-                    has_children: false,
-                    color: self.color,
-                }));
-                self.children[4] = Some(Box::new(Ocnode {
-                    x_index: self.x_index * 2 + 1,
-                    y_index: self.y_index * 2 + 1,
-                    z_index: self.z_index * 2,
-                    sub_division_level: self.sub_division_level + 1,
-                    active: active,
-                    children: [None, None, None, None, None, None, None, None],
-                    has_children: false,
-                    color: self.color,
-                }));
-                self.children[5] = Some(Box::new(Ocnode {
-                    x_index: self.x_index * 2,
-                    y_index: self.y_index * 2 + 1,
-                    z_index: self.z_index * 2 + 1,
-                    sub_division_level: self.sub_division_level + 1,
-                    active: active,
-                    children: [None, None, None, None, None, None, None, None],
-                    has_children: false,
-                    color: self.color,
-                }));
-                self.children[6] = Some(Box::new(Ocnode {
-                    x_index: self.x_index * 2 + 1,
-                    y_index: self.y_index * 2,
-                    z_index: self.z_index * 2 + 1,
-                    sub_division_level: self.sub_division_level + 1,
-                    active: active,
-                    children: [None, None, None, None, None, None, None, None],
-                    has_children: false,
-                    color: self.color,
-                }));
-                self.children[7] = Some(Box::new(Ocnode {
-                    x_index: self.x_index * 2 + 1,
-                    y_index: self.y_index * 2 + 1,
-                    z_index: self.z_index * 2 + 1,
-                    sub_division_level: self.sub_division_level + 1,
-                    active: active,
-                    children: [None, None, None, None, None, None, None, None],
-                    has_children: false,
-                    color: self.color,
-                }));
-            }
+            self.children[1] = Some(Box::new(Ocnode {
+                x_index: self.x_index + self.resolution(self.sub_division_level + 1) as i32,
+                y_index: self.y_index,
+                z_index: self.z_index,
+                sub_division_level: self.sub_division_level + 1,
+                active: false,
+                children: [None, None, None, None, None, None, None, None],
+                has_children: false,
+                color: self.color,
+            }));
+            self.children[2] = Some(Box::new(Ocnode {
+                x_index: self.x_index,
+                y_index: self.y_index + self.resolution(self.sub_division_level + 1) as i32,
+                z_index: self.z_index,
+                sub_division_level: self.sub_division_level + 1,
+                active: false,
+                children: [None, None, None, None, None, None, None, None],
+                has_children: false,
+                color: self.color,
+            }));
+            self.children[3] = Some(Box::new(Ocnode {
+                x_index: self.x_index,
+                y_index: self.y_index,
+                z_index: self.z_index + self.resolution(self.sub_division_level + 1) as i32,
+                sub_division_level: self.sub_division_level + 1,
+                active: false,
+                children: [None, None, None, None, None, None, None, None],
+                has_children: false,
+                color: self.color,
+            }));
+            self.children[4] = Some(Box::new(Ocnode {
+                x_index: self.x_index + self.resolution(self.sub_division_level + 1) as i32,
+                y_index: self.y_index + self.resolution(self.sub_division_level + 1) as i32,
+                z_index: self.z_index,
+                sub_division_level: self.sub_division_level + 1,
+                active: false,
+                children: [None, None, None, None, None, None, None, None],
+                has_children: false,
+                color: self.color,
+            }));
+            self.children[5] = Some(Box::new(Ocnode {
+                x_index: self.x_index,
+                y_index: self.y_index + self.resolution(self.sub_division_level + 1) as i32,
+                z_index: self.z_index + self.resolution(self.sub_division_level + 1) as i32,
+                sub_division_level: self.sub_division_level + 1,
+                active: false,
+                children: [None, None, None, None, None, None, None, None],
+                has_children: false,
+                color: self.color,
+            }));
+            self.children[6] = Some(Box::new(Ocnode {
+                x_index: self.x_index + self.resolution(self.sub_division_level + 1) as i32,
+                y_index: self.y_index,
+                z_index: self.z_index + self.resolution(self.sub_division_level + 1) as i32,
+                sub_division_level: self.sub_division_level + 1,
+                active: false,
+                children: [None, None, None, None, None, None, None, None],
+                has_children: false,
+                color: self.color,
+            }));
+            self.children[7] = Some(Box::new(Ocnode {
+                x_index: self.x_index + self.resolution(self.sub_division_level + 1) as i32,
+                y_index: self.y_index + self.resolution(self.sub_division_level + 1) as i32,
+                z_index: self.z_index + self.resolution(self.sub_division_level + 1) as i32,
+                sub_division_level: self.sub_division_level + 1,
+                active: false,
+                children: [None, None, None, None, None, None, None, None],
+                has_children: false,
+                color: self.color,
+            }));
         }
     }
 }

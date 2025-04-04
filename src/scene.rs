@@ -465,7 +465,7 @@ pub mod scene {
         pub fn init(&mut self) {
             self.light.eye = Point3::new(15.0, 60.0, 14.0);
             self.light.target = Point3::new(0.0, 0.0, 0.0);
-            self.selection_cube.scale = 1.01f32;
+            self.selection_cube.scale = 0.98f32;
             self.selection_cube.init();
             self.grid_xz.init();
             self.grid_xz.rotate([(90.0 as f32).to_radians(), 0.0, 0.0]);
