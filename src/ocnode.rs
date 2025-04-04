@@ -200,10 +200,9 @@ pub mod ocnode {
                     cube.scale = scale;
                     cube.init();
 
-                    let x = self.x_index as f32 * (scale);
-                    let y = self.y_index as f32 * (scale);
-                    let z = self.z_index as f32 * (scale);
-
+                    let x = self.x_index as f32 * (1.0);
+                    let y = self.y_index as f32 * (1.0);
+                    let z = self.z_index as f32 * (1.0);
                     cube.translate([x, y, z]);
                     vec![cube]
                 } else {
