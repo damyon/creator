@@ -45,6 +45,7 @@ pub mod octree {
             for node in source.active_nodes {
                 self.root.apply(&node);
             }
+            self.root.optimise();
         }
 
         pub fn drawables(&mut self) -> Vec<Cube> {
@@ -58,6 +59,7 @@ pub mod octree {
 
         pub fn toggle_voxel(&mut self, position: [i32; 3], value: bool, color: [f32; 4]) {
             self.root.toggle_voxel(position, value, color);
+            self.root.optimise();
         }
 
         pub fn prepare(&self) -> StoredOctree {

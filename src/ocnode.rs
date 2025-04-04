@@ -121,6 +121,30 @@ pub mod ocnode {
             }
         }
 
+        /**
+         * Set the active state to match the combined active state of all children.
+         */
+        pub fn optimise(&mut self) {
+            if self.has_children {
+                // Optimize leaf first then move up the tree.
+                let squirts = self.children.each_mut();
+                for child in squirts {
+                    match child {
+                        None => {}
+                        Some(down) => {
+                            down.optimise();
+                        }
+                    }
+                }
+
+                let squirts = self.children.each_mut();
+                let has_hole = squirts
+                    .into_iter()
+                    .any(|child| !child.as_ref().expect("child").active);
+                self.active = !has_hole;
+            }
+        }
+
         pub fn all_voxels_active(&self, positions: &Vec<[i32; 3]>) -> bool {
             for position in positions {
                 if self.x_index == position[0]
