@@ -11,6 +11,7 @@ pub mod scene {
     use crate::grid::grid::Grid;
     use crate::model::model::Model;
     use crate::mouse::mouse::Mouse;
+    use crate::ocnode::ocnode::Ocnode;
     use crate::storage::storage::Storage;
     use crate::stored_octree::stored_octree::StoredOctree;
     use crate::{camera::camera::Camera, cube::cube::Cube};
@@ -225,13 +226,14 @@ pub mod scene {
             );
 
             let value: bool = scene.model.all_voxels_active(&selections);
-
+            let count = selections.len();
             if value {
-                log::info!("Toggle all voxels active: TRUE");
+                log::info!("Toggle all voxels active: TRUE ${count}");
             } else {
-                log::info!("Toggle all voxels active: FALSE");
+                log::info!("Toggle all voxels active: FALSE ${count}");
             }
             for selection in selections {
+                log::info!("Selection {:?}", selection);
                 scene
                     .model
                     .toggle_voxel(selection, !value, scene.material_color);
@@ -559,7 +561,7 @@ pub mod scene {
             shape: SelectionShape,
         ) -> Vec<[i32; 3]> {
             let mut voxels = Vec::new();
-            let range: i32 = 32;
+            let range: i32 = Ocnode::range() * 2;
             let radius_squared: i32 = radius.pow(2);
 
             if shape == SelectionShape::Sphere {

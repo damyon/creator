@@ -6,7 +6,7 @@ pub mod ocnode {
         [None, None, None, None, None, None, None, None]
     }
 
-    pub const LEVELS: u32 = 6;
+    pub const LEVELS: u32 = 7;
 
     #[derive(Serialize, Deserialize, Clone)]
     pub struct Ocnode {
@@ -174,6 +174,7 @@ pub mod ocnode {
             if self.x_index == position[0]
                 && self.y_index == position[1]
                 && self.z_index == position[2]
+                && self.sub_division_level == LEVELS
             {
                 self.active = value;
                 self.color = color;

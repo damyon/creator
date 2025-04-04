@@ -43,14 +43,10 @@ pub mod model {
         }
 
         pub async fn save(&self) {
-            log::debug!("We save the things");
             let storage = Storage::new();
-            log::debug!("Got storage");
 
             let serial = self.voxels.prepare();
-            log::debug!("Prepared the scene");
             _ = storage.save(serial).await;
-            log::debug!("We wrote it");
         }
     }
 }

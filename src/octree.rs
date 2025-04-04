@@ -58,6 +58,7 @@ pub mod octree {
         }
 
         pub fn toggle_voxel(&mut self, position: [i32; 3], value: bool, color: [f32; 4]) {
+            log::debug!("Toggle voxels in the tree.");
             self.root.toggle_voxel(position, value, color);
             self.root.optimise();
         }
