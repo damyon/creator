@@ -52,6 +52,7 @@ pub mod scene {
         throttle: u32,
         loading: bool,
         smooth: bool,
+        dirty: bool,
     }
 
     impl Scene {
@@ -89,12 +90,14 @@ pub mod scene {
                 throttle: 10,
                 loading: true,
                 smooth: true,
+                dirty: true,
             });
             GLOBSTATE.lock().unwrap()
         }
 
         pub fn queue_command(command: Command) {
             let mut scene = Self::access();
+            scene.dirty = true;
 
             scene.command_input.queue_command(command);
         }
@@ -407,6 +410,10 @@ pub mod scene {
         pub fn throttle() -> bool {
             let mut scene = Self::access();
 
+            if !scene.dirty {
+                return true;
+            }
+
             if scene.loading {
                 return true;
             }
@@ -419,7 +426,7 @@ pub mod scene {
             if scene.throttle >= 1 {
                 return true;
             }
-            scene.throttle = 10;
+            scene.throttle = 3;
             false
         }
 
@@ -757,6 +764,7 @@ pub mod scene {
             }
 
             graphics.finish_camera_frame();
+            scene.dirty = false;
         }
     }
 }
