@@ -505,7 +505,9 @@ pub mod graphics {
         }
 
         pub fn use_camera_shader(&self) {
-            self.gl.enable(WebGlRenderingContext::BLEND);
+            //self.gl.enable(WebGlRenderingContext::BLEND);
+            self.gl.disable(WebGlRenderingContext::BLEND);
+
             if !self.swap_shaders {
                 self.gl.use_program(self.camera_program.as_ref());
             } else {

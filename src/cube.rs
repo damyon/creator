@@ -22,7 +22,7 @@ pub mod cube {
                 normals: [0.0; 108],
                 translation: [0.0; 3],
                 rotation: [0.0; 3],
-                color: [0.3, 0.3, 0.1, 0.03],
+                color: [0.3, 0.3, 0.1, 1.0],
                 scale: 0.9999,
                 floor: 0.0001,
             }

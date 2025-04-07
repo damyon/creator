@@ -1,5 +1,6 @@
 pub mod scene {
 
+    use js_sys::Math::random;
     use std::cmp::{max, min};
     use std::sync::{Mutex, MutexGuard};
     use web_sys::WebGlRenderingContext;
@@ -50,6 +51,7 @@ pub mod scene {
         drawing: bool,
         throttle: u32,
         loading: bool,
+        smooth: bool,
     }
 
     impl Scene {
@@ -86,6 +88,7 @@ pub mod scene {
                 drawing: false,
                 throttle: 10,
                 loading: true,
+                smooth: true,
             });
             GLOBSTATE.lock().unwrap()
         }
@@ -234,9 +237,18 @@ pub mod scene {
             }
             for selection in selections {
                 log::info!("Selection {:?}", selection);
-                scene
-                    .model
-                    .toggle_voxel(selection, !value, scene.material_color);
+                let bump = if !scene.smooth {
+                    0.0f32
+                } else {
+                    random() as f32 / 10.0 - 0.05
+                };
+                let colour = [
+                    (scene.material_color[0] + bump).clamp(0.0, 1.0),
+                    (scene.material_color[1] + bump).clamp(0.0, 1.0),
+                    (scene.material_color[2] + bump).clamp(0.0, 1.0),
+                    1.0,
+                ];
+                scene.model.toggle_voxel(selection, !value, colour);
             }
         }
 
@@ -419,6 +431,7 @@ pub mod scene {
             let blue_f32 = blue as f32 / 255.0;
 
             self.material_color = [red_f32, green_f32, blue_f32, 1.0];
+            self.selection_cube.color = [red_f32, green_f32, blue_f32, 0.5];
         }
 
         pub async fn load_scene() {
@@ -449,6 +462,16 @@ pub mod scene {
             model.delete_scene().await;
         }
 
+        pub async fn toggle_noise() {
+            let mut scene = Self::access();
+            scene.smooth = false;
+        }
+
+        pub async fn toggle_smooth() {
+            let mut scene = Self::access();
+            scene.smooth = true;
+        }
+
         pub async fn load_first_scene() {
             let storage = Storage::new();
             let serial: Option<StoredOctree> = storage.load_first_scene().await;
@@ -467,7 +490,8 @@ pub mod scene {
         pub fn init(&mut self) {
             self.light.eye = Point3::new(15.0, 60.0, 14.0);
             self.light.target = Point3::new(0.0, 0.0, 0.0);
-            self.selection_cube.scale = 0.95f32;
+            self.selection_cube.scale = 0.8f32;
+            self.selection_cube.color = [0.8, 0.8, 0.8, 0.5];
             self.selection_cube.init();
             self.grid_xz.init();
             self.grid_xz.rotate([(90.0 as f32).to_radians(), 0.0, 0.0]);
@@ -709,9 +733,9 @@ pub mod scene {
 
             for selection in selections {
                 scene.selection_cube.translation = [
-                    selection[0] as f32,
-                    selection[1] as f32,
-                    selection[2] as f32,
+                    selection[0] as f32 + 0.1,
+                    selection[1] as f32 + 0.1,
+                    selection[2] as f32 + 0.1,
                 ];
                 graphics.draw(
                     &scene.selection_cube,

@@ -140,6 +140,15 @@ pub mod ocnode {
                     .into_iter()
                     .any(|child| !child.as_ref().expect("child").active);
                 self.active = !has_hole;
+
+                let first = self.children.first();
+
+                match first {
+                    None => {}
+                    Some(node) => {
+                        self.color = node.as_ref().unwrap().color;
+                    }
+                }
             }
         }
 

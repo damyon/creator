@@ -58,6 +58,18 @@ pub async fn load_scene() -> Result<bool, JsValue> {
 }
 
 #[wasm_bindgen]
+pub async fn toggle_noise() -> Result<bool, JsValue> {
+    Scene::toggle_noise().await;
+    Ok(true)
+}
+
+#[wasm_bindgen]
+pub async fn toggle_smooth() -> Result<bool, JsValue> {
+    Scene::toggle_smooth().await;
+    Ok(true)
+}
+
+#[wasm_bindgen]
 pub async fn delete_scene() -> Result<bool, JsValue> {
     Scene::delete_scene().await;
     Ok(true)

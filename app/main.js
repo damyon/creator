@@ -7,19 +7,30 @@ import init, {
   set_material_color,
   scene_names,
   set_scene_name,
+  toggle_noise,
+  toggle_smooth,
 } from "./creator.js";
 
 const CANVAS_ID = "scene";
+const SAVE_ID = "save";
+const DELETE_ID = "delete";
+const LOAD_ID = "load";
+const NAME_ID = "name";
+const NOISE_ID = "noise";
+const SOLID_ID = "solid";
+const COLOUR_ID = "colour";
+const SCENE_LIST_ID = "scene-list";
+
 var processing = true;
 
-document.getElementById("save").onclick = function () {
+document.getElementById(SAVE_ID).onclick = function () {
   processing = true;
   save_scene();
   load_scene_names();
   processing = false;
 };
 
-document.getElementById("delete").onclick = function () {
+document.getElementById(DELETE_ID).onclick = function () {
   processing = true;
   delete_scene();
   load_scene_names();
@@ -31,12 +42,12 @@ function load_deferred() {
   processing = false;
 }
 
-document.getElementById("load").onclick = function () {
+document.getElementById(LOAD_ID).onclick = function () {
   processing = true;
   setTimeout(load_deferred, 500);
 };
 
-document.getElementById("name").onchange = function (e) {
+document.getElementById(NAME_ID).onchange = function (e) {
   processing = true;
   set_scene_name(e.target.value);
   processing = false;
@@ -47,7 +58,23 @@ function hex_to_rgb(hex) {
   return result ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)] : null;
 }
 
-document.getElementById("color").onchange = function (event) {
+document.getElementById(NOISE_ID).onclick = function (event) {
+  toggle_noise();
+  document.getElementById(NOISE_ID).style.display = "none";
+  document.getElementById(SOLID_ID).style.display = "block";
+
+  document.getElementById(CANVAS_ID).focus();
+};
+
+document.getElementById(SOLID_ID).onclick = function (event) {
+  toggle_smooth();
+  document.getElementById(SOLID_ID).style.display = "none";
+  document.getElementById(NOISE_ID).style.display = "block";
+
+  document.getElementById(CANVAS_ID).focus();
+};
+
+document.getElementById(COLOUR_ID).onchange = function (event) {
   var hexColor = event.target.value;
   var rgb = hex_to_rgb(hexColor);
   if (rgb) {
@@ -69,7 +96,7 @@ async function load_scene_names() {
   let process = scene_names();
 
   process.then((values) => {
-    let scenes = document.getElementById("scene-list");
+    let scenes = document.getElementById(SCENE_LIST_ID);
     scenes.innerHTML = "";
     for (const name of values) {
       scenes.appendChild(new Option(name));
