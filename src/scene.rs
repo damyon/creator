@@ -237,7 +237,7 @@ pub mod scene {
             }
             for selection in selections {
                 log::info!("Selection {:?}", selection);
-                let bump = if !scene.smooth {
+                let bump = if scene.smooth {
                     0.0f32
                 } else {
                     random() as f32 / 10.0 - 0.05
@@ -314,7 +314,7 @@ pub mod scene {
 
         pub fn handle_mouse_scroll(command: &Command, scene: &mut Scene) {
             let direction: u32 = command.data1;
-            let max_selection_radius: u32 = 16;
+            let max_selection_radius: u32 = 32;
             let min_selection_radius: u32 = 1;
 
             if direction > 0 {

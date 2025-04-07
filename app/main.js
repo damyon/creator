@@ -58,18 +58,18 @@ function hex_to_rgb(hex) {
   return result ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)] : null;
 }
 
-document.getElementById(NOISE_ID).onclick = function (event) {
+document.getElementById(SOLID_ID).onclick = function (event) {
   toggle_noise();
-  document.getElementById(NOISE_ID).style.display = "none";
-  document.getElementById(SOLID_ID).style.display = "block";
+  document.getElementById(SOLID_ID).style.display = "none";
+  document.getElementById(NOISE_ID).style.display = "block";
 
   document.getElementById(CANVAS_ID).focus();
 };
 
-document.getElementById(SOLID_ID).onclick = function (event) {
+document.getElementById(NOISE_ID).onclick = function (event) {
   toggle_smooth();
-  document.getElementById(SOLID_ID).style.display = "none";
-  document.getElementById(NOISE_ID).style.display = "block";
+  document.getElementById(NOISE_ID).style.display = "none";
+  document.getElementById(SOLID_ID).style.display = "block";
 
   document.getElementById(CANVAS_ID).focus();
 };
