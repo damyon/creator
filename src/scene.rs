@@ -292,6 +292,12 @@ pub mod scene {
             scene.selection_position[1] -= 1;
         }
 
+        pub fn scene_toggle_selection_shape() {
+            let mut scene = Self::access();
+
+            Self::handle_toggle_selection_shape(&mut scene);
+        }
+
         pub fn handle_toggle_selection_shape(scene: &mut Scene) {
             scene.selection_shape = if scene.selection_shape == SelectionShape::Sphere {
                 SelectionShape::Cube

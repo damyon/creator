@@ -9,6 +9,7 @@ export function toggle_smooth(): Promise<boolean>;
 export function delete_scene(): Promise<boolean>;
 export function set_scene_name(name: string): boolean;
 export function load_first_scene(): Promise<any>;
+export function toggle_selection_shape(): boolean;
 export function set_material_color(red: string, green: string, blue: string): boolean;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
@@ -24,6 +25,7 @@ export interface InitOutput {
   readonly delete_scene: () => number;
   readonly set_scene_name: (a: number, b: number, c: number) => void;
   readonly load_first_scene: () => number;
+  readonly toggle_selection_shape: (a: number) => void;
   readonly set_material_color: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;

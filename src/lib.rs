@@ -119,6 +119,13 @@ pub fn draw_scene() {
 }
 
 #[wasm_bindgen]
+pub fn toggle_selection_shape() -> Result<bool, JsValue> {
+    Scene::scene_toggle_selection_shape();
+
+    Ok(true)
+}
+
+#[wasm_bindgen]
 pub fn set_material_color(red: &str, green: &str, blue: &str) -> Result<bool, JsValue> {
     Scene::set_scene_material_color(red, green, blue);
 

@@ -10,6 +10,7 @@ export const toggle_smooth: () => number;
 export const delete_scene: () => number;
 export const set_scene_name: (a: number, b: number, c: number) => void;
 export const load_first_scene: () => number;
+export const toggle_selection_shape: (a: number) => void;
 export const set_material_color: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => void;
 export const __wbindgen_malloc: (a: number, b: number) => number;
 export const __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;

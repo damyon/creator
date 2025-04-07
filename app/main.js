@@ -4,6 +4,7 @@ import init, {
   delete_scene,
   save_scene,
   init_scene,
+  toggle_selection_shape,
   set_material_color,
   scene_names,
   set_scene_name,
@@ -21,6 +22,14 @@ const SOLID_ID = "solid";
 const COLOUR_ID = "colour";
 const SCENE_LIST_ID = "scene-list";
 
+const SPHERE_ID = "sphere";
+const CUBE_ID = "cube";
+const SQUARE_XZ_ID = "square-xz";
+const SQUARE_XY_ID = "square-xy";
+const SQUARE_YZ_ID = "square-yz";
+const CIRCLE_XZ_ID = "circle-xz";
+const CIRCLE_XY_ID = "circle-xy";
+const CIRCLE_YZ_ID = "circle-yz";
 var processing = true;
 
 document.getElementById(SAVE_ID).onclick = function () {
@@ -70,6 +79,121 @@ document.getElementById(NOISE_ID).onclick = function (event) {
   toggle_smooth();
   document.getElementById(NOISE_ID).style.display = "none";
   document.getElementById(SOLID_ID).style.display = "block";
+
+  document.getElementById(CANVAS_ID).focus();
+};
+
+document.getElementById(SPHERE_ID).onclick = function (event) {
+  toggle_selection_shape();
+
+  document.getElementById(SPHERE_ID).style.display = "none";
+  document.getElementById(CUBE_ID).style.display = "block";
+  document.getElementById(SQUARE_XZ_ID).style.display = "none";
+  document.getElementById(SQUARE_XY_ID).style.display = "none";
+  document.getElementById(SQUARE_YZ_ID).style.display = "none";
+  document.getElementById(CIRCLE_XZ_ID).style.display = "none";
+  document.getElementById(CIRCLE_XY_ID).style.display = "none";
+  document.getElementById(CIRCLE_YZ_ID).style.display = "none";
+
+  document.getElementById(CANVAS_ID).focus();
+};
+document.getElementById(CUBE_ID).onclick = function (event) {
+  toggle_selection_shape();
+
+  document.getElementById(SPHERE_ID).style.display = "none";
+  document.getElementById(CUBE_ID).style.display = "none";
+  document.getElementById(SQUARE_XZ_ID).style.display = "block";
+  document.getElementById(SQUARE_XY_ID).style.display = "none";
+  document.getElementById(SQUARE_YZ_ID).style.display = "none";
+  document.getElementById(CIRCLE_XZ_ID).style.display = "none";
+  document.getElementById(CIRCLE_XY_ID).style.display = "none";
+  document.getElementById(CIRCLE_YZ_ID).style.display = "none";
+
+  document.getElementById(CANVAS_ID).focus();
+};
+document.getElementById(SQUARE_XZ_ID).onclick = function (event) {
+  toggle_selection_shape();
+
+  document.getElementById(SPHERE_ID).style.display = "none";
+  document.getElementById(CUBE_ID).style.display = "none";
+  document.getElementById(SQUARE_XZ_ID).style.display = "none";
+  document.getElementById(SQUARE_XY_ID).style.display = "block";
+  document.getElementById(SQUARE_YZ_ID).style.display = "none";
+  document.getElementById(CIRCLE_XZ_ID).style.display = "none";
+  document.getElementById(CIRCLE_XY_ID).style.display = "none";
+  document.getElementById(CIRCLE_YZ_ID).style.display = "none";
+
+  document.getElementById(CANVAS_ID).focus();
+};
+
+document.getElementById(SQUARE_XY_ID).onclick = function (event) {
+  toggle_selection_shape();
+
+  document.getElementById(SPHERE_ID).style.display = "none";
+  document.getElementById(CUBE_ID).style.display = "none";
+  document.getElementById(SQUARE_XZ_ID).style.display = "none";
+  document.getElementById(SQUARE_XY_ID).style.display = "none";
+  document.getElementById(SQUARE_YZ_ID).style.display = "block";
+  document.getElementById(CIRCLE_XZ_ID).style.display = "none";
+  document.getElementById(CIRCLE_XY_ID).style.display = "none";
+  document.getElementById(CIRCLE_YZ_ID).style.display = "none";
+
+  document.getElementById(CANVAS_ID).focus();
+};
+
+document.getElementById(SQUARE_YZ_ID).onclick = function (event) {
+  toggle_selection_shape();
+
+  document.getElementById(SPHERE_ID).style.display = "none";
+  document.getElementById(CUBE_ID).style.display = "none";
+  document.getElementById(SQUARE_XZ_ID).style.display = "none";
+  document.getElementById(SQUARE_XY_ID).style.display = "none";
+  document.getElementById(SQUARE_YZ_ID).style.display = "none";
+  document.getElementById(CIRCLE_XZ_ID).style.display = "block";
+  document.getElementById(CIRCLE_XY_ID).style.display = "none";
+  document.getElementById(CIRCLE_YZ_ID).style.display = "none";
+
+  document.getElementById(CANVAS_ID).focus();
+};
+document.getElementById(CIRCLE_XZ_ID).onclick = function (event) {
+  toggle_selection_shape();
+
+  document.getElementById(SPHERE_ID).style.display = "none";
+  document.getElementById(CUBE_ID).style.display = "none";
+  document.getElementById(SQUARE_XZ_ID).style.display = "none";
+  document.getElementById(SQUARE_XY_ID).style.display = "none";
+  document.getElementById(SQUARE_YZ_ID).style.display = "none";
+  document.getElementById(CIRCLE_XZ_ID).style.display = "none";
+  document.getElementById(CIRCLE_XY_ID).style.display = "block";
+  document.getElementById(CIRCLE_YZ_ID).style.display = "none";
+
+  document.getElementById(CANVAS_ID).focus();
+};
+document.getElementById(CIRCLE_XY_ID).onclick = function (event) {
+  toggle_selection_shape();
+
+  document.getElementById(SPHERE_ID).style.display = "none";
+  document.getElementById(CUBE_ID).style.display = "none";
+  document.getElementById(SQUARE_XZ_ID).style.display = "none";
+  document.getElementById(SQUARE_XY_ID).style.display = "none";
+  document.getElementById(SQUARE_YZ_ID).style.display = "none";
+  document.getElementById(CIRCLE_XZ_ID).style.display = "none";
+  document.getElementById(CIRCLE_XY_ID).style.display = "none";
+  document.getElementById(CIRCLE_YZ_ID).style.display = "block";
+
+  document.getElementById(CANVAS_ID).focus();
+};
+document.getElementById(CIRCLE_YZ_ID).onclick = function (event) {
+  toggle_selection_shape();
+
+  document.getElementById(SPHERE_ID).style.display = "block";
+  document.getElementById(CUBE_ID).style.display = "none";
+  document.getElementById(SQUARE_XZ_ID).style.display = "none";
+  document.getElementById(SQUARE_XY_ID).style.display = "none";
+  document.getElementById(SQUARE_YZ_ID).style.display = "none";
+  document.getElementById(CIRCLE_XZ_ID).style.display = "none";
+  document.getElementById(CIRCLE_XY_ID).style.display = "none";
+  document.getElementById(CIRCLE_YZ_ID).style.display = "none";
 
   document.getElementById(CANVAS_ID).focus();
 };
