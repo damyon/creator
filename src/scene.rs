@@ -143,19 +143,9 @@ pub mod scene {
 
                 scene.camera.eye = Point3::new(adjusted.x, current_camera_eye.y, adjusted.y);
 
-                // now do the same thing for vertical axis
-                let current_camera_eye = scene.camera.eye;
-                let current_camera_eye_2d = Point2::new(current_camera_eye.y, current_camera_eye.z);
-                let current_camera_target_2d =
-                    Point2::new(current_camera_target.y, current_camera_target.z);
-                // rotate the eye around the target
-                let adjusted = Self::rotate_2d(
-                    current_camera_eye_2d,
-                    current_camera_target_2d,
-                    -position_diff.y as f32 / blunting,
-                );
+                // Up down does not need rotation.
 
-                scene.camera.eye = Point3::new(current_camera_eye.x, adjusted.x, adjusted.y);
+                scene.camera.eye.y += position_diff.y as f32 / 10.0f32;
             }
             scene.mouse.last_position = current_position;
         }
@@ -426,7 +416,7 @@ pub mod scene {
             if scene.throttle >= 1 {
                 return true;
             }
-            scene.throttle = 3;
+            scene.throttle = 2;
             false
         }
 
