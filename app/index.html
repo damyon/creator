@@ -42,10 +42,9 @@
         </div>
         <input
             id="name"
-            list="scene-list"
+            type="text"
             class="widget"
             placeholder="Scene name..."
-            value="Default"
             style="
                 position: absolute;
                 left: 10px;
@@ -54,12 +53,29 @@
                 font-weight: 700;
                 cursor: text;
                 border: 2px solid black;
+                background: white;
+                color: black;
                 border-radius: 4px;
             "
         />
-        <datalist id="scene-list">
-            <option>New Scene...</option>
-        </datalist>
+        <select
+            id="scene-list"
+            class="widget"
+            style="
+                position: absolute;
+                left: 310px;
+                top: 10px;
+                font-size: 1em;
+                font-weight: 700;
+                cursor: text;
+                border: 2px solid black;
+                background: white;
+                color: black;
+                border-radius: 4px;
+            "
+        >
+            <option>None</option>
+        </select>
         <input
             type="color"
             id="colour"
@@ -144,7 +160,7 @@
             class="widget"
             style="border: none; position: absolute; left: 10px; bottom: 10px"
         >
-            <i class="fa fa-question"></i>
+            <i class="bi-question-circle"></i>
         </button>
     </body>
 </html>

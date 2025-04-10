@@ -16,16 +16,13 @@ pub mod ocnode {
         y_index: i32,
         #[serde(rename = "z")]
         z_index: i32,
-        #[serde(rename = "l")]
+        #[serde(rename = "level")]
         sub_division_level: u32,
-        #[serde(rename = "a")]
         active: bool,
         #[serde(skip)]
         #[serde(default = "empty_list")]
         children: [Option<Box<Self>>; 8],
-        #[serde(rename = "h")]
         has_children: bool,
-        #[serde(rename = "c")]
         color: [f32; 4],
     }
 

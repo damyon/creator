@@ -207,6 +207,18 @@ document.getElementById(COLOUR_ID).onchange = function (event) {
   document.getElementById(CANVAS_ID).focus();
 };
 
+document.getElementById(SCENE_LIST_ID).onchange = function (event) {
+  var scene = event.target.value;
+  if (scene != "None") {
+    var name = document.getElementById(NAME_ID);
+    name.value = scene;
+    processing = true;
+    set_scene_name(scene);
+    processing = false;
+    setTimeout(load_deferred, 500);
+  }
+};
+
 document.getElementById(CANVAS_ID).width = window.innerWidth;
 document.getElementById(CANVAS_ID).height = window.innerHeight;
 
@@ -222,6 +234,7 @@ async function load_scene_names() {
   process.then((values) => {
     let scenes = document.getElementById(SCENE_LIST_ID);
     scenes.innerHTML = "";
+    scenes.appendChild(new Option("None"));
     for (const name of values) {
       scenes.appendChild(new Option(name));
     }

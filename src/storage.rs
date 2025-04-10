@@ -136,7 +136,7 @@ pub mod storage {
                 .await
                 .expect("Database could not open");
 
-            log::debug!("We made a DB");
+            log::debug!("We made a DB to get the names");
 
             let transaction = db
                 .transaction("scenes")
@@ -148,20 +148,16 @@ pub mod storage {
                 .object_store("scenes")
                 .expect("Could not get object store");
 
-            let cursor_opt = store.open_cursor().await.expect("Got a cursor");
-            let mut names: Vec<String> = vec![];
 
-            if cursor_opt.is_some() {
-                let mut cursor = cursor_opt.unwrap();
-                // This should loop.
-                let mut next: Option<String> = cursor.next_key().await.expect("odd");
-                while next.is_some() {
-                    names.push(next.unwrap().to_string());
-                    next = cursor.next_key().await.expect("At least one");
-                }
+            let mut keys = store.get_all_keys().await.expect("Got keys");
+            let mut names: Vec<String> = vec![];
+            let mut name = keys.next();
+            while name.is_some() {
+                names.push(name.expect("has value").expect("is not error"));
+                name = keys.next()
             }
 
-            names
+            names.clone()
         }
     }
 }
