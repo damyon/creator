@@ -126,8 +126,8 @@ pub fn toggle_selection_shape() -> Result<bool, JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn set_material_color(red: &str, green: &str, blue: &str) -> Result<bool, JsValue> {
-    Scene::set_scene_material_color(red, green, blue);
+pub fn set_material_color(red: &str, green: &str, blue: &str, alpha: &str) -> Result<bool, JsValue> {
+    Scene::set_scene_material_color(red, green, blue, alpha);
 
     Ok(true)
 }

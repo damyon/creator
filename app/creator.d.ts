@@ -10,7 +10,7 @@ export function delete_scene(): Promise<boolean>;
 export function set_scene_name(name: string): boolean;
 export function load_first_scene(): Promise<any>;
 export function toggle_selection_shape(): boolean;
-export function set_material_color(red: string, green: string, blue: string): boolean;
+export function set_material_color(red: string, green: string, blue: string, alpha: string): boolean;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
@@ -26,7 +26,7 @@ export interface InitOutput {
   readonly set_scene_name: (a: number, b: number) => [number, number, number];
   readonly load_first_scene: () => any;
   readonly toggle_selection_shape: () => [number, number, number];
-  readonly set_material_color: (a: number, b: number, c: number, d: number, e: number, f: number) => [number, number, number];
+  readonly set_material_color: (a: number, b: number, c: number, d: number, e: number, f: number, g: number, h: number) => [number, number, number];
   readonly __wbindgen_malloc: (a: number, b: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;
   readonly __wbindgen_exn_store: (a: number) => void;
@@ -35,13 +35,13 @@ export interface InitOutput {
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __wbindgen_export_6: WebAssembly.Table;
   readonly __externref_table_dealloc: (a: number) => void;
-  readonly closure99_externref_shim_multivalue_shim: (a: number, b: number, c: any) => [number, number];
-  readonly closure130_externref_shim: (a: number, b: number, c: any) => void;
+  readonly closure78_externref_shim_multivalue_shim: (a: number, b: number, c: any) => [number, number];
+  readonly closure132_externref_shim: (a: number, b: number, c: any) => void;
   readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h1b9b854405bba378: (a: number, b: number) => void;
   readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hb67cdff91b1a7195: (a: number, b: number) => void;
-  readonly closure151_externref_shim: (a: number, b: number, c: any) => void;
-  readonly closure163_externref_shim: (a: number, b: number, c: any) => void;
-  readonly closure183_externref_shim: (a: number, b: number, c: any, d: any) => void;
+  readonly closure153_externref_shim: (a: number, b: number, c: any) => void;
+  readonly closure165_externref_shim: (a: number, b: number, c: any) => void;
+  readonly closure185_externref_shim: (a: number, b: number, c: any, d: any) => void;
   readonly __wbindgen_start: () => void;
 }
 

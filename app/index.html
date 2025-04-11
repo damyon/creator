@@ -76,13 +76,29 @@
         >
             <option>None</option>
         </select>
-        <input
-            type="color"
-            id="colour"
+        <div
             class="widget"
-            style="position: absolute; left: 10px; top: 70px; width: 50px; height: 50px; border: none"
-            value="#CCCCCC"
-        />
+            style="
+                position: absolute;
+                left: 10px;
+                top: 70px;
+                width: 140px;
+                color: white;
+                border: none;
+                border-radius: 20px;
+            "
+        >
+            <input type="color" id="colour" value="#CCCCCC" style="float: left" />
+            <input
+                type="range"
+                id="alpha"
+                min="0.0"
+                max="1.0"
+                step="0.05"
+                style="float: left; padding: 5px; width: 60px; margin-left: 20px; accent-color: white"
+                value="1.0"
+            />
+        </div>
         <button id="solid" class="widget" style="position: absolute; left: 10px; top: 130px; border: none">
             <i class="bi-droplet-fill"></i>
         </button>

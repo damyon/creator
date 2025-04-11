@@ -239,7 +239,7 @@ pub mod scene {
                     (scene.material_color[0] + bump).clamp(0.0, 1.0),
                     (scene.material_color[1] + bump).clamp(0.0, 1.0),
                     (scene.material_color[2] + bump).clamp(0.0, 1.0),
-                    1.0,
+                    (scene.material_color[3]).clamp(0.0, 1.0),
                 ];
                 scene.model.toggle_voxel(selection, !value, colour);
             }
@@ -420,20 +420,22 @@ pub mod scene {
             false
         }
 
-        pub fn set_scene_material_color(red_str: &str, green_str: &str, blue_str: &str) {
+        pub fn set_scene_material_color(red_str: &str, green_str: &str, blue_str: &str, alpha_str: &str) {
             let mut scene = Self::access();
-            scene.set_material_color(red_str, green_str, blue_str);
+            scene.set_material_color(red_str, green_str, blue_str, alpha_str);
         }
 
-        pub fn set_material_color(&mut self, red_str: &str, green_str: &str, blue_str: &str) {
+        pub fn set_material_color(&mut self, red_str: &str, green_str: &str, blue_str: &str, alpha_str: &str) {
+            log::debug!("Set material colour ({red_str}, {green_str}, {blue_str}, {alpha_str})");
             let red = red_str.parse::<i32>().unwrap();
             let red_f32 = red as f32 / 255.0;
             let green = green_str.parse::<i32>().unwrap();
             let green_f32 = green as f32 / 255.0;
             let blue = blue_str.parse::<i32>().unwrap();
             let blue_f32 = blue as f32 / 255.0;
+            let alpha_f32 = alpha_str.parse::<f32>().unwrap();
 
-            self.material_color = [red_f32, green_f32, blue_f32, 1.0];
+            self.material_color = [red_f32, green_f32, blue_f32, alpha_f32];
             self.selection_cube.color = [red_f32, green_f32, blue_f32, 0.5];
         }
 

@@ -20,6 +20,7 @@ const NAME_ID = "name";
 const NOISE_ID = "noise";
 const SOLID_ID = "solid";
 const COLOUR_ID = "colour";
+const ALPHA_ID = "alpha";
 const SCENE_LIST_ID = "scene-list";
 
 const SPHERE_ID = "sphere";
@@ -198,14 +199,17 @@ document.getElementById(CIRCLE_YZ_ID).onclick = function (event) {
   document.getElementById(CANVAS_ID).focus();
 };
 
-document.getElementById(COLOUR_ID).onchange = function (event) {
-  var hexColor = event.target.value;
+function updateColour() {
+  var hexColor = document.getElementById(COLOUR_ID).value;
+  var alpha = document.getElementById(ALPHA_ID).value;
   var rgb = hex_to_rgb(hexColor);
   if (rgb) {
-    set_material_color(rgb[0] + "", rgb[1] + "", rgb[2] + "");
+    set_material_color(rgb[0] + "", rgb[1] + "", rgb[2] + "", alpha + "");
   }
   document.getElementById(CANVAS_ID).focus();
-};
+}
+document.getElementById(COLOUR_ID).onchange = updateColour;
+document.getElementById(ALPHA_ID).onchange = updateColour;
 
 document.getElementById(SCENE_LIST_ID).onchange = function (event) {
   var scene = event.target.value;
