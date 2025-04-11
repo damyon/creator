@@ -100,17 +100,28 @@
             />
         </div>
         <button id="solid" class="widget" style="position: absolute; left: 10px; top: 130px; border: none">
-            <i class="bi-droplet-fill"></i>
+            <span style="background: white; width: 30px; height: 30px; display: inline-block; border-radius: 50%;"></i>
         </button>
         <button
             id="noise"
             class="widget"
             style="position: absolute; left: 10px; top: 130px; border: none; display: none"
         >
-            <i class="bi-droplet-half"></i>
+            <svg style="width: 30px; height: 30px; border-radius: 50%;"
+                viewBox="0 0 30 30" xmlns='http://www.w3.org/2000/svg'>
+              <filter id='noiseFilter'>
+                <feTurbulence
+                  type='fractalNoise'
+                  baseFrequency='0.65'
+                  numOctaves='3'
+                  stitchTiles='stitch' />
+              </filter>
+
+              <rect width='100%' height='100%' filter='url(#noiseFilter)' />
+            </svg>
         </button>
         <button id="sphere" class="widget" style="position: absolute; left: 10px; top: 190px; border: none">
-            <i class="bi-circle-fill"></i>
+            <i class="bi-globe"></i>
         </button>
         <button
             id="cube"
