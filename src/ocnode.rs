@@ -136,8 +136,26 @@ pub mod ocnode {
                 let has_hole = squirts
                     .into_iter()
                     .any(|child| !child.as_ref().expect("child").active);
-                self.active = !has_hole;
+                let squirts = self.children.each_mut();
+                let mut colour = [0.0, 0.0, 0.0, 0.0];
+                match squirts[0] {
+                    None => {
+                        log::debug!("Should not get here")
+                    }
+                    Some(node) => {
+                        colour = node.color;
+                    }
+                };
+                let squirts = self.children.each_mut();
+                let not_uniform_color = squirts
+                    .into_iter()
+                    .any(|child| {
+                        let compare = child.as_ref().expect("child").color;
 
+                        compare[0] != colour[0] || compare[1] != colour[1] || compare[2] != colour[2] || compare[3] != colour[3]
+                    });
+
+                self.active = !has_hole && !not_uniform_color;
                 let first = self.children.first();
 
                 match first {
