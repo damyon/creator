@@ -12,5 +12,6 @@ pub mod drawable {
         fn vertices(&self) -> &[f32];
         fn normals(&self) -> &[f32];
         fn color(&self) -> &[f32; 4];
+        fn depth(&self, camera: [f32; 3]) -> f32;
     }
 }

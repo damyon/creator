@@ -229,6 +229,7 @@ pub mod ocnode {
                     let y = self.y_index as f32 * (1.0);
                     let z = self.z_index as f32 * (1.0);
                     cube.translate([x, y, z]);
+
                     vec![cube]
                 } else {
                     let mut child_cubes: Vec<Cube> = vec![];

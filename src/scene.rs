@@ -751,7 +751,17 @@ pub mod scene {
             }
             graphics.draw(&scene.grid_xz, WebGlRenderingContext::LINES, camera, light);
 
-            for voxel in scene.model.drawables().iter() {
+            let mut drawables = scene.model.drawables();
+
+            let camera_eye = [scene.camera.eye.x, scene.camera.eye.y, scene.camera.eye.z];
+            drawables.sort_by(|a, b| {
+                let a_dist = a.depth(camera_eye);
+                let b_dist = b.depth(camera_eye);
+
+                b_dist.partial_cmp(&a_dist).unwrap()
+            });
+
+            for voxel in drawables.iter() {
                 graphics.draw(voxel, WebGlRenderingContext::TRIANGLES, camera, light);
             }
 

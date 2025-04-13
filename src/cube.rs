@@ -328,5 +328,11 @@ pub mod cube {
         fn normals(&self) -> &[f32] {
             &self.normals
         }
+
+        fn depth(&self, camera: [f32; 3]) -> f32 {
+            (((self.translation[0] - camera[0]) as f32).powi(2) +
+            ((self.translation[1] - camera[1]) as f32).powi(2) +
+            ((self.translation[2] - camera[2]) as f32).powi(2)).sqrt()
+        }
     }
 }
