@@ -31,6 +31,20 @@ const SQUARE_YZ_ID = "square-yz";
 const CIRCLE_XZ_ID = "circle-xz";
 const CIRCLE_XY_ID = "circle-xy";
 const CIRCLE_YZ_ID = "circle-yz";
+
+var selection_shape = SPHERE_ID;
+
+function get_next_selection_shape() {
+  if (selection_shape == SPHERE_ID) return CUBE_ID;
+  if (selection_shape == CUBE_ID) return SQUARE_XZ_ID;
+  if (selection_shape == SQUARE_XZ_ID) return SQUARE_XY_ID;
+  if (selection_shape == SQUARE_XY_ID) return SQUARE_YZ_ID;
+  if (selection_shape == SQUARE_YZ_ID) return CIRCLE_XZ_ID;
+  if (selection_shape == CIRCLE_XZ_ID) return CIRCLE_XY_ID;
+  if (selection_shape == CIRCLE_XY_ID) return CIRCLE_YZ_ID;
+  if (selection_shape == CIRCLE_YZ_ID) return SPHERE_ID;
+}
+
 var processing = true;
 
 document.getElementById(SAVE_ID).onclick = function () {
@@ -84,11 +98,12 @@ document.getElementById(NOISE_ID).onclick = function (event) {
   document.getElementById(CANVAS_ID).focus();
 };
 
-document.getElementById(SPHERE_ID).onclick = function (event) {
+function select_next_shape() {
   toggle_selection_shape();
+  selection_shape = get_next_selection_shape();
 
   document.getElementById(SPHERE_ID).style.display = "none";
-  document.getElementById(CUBE_ID).style.display = "block";
+  document.getElementById(CUBE_ID).style.display = "none";
   document.getElementById(SQUARE_XZ_ID).style.display = "none";
   document.getElementById(SQUARE_XY_ID).style.display = "none";
   document.getElementById(SQUARE_YZ_ID).style.display = "none";
@@ -96,107 +111,43 @@ document.getElementById(SPHERE_ID).onclick = function (event) {
   document.getElementById(CIRCLE_XY_ID).style.display = "none";
   document.getElementById(CIRCLE_YZ_ID).style.display = "none";
 
+  document.getElementById(selection_shape).style.display = "block";
   document.getElementById(CANVAS_ID).focus();
+}
+
+document.getElementById(CANVAS_ID).onkeydown = function (event) {
+  // T
+  if (event.key == "t") {
+    select_next_shape();
+    event.preventDefault();
+  }
+};
+
+document.getElementById(SPHERE_ID).onclick = function (event) {
+  select_next_shape();
 };
 document.getElementById(CUBE_ID).onclick = function (event) {
-  toggle_selection_shape();
-
-  document.getElementById(SPHERE_ID).style.display = "none";
-  document.getElementById(CUBE_ID).style.display = "none";
-  document.getElementById(SQUARE_XZ_ID).style.display = "block";
-  document.getElementById(SQUARE_XY_ID).style.display = "none";
-  document.getElementById(SQUARE_YZ_ID).style.display = "none";
-  document.getElementById(CIRCLE_XZ_ID).style.display = "none";
-  document.getElementById(CIRCLE_XY_ID).style.display = "none";
-  document.getElementById(CIRCLE_YZ_ID).style.display = "none";
-
-  document.getElementById(CANVAS_ID).focus();
+  select_next_shape();
 };
 document.getElementById(SQUARE_XZ_ID).onclick = function (event) {
-  toggle_selection_shape();
-
-  document.getElementById(SPHERE_ID).style.display = "none";
-  document.getElementById(CUBE_ID).style.display = "none";
-  document.getElementById(SQUARE_XZ_ID).style.display = "none";
-  document.getElementById(SQUARE_XY_ID).style.display = "block";
-  document.getElementById(SQUARE_YZ_ID).style.display = "none";
-  document.getElementById(CIRCLE_XZ_ID).style.display = "none";
-  document.getElementById(CIRCLE_XY_ID).style.display = "none";
-  document.getElementById(CIRCLE_YZ_ID).style.display = "none";
-
-  document.getElementById(CANVAS_ID).focus();
+  select_next_shape();
 };
 
 document.getElementById(SQUARE_XY_ID).onclick = function (event) {
-  toggle_selection_shape();
-
-  document.getElementById(SPHERE_ID).style.display = "none";
-  document.getElementById(CUBE_ID).style.display = "none";
-  document.getElementById(SQUARE_XZ_ID).style.display = "none";
-  document.getElementById(SQUARE_XY_ID).style.display = "none";
-  document.getElementById(SQUARE_YZ_ID).style.display = "block";
-  document.getElementById(CIRCLE_XZ_ID).style.display = "none";
-  document.getElementById(CIRCLE_XY_ID).style.display = "none";
-  document.getElementById(CIRCLE_YZ_ID).style.display = "none";
-
-  document.getElementById(CANVAS_ID).focus();
+  select_next_shape();
 };
 
 document.getElementById(SQUARE_YZ_ID).onclick = function (event) {
-  toggle_selection_shape();
-
-  document.getElementById(SPHERE_ID).style.display = "none";
-  document.getElementById(CUBE_ID).style.display = "none";
-  document.getElementById(SQUARE_XZ_ID).style.display = "none";
-  document.getElementById(SQUARE_XY_ID).style.display = "none";
-  document.getElementById(SQUARE_YZ_ID).style.display = "none";
-  document.getElementById(CIRCLE_XZ_ID).style.display = "block";
-  document.getElementById(CIRCLE_XY_ID).style.display = "none";
-  document.getElementById(CIRCLE_YZ_ID).style.display = "none";
-
-  document.getElementById(CANVAS_ID).focus();
+  select_next_shape();
 };
 document.getElementById(CIRCLE_XZ_ID).onclick = function (event) {
-  toggle_selection_shape();
-
-  document.getElementById(SPHERE_ID).style.display = "none";
-  document.getElementById(CUBE_ID).style.display = "none";
-  document.getElementById(SQUARE_XZ_ID).style.display = "none";
-  document.getElementById(SQUARE_XY_ID).style.display = "none";
-  document.getElementById(SQUARE_YZ_ID).style.display = "none";
-  document.getElementById(CIRCLE_XZ_ID).style.display = "none";
-  document.getElementById(CIRCLE_XY_ID).style.display = "block";
-  document.getElementById(CIRCLE_YZ_ID).style.display = "none";
-
-  document.getElementById(CANVAS_ID).focus();
+  select_next_shape();
 };
 document.getElementById(CIRCLE_XY_ID).onclick = function (event) {
-  toggle_selection_shape();
-
-  document.getElementById(SPHERE_ID).style.display = "none";
-  document.getElementById(CUBE_ID).style.display = "none";
-  document.getElementById(SQUARE_XZ_ID).style.display = "none";
-  document.getElementById(SQUARE_XY_ID).style.display = "none";
-  document.getElementById(SQUARE_YZ_ID).style.display = "none";
-  document.getElementById(CIRCLE_XZ_ID).style.display = "none";
-  document.getElementById(CIRCLE_XY_ID).style.display = "none";
-  document.getElementById(CIRCLE_YZ_ID).style.display = "block";
-
-  document.getElementById(CANVAS_ID).focus();
+  select_next_shape();
 };
 document.getElementById(CIRCLE_YZ_ID).onclick = function (event) {
-  toggle_selection_shape();
-
-  document.getElementById(SPHERE_ID).style.display = "block";
-  document.getElementById(CUBE_ID).style.display = "none";
-  document.getElementById(SQUARE_XZ_ID).style.display = "none";
-  document.getElementById(SQUARE_XY_ID).style.display = "none";
-  document.getElementById(SQUARE_YZ_ID).style.display = "none";
-  document.getElementById(CIRCLE_XZ_ID).style.display = "none";
-  document.getElementById(CIRCLE_XY_ID).style.display = "none";
-  document.getElementById(CIRCLE_YZ_ID).style.display = "none";
-
-  document.getElementById(CANVAS_ID).focus();
+  select_next_shape();
 };
 
 function updateColour() {

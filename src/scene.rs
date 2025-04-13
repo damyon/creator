@@ -354,7 +354,7 @@ pub mod scene {
                 // 3
                 99 => Self::handle_move_selection_down(scene),
                 // T
-                84 => Self::handle_toggle_selection_shape(scene),
+                //84 => Self::handle_toggle_selection_shape(scene),
                 _ => log::info!("Unhandled key press: {}", key),
             }
         }
