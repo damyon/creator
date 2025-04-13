@@ -235,13 +235,13 @@ pub mod scene {
                 } else {
                     random() as f32 / 10.0 - 0.05
                 };
-                let colour = [
+                let color = [
                     (scene.material_color[0] + bump).clamp(0.0, 1.0),
                     (scene.material_color[1] + bump).clamp(0.0, 1.0),
                     (scene.material_color[2] + bump).clamp(0.0, 1.0),
                     (scene.material_color[3]).clamp(0.0, 1.0),
                 ];
-                scene.model.toggle_voxel(selection, !value, colour);
+                scene.model.toggle_voxel(selection, !value, color);
             }
         }
 
@@ -426,7 +426,7 @@ pub mod scene {
         }
 
         pub fn set_material_color(&mut self, red_str: &str, green_str: &str, blue_str: &str, alpha_str: &str) {
-            log::debug!("Set material colour ({red_str}, {green_str}, {blue_str}, {alpha_str})");
+            log::debug!("Set material color ({red_str}, {green_str}, {blue_str}, {alpha_str})");
             let red = red_str.parse::<i32>().unwrap();
             let red_f32 = red as f32 / 255.0;
             let green = green_str.parse::<i32>().unwrap();

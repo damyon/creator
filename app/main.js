@@ -19,7 +19,7 @@ const LOAD_ID = "load";
 const NAME_ID = "name";
 const NOISE_ID = "noise";
 const SOLID_ID = "solid";
-const COLOUR_ID = "colour";
+const COLOR_ID = "color";
 const ALPHA_ID = "alpha";
 const SCENE_LIST_ID = "scene-list";
 
@@ -200,7 +200,7 @@ document.getElementById(CIRCLE_YZ_ID).onclick = function (event) {
 };
 
 function updateColour() {
-  var hexColor = document.getElementById(COLOUR_ID).value;
+  var hexColor = document.getElementById(COLOR_ID).value;
   var alpha = document.getElementById(ALPHA_ID).value;
   var rgb = hex_to_rgb(hexColor);
   if (rgb) {
@@ -208,7 +208,7 @@ function updateColour() {
   }
   document.getElementById(CANVAS_ID).focus();
 }
-document.getElementById(COLOUR_ID).onchange = updateColour;
+document.getElementById(COLOR_ID).onchange = updateColour;
 document.getElementById(ALPHA_ID).onchange = updateColour;
 
 document.getElementById(SCENE_LIST_ID).onchange = function (event) {

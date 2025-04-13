@@ -137,13 +137,13 @@ pub mod ocnode {
                     .into_iter()
                     .any(|child| !child.as_ref().expect("child").active);
                 let squirts = self.children.each_mut();
-                let mut colour = [0.0, 0.0, 0.0, 0.0];
+                let mut color = [0.0, 0.0, 0.0, 0.0];
                 match squirts[0] {
                     None => {
                         log::debug!("Should not get here")
                     }
                     Some(node) => {
-                        colour = node.color;
+                        color = node.color;
                     }
                 };
                 let squirts = self.children.each_mut();
@@ -152,7 +152,7 @@ pub mod ocnode {
                     .any(|child| {
                         let compare = child.as_ref().expect("child").color;
 
-                        compare[0] != colour[0] || compare[1] != colour[1] || compare[2] != colour[2] || compare[3] != colour[3]
+                        compare[0] != color[0] || compare[1] != color[1] || compare[2] != color[2] || compare[3] != color[3]
                     });
 
                 self.active = !has_hole && !not_uniform_color;
