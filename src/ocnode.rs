@@ -147,13 +147,14 @@ pub mod ocnode {
                     }
                 };
                 let squirts = self.children.each_mut();
-                let not_uniform_color = squirts
-                    .into_iter()
-                    .any(|child| {
-                        let compare = child.as_ref().expect("child").color;
+                let not_uniform_color = squirts.into_iter().any(|child| {
+                    let compare = child.as_ref().expect("child").color;
 
-                        compare[0] != color[0] || compare[1] != color[1] || compare[2] != color[2] || compare[3] != color[3]
-                    });
+                    compare[0] != color[0]
+                        || compare[1] != color[1]
+                        || compare[2] != color[2]
+                        || compare[3] != color[3]
+                });
 
                 self.active = !has_hole && !not_uniform_color;
                 let first = self.children.first();
