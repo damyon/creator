@@ -6,3 +6,6 @@ view:
 
 watch: 
 	bacon
+
+dev:
+	cargo install bacon
