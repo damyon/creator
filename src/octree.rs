@@ -27,6 +27,10 @@ pub mod octree {
             self.root.clear();
         }
 
+        pub fn optimize(&mut self, camera_eye: [f32; 3]) {
+            self.root.optimize(camera_eye);
+        }
+
         pub fn init(&mut self) {
             // The LEVELS here is important. It defines the number of sub-divisions
             // so it exponentially increases the number of nodes.
@@ -37,7 +41,7 @@ pub mod octree {
             self.name = name;
         }
 
-        pub fn load_from_serial(&mut self, source: StoredOctree) {
+        pub fn load_from_serial(&mut self, source: StoredOctree, camera_eye: [f32; 3]) {
             self.name = source.name;
 
             self.root.clear();
@@ -45,7 +49,7 @@ pub mod octree {
             for node in source.active_nodes {
                 self.root.apply(&node);
             }
-            self.root.optimise();
+            self.root.optimize(camera_eye);
         }
 
         pub fn drawables(&mut self) -> Vec<Cube> {
@@ -57,10 +61,16 @@ pub mod octree {
             self.root.decimate(sub_division_level);
         }
 
-        pub fn toggle_voxel(&mut self, position: [i32; 3], value: bool, color: [f32; 4]) {
+        pub fn toggle_voxel(
+            &mut self,
+            position: [i32; 3],
+            value: bool,
+            color: [f32; 4],
+            camera_eye: [f32; 3],
+        ) {
             log::debug!("Toggle voxels in the tree.");
             self.root.toggle_voxel(position, value, color);
-            self.root.optimise();
+            self.root.optimize(camera_eye);
         }
 
         pub fn prepare(&self) -> StoredOctree {

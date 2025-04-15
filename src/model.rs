@@ -19,6 +19,10 @@ pub mod model {
             self.voxels.drawables()
         }
 
+        pub fn optimize(&mut self, camera_eye: [f32; 3]) {
+            self.voxels.optimize(camera_eye);
+        }
+
         pub fn init(&mut self) {
             self.voxels.init();
         }
@@ -27,8 +31,15 @@ pub mod model {
             self.voxels.set_name(name);
         }
 
-        pub fn toggle_voxel(&mut self, position: [i32; 3], value: bool, color: [f32; 4]) {
-            self.voxels.toggle_voxel(position, value, color);
+        pub fn toggle_voxel(
+            &mut self,
+            position: [i32; 3],
+            value: bool,
+            color: [f32; 4],
+            camera_eye: [f32; 3],
+        ) {
+            log::debug!("Toggle a voxel");
+            self.voxels.toggle_voxel(position, value, color, camera_eye);
         }
 
         pub fn all_voxels_active(&self, positions: &Vec<[i32; 3]>) -> bool {

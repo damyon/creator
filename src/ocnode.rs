@@ -116,10 +116,17 @@ pub mod ocnode {
             }
         }
 
+        fn depth(&self, camera: [f32; 3]) -> f32 {
+            (((self.x_index as f32 - camera[0]) as f32).powi(2)
+                + ((self.y_index as f32 - camera[1]) as f32).powi(2)
+                + ((self.z_index as f32 - camera[2]) as f32).powi(2))
+            .sqrt()
+        }
+
         /**
          * Set the active state to match the combined active state of all children.
          */
-        pub fn optimise(&mut self) {
+        pub fn optimize(&mut self, camera_eye: [f32; 3]) {
             if self.has_children {
                 // Optimize leaf first then move up the tree.
                 let squirts = self.children.each_mut();
@@ -127,10 +134,14 @@ pub mod ocnode {
                     match child {
                         None => {}
                         Some(down) => {
-                            down.optimise();
+                            down.optimize(camera_eye);
                         }
                     }
                 }
+                let squirts = self.children.each_mut();
+                let has_peg = squirts
+                    .into_iter()
+                    .any(|child| child.as_ref().expect("child").active);
 
                 let squirts = self.children.each_mut();
                 let has_hole = squirts
@@ -156,7 +167,11 @@ pub mod ocnode {
                         || compare[3] != color[3]
                 });
 
-                self.active = !has_hole && !not_uniform_color;
+                let res = LEVELS.checked_sub(self.sub_division_level).expect("");
+                let depth = self.depth(camera_eye) / res as f32;
+                let lod = 60.0;
+
+                self.active = (has_peg && (depth > lod)) || (!has_hole && !not_uniform_color);
                 let first = self.children.first();
 
                 match first {

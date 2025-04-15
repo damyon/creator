@@ -146,6 +146,9 @@ pub mod scene {
                 // Up down does not need rotation.
 
                 scene.camera.eye.y += position_diff.y as f32 / 10.0f32;
+
+                let camera_eye = [scene.camera.eye.x, scene.camera.eye.y, scene.camera.eye.z];
+                scene.model.optimize(camera_eye);
             }
             scene.mouse.last_position = current_position;
         }
@@ -161,6 +164,9 @@ pub mod scene {
                 scene.camera.target.y + 0.1 as f32,
                 scene.camera.target.z,
             );
+
+            let camera_eye = [scene.camera.eye.x, scene.camera.eye.y, scene.camera.eye.z];
+            scene.model.optimize(camera_eye);
         }
 
         pub fn handle_move_down(scene: &mut Scene) {
@@ -174,6 +180,8 @@ pub mod scene {
                 scene.camera.target.y - 0.1 as f32,
                 scene.camera.target.z,
             );
+            let camera_eye = [scene.camera.eye.x, scene.camera.eye.y, scene.camera.eye.z];
+            scene.model.optimize(camera_eye);
         }
 
         pub fn handle_move_left(scene: &mut Scene) {
@@ -184,6 +192,8 @@ pub mod scene {
 
             scene.camera.eye += projection;
             scene.camera.target += projection;
+            let camera_eye = [scene.camera.eye.x, scene.camera.eye.y, scene.camera.eye.z];
+            scene.model.optimize(camera_eye);
         }
 
         pub fn handle_move_right(scene: &mut Scene) {
@@ -194,6 +204,8 @@ pub mod scene {
 
             scene.camera.eye -= projection;
             scene.camera.target -= projection;
+            let camera_eye = [scene.camera.eye.x, scene.camera.eye.y, scene.camera.eye.z];
+            scene.model.optimize(camera_eye);
         }
 
         pub fn handle_move_forward(scene: &mut Scene) {
@@ -203,6 +215,8 @@ pub mod scene {
 
             scene.camera.eye += projection;
             scene.camera.target += projection;
+            let camera_eye = [scene.camera.eye.x, scene.camera.eye.y, scene.camera.eye.z];
+            scene.model.optimize(camera_eye);
         }
 
         pub fn handle_move_backward(scene: &mut Scene) {
@@ -212,6 +226,8 @@ pub mod scene {
 
             scene.camera.eye += projection;
             scene.camera.target += projection;
+            let camera_eye = [scene.camera.eye.x, scene.camera.eye.y, scene.camera.eye.z];
+            scene.model.optimize(camera_eye);
         }
 
         pub fn handle_toggle_voxel(scene: &mut Scene) {
@@ -241,7 +257,10 @@ pub mod scene {
                     (scene.material_color[2] + bump).clamp(0.0, 1.0),
                     (scene.material_color[3]).clamp(0.0, 1.0),
                 ];
-                scene.model.toggle_voxel(selection, !value, color);
+                let camera_eye = [scene.camera.eye.x, scene.camera.eye.y, scene.camera.eye.z];
+                scene
+                    .model
+                    .toggle_voxel(selection, !value, color, camera_eye);
             }
         }
 
@@ -420,12 +439,23 @@ pub mod scene {
             false
         }
 
-        pub fn set_scene_material_color(red_str: &str, green_str: &str, blue_str: &str, alpha_str: &str) {
+        pub fn set_scene_material_color(
+            red_str: &str,
+            green_str: &str,
+            blue_str: &str,
+            alpha_str: &str,
+        ) {
             let mut scene = Self::access();
             scene.set_material_color(red_str, green_str, blue_str, alpha_str);
         }
 
-        pub fn set_material_color(&mut self, red_str: &str, green_str: &str, blue_str: &str, alpha_str: &str) {
+        pub fn set_material_color(
+            &mut self,
+            red_str: &str,
+            green_str: &str,
+            blue_str: &str,
+            alpha_str: &str,
+        ) {
             log::debug!("Set material color ({red_str}, {green_str}, {blue_str}, {alpha_str})");
             let red = red_str.parse::<i32>().unwrap();
             let red_f32 = red as f32 / 255.0;
@@ -451,7 +481,11 @@ pub mod scene {
             let serial: Option<StoredOctree> = storage.load_scene(name).await;
             if serial.is_some() {
                 let mut scene = Self::access();
-                scene.model.voxels.load_from_serial(serial.unwrap());
+                let camera_eye = [scene.camera.eye.x, scene.camera.eye.y, scene.camera.eye.z];
+                scene
+                    .model
+                    .voxels
+                    .load_from_serial(serial.unwrap(), camera_eye);
                 scene.drawing = true;
                 scene.loading = false;
             }
@@ -482,7 +516,11 @@ pub mod scene {
             let serial: Option<StoredOctree> = storage.load_first_scene().await;
             if serial.is_some() {
                 let mut scene = Self::access();
-                scene.model.voxels.load_from_serial(serial.unwrap());
+                let camera_eye = [scene.camera.eye.x, scene.camera.eye.y, scene.camera.eye.z];
+                scene
+                    .model
+                    .voxels
+                    .load_from_serial(serial.unwrap(), camera_eye);
                 scene.drawing = true;
                 scene.loading = false;
             } else {
