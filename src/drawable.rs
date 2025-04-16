@@ -1,6 +1,6 @@
-
 extern crate nalgebra as na;
 
+/// Drawable objects can provide whats need to render themselves in WebGL.
 pub trait Drawable {
     fn init(&mut self);
     fn count_vertices(&self) -> u16;

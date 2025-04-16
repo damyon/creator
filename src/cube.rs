@@ -1,3 +1,4 @@
+/// A cube is a drawable item that can be positioned, rotated and scaled.
 #[derive(Copy, Clone)]
 pub struct Cube {
     pub vertices_count: u16,
@@ -13,6 +14,7 @@ pub struct Cube {
 use crate::drawable::Drawable;
 
 impl Cube {
+    /// Create a new default cube.
     pub const fn new() -> Cube {
         Cube {
             vertices_count: 108,
@@ -21,13 +23,14 @@ impl Cube {
             translation: [0.0; 3],
             rotation: [0.0; 3],
             color: [0.3, 0.3, 0.1, 1.0],
-            scale: 0.9999,
+            scale: 0.9999, // The scale is slightly smaller than 1 to prevent z-fighting
             floor: 0.0001,
         }
     }
 }
 
 impl Drawable for Cube {
+    /// Init a new cube so it's ready to draw.
     fn init(&mut self) {
         let mut index: usize = 0;
         let mut increment = || -> usize {
@@ -291,42 +294,51 @@ impl Drawable for Cube {
         self.normals[normal_increment()] = 0.0;
     }
 
+    /// A cube always has the same number of vertices
     fn count_vertices(&self) -> u16 {
         self.vertices_count
     }
 
+    /// We can move a cube
     fn translation(&self) -> &[f32; 3] {
         &self.translation
     }
 
+    /// Cubes have a colour - including alphas.
     fn color(&self) -> &[f32; 4] {
         &self.color
     }
 
+    /// Move a cube.
     fn translate(&mut self, amount: [f32; 3]) {
         self.translation[0] += amount[0];
         self.translation[1] += amount[1];
         self.translation[2] += amount[2];
     }
 
+    /// Rotate a cube.
     fn rotate(&mut self, amount: [f32; 3]) {
         self.rotation[0] += amount[0];
         self.rotation[1] += amount[1];
         self.rotation[2] += amount[2];
     }
 
+    /// Get the current rotation.
     fn rotation(&self) -> &[f32; 3] {
         &self.rotation
     }
 
+    /// Get an array of vertices.
     fn vertices(&self) -> &[f32] {
         &self.vertices
     }
 
+    /// Get an array of normals.
     fn normals(&self) -> &[f32] {
         &self.normals
     }
 
+    /// Calculate the distance between the cube and the camera.
     fn depth(&self, camera: [f32; 3]) -> f32 {
         ((self.translation[0] - camera[0]).powi(2)
             + (self.translation[1] - camera[1]).powi(2)

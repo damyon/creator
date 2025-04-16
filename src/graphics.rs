@@ -14,6 +14,8 @@ extern crate nalgebra_glm as glm;
 use na::{Isometry3, Matrix4, Orthographic3, Perspective3, Vector3};
 
 extern crate js_sys;
+
+/// All the things we need to know to render to the screen.
 pub struct Graphics {
     pub gl: WebGlRenderingContext,
     pub canvas_width: i32,
@@ -29,6 +31,7 @@ pub struct Graphics {
 }
 
 impl Graphics {
+    /// Create a new Graphics container with default values.
     pub fn new() -> Graphics {
         let canvas_id = "scene";
         let document = web_sys::window().unwrap().document().unwrap();
@@ -77,6 +80,7 @@ impl Graphics {
         }
     }
 
+    /// Compile a shader and link it to the graphics card.
     pub fn create_shader(&self, shader_type: u32, source: &str) -> Result<WebGlShader, JsValue> {
         let shader = self
             .gl
@@ -102,6 +106,7 @@ impl Graphics {
         }
     }
 
+    /// Combine the 2 shaders and link them.
     pub fn create_program(
         &self,
         vertex_shader: &WebGlShader,
@@ -125,6 +130,7 @@ impl Graphics {
         }
     }
 
+    /// Create a texture large enough to record depth values for shadow mapping.
     pub fn create_shadow_depth_texture(&mut self) {
         if self.gl.get_extension("OES_texture_float").is_err() {
             panic!("Webgl extension error.");
@@ -207,6 +213,7 @@ impl Graphics {
             .bind_renderbuffer(WebGlRenderingContext::RENDERBUFFER, None);
     }
 
+    /// Get the view from the light for calculating shadows.
     pub fn build_light_projection(&self) -> Matrix4<f32> {
         if self.swap_cameras {
             Perspective3::new(
@@ -221,6 +228,7 @@ impl Graphics {
         }
     }
 
+    /// Get the view from the camera.
     pub fn build_camera_projection(&self) -> Matrix4<f32> {
         if self.swap_cameras {
             Orthographic3::new(-32.0, 32.0, -32.0, 32.0, 0.1, 120.0).into_inner()
@@ -235,6 +243,7 @@ impl Graphics {
         }
     }
 
+    /// Format the vertices for WebGL.
     pub fn setup_vertices(
         &self,
         vertices: &[f32],
@@ -302,12 +311,14 @@ impl Graphics {
         }
     }
 
+    /// Compile the various shaders.
     pub fn setup_shaders(&mut self) {
         self.light_program = Some(self.setup_light_shaders());
         self.camera_program = Some(self.setup_camera_shaders());
         self.create_shadow_depth_texture();
     }
 
+    /// Compile the light shaders.
     pub fn setup_light_shaders(&mut self) -> WebGlProgram {
         let vertex_shader_source = "
                 attribute vec4 a_position;
@@ -371,6 +382,7 @@ impl Graphics {
         program
     }
 
+    /// Compile the camera shaders.
     pub fn setup_camera_shaders(&mut self) -> WebGlProgram {
         let vertex_shader_source = "
                 attribute vec4 a_position;
@@ -488,6 +500,7 @@ impl Graphics {
         program
     }
 
+    /// Use the created light shaders.
     pub fn use_light_shader(&self) {
         self.gl.disable(WebGlRenderingContext::BLEND);
 
@@ -498,6 +511,7 @@ impl Graphics {
         }
     }
 
+    /// Use the camera shaders.
     pub fn use_camera_shader(&self) {
         self.gl.enable(WebGlRenderingContext::BLEND);
         self.gl.blend_func(
@@ -512,6 +526,7 @@ impl Graphics {
         }
     }
 
+    /// Clear the colour and depth buffers for rendering a new frame.
     pub fn clear(&self) {
         self.gl.clear_color(0.1, 0.1, 0.8, 0.5);
         self.gl.clear(
@@ -519,6 +534,7 @@ impl Graphics {
         );
     }
 
+    /// Render to the shadow buffer so we can compute shadows.
     pub fn draw_shadow(&self, drawable: &impl Drawable, render_mode: u32, light: Camera) {
         let shader = if self.swap_shaders {
             self.camera_program.as_ref()
@@ -578,6 +594,7 @@ impl Graphics {
         self.gl.flush();
     }
 
+    /// Render to the actual color buffer.
     pub fn draw(&self, drawable: &impl Drawable, render_mode: u32, camera: Camera, light: Camera) {
         let shader = if self.swap_shaders {
             self.light_program.as_ref()
@@ -694,6 +711,7 @@ impl Graphics {
         self.gl.flush();
     }
 
+    /// Prepare to draw the shadow.
     pub fn prepare_shadow_frame(&self) {
         self.use_light_shader();
 
@@ -713,11 +731,13 @@ impl Graphics {
         );
     }
 
+    /// Complete the shadow drawing.
     pub fn finish_shadow_frame(&self) {
         self.gl
             .bind_framebuffer(WebGlRenderingContext::FRAMEBUFFER, None);
     }
 
+    /// Prepare the camera frame.
     pub fn prepare_camera_frame(&self) {
         self.use_camera_shader();
         self.gl
@@ -743,5 +763,6 @@ impl Graphics {
         }
     }
 
+    /// We are done with the camera frame.
     pub fn finish_camera_frame(&self) {}
 }
