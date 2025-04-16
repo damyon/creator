@@ -21,9 +21,9 @@ mod scene;
 mod storage;
 mod stored_octree;
 
-use crate::graphics::graphics::Graphics;
-use crate::scene::scene::Scene;
-use crate::storage::storage::Storage;
+use crate::graphics::Graphics;
+use crate::scene::Scene;
+use crate::storage::Storage;
 extern crate nalgebra as na;
 
 #[wasm_bindgen]
@@ -84,8 +84,8 @@ pub fn set_scene_name(name: &str) -> Result<bool, JsValue> {
 #[wasm_bindgen]
 pub async fn load_first_scene() -> Result<JsValue, JsValue> {
     Scene::load_first_scene().await;
-
-    let f: Rc<RefCell<Option<Closure<dyn FnMut()>>>> = Rc::new(RefCell::new(None));
+    type DynFunc = Rc<RefCell<Option<Closure<dyn FnMut()>>>>;
+    let f: DynFunc = Rc::new(RefCell::new(None));
     let outer_f = f.clone();
 
     let window = web_sys::window().unwrap();
@@ -114,8 +114,6 @@ pub fn draw_scene() {
 
         Scene::draw(&graphics);
     }
-
-    
 }
 
 #[wasm_bindgen]
@@ -126,7 +124,12 @@ pub fn toggle_selection_shape() -> Result<bool, JsValue> {
 }
 
 #[wasm_bindgen]
-pub fn set_material_color(red: &str, green: &str, blue: &str, alpha: &str) -> Result<bool, JsValue> {
+pub fn set_material_color(
+    red: &str,
+    green: &str,
+    blue: &str,
+    alpha: &str,
+) -> Result<bool, JsValue> {
     Scene::set_scene_material_color(red, green, blue, alpha);
 
     Ok(true)
