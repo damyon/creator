@@ -330,9 +330,9 @@ pub mod cube {
         }
 
         fn depth(&self, camera: [f32; 3]) -> f32 {
-            (((self.translation[0] - camera[0]) as f32).powi(2) +
-            ((self.translation[1] - camera[1]) as f32).powi(2) +
-            ((self.translation[2] - camera[2]) as f32).powi(2)).sqrt()
+            ((self.translation[0] - camera[0]).powi(2) +
+            (self.translation[1] - camera[1]).powi(2) +
+            (self.translation[2] - camera[2]).powi(2)).sqrt()
         }
     }
 }

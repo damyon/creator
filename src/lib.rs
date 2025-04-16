@@ -115,7 +115,7 @@ pub fn draw_scene() {
         Scene::draw(&graphics);
     }
 
-    ()
+    
 }
 
 #[wasm_bindgen]

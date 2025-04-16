@@ -20,7 +20,7 @@ pub mod storage {
             Storage { _noop: 0.0 }
         }
 
-        pub async fn save(self: Self, data: StoredOctree) {
+        pub async fn save(self, data: StoredOctree) {
             let db = Database::open("creation")
                 .with_version(1u8)
                 .with_on_upgrade_needed(|_event, db| {
@@ -53,7 +53,7 @@ pub mod storage {
             _ = transaction.commit().await;
         }
 
-        pub async fn delete_scene(self: Self, name: String) {
+        pub async fn delete_scene(self, name: String) {
             let db = Database::open("creation")
                 .with_version(1u8)
                 .await
@@ -72,13 +72,13 @@ pub mod storage {
                 .expect("Could not get object store");
 
             log::debug!("delete_scene We got the store");
-            _ = store.delete(name).await.expect("Was not deleted");
+            store.delete(name).await.expect("Was not deleted");;
             log::debug!("delete_scene We loaded the nuts");
             _ = transaction.commit().await;
             log::debug!("delete_scene We committed the transaction");
         }
 
-        pub async fn load_scene(self: Self, name: String) -> Option<StoredOctree> {
+        pub async fn load_scene(self, name: String) -> Option<StoredOctree> {
             let db = Database::open("creation")
                 .with_version(1u8)
                 .with_on_upgrade_needed(|_event, db| {
@@ -117,11 +117,11 @@ pub mod storage {
             serial
         }
 
-        pub async fn load_first_scene(self: Self) -> Option<StoredOctree> {
+        pub async fn load_first_scene(self) -> Option<StoredOctree> {
             self.load_scene("Default".to_string()).await
         }
 
-        pub async fn list_scenes(self: Self) -> Vec<String> {
+        pub async fn list_scenes(self) -> Vec<String> {
             let db = Database::open("creation")
                 .with_version(1u8)
                 .with_on_upgrade_needed(|_event, db| {

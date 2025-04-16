@@ -117,9 +117,9 @@ pub mod ocnode {
         }
 
         fn depth(&self, camera: [f32; 3]) -> f32 {
-            (((self.x_index as f32 - camera[0]) as f32).powi(2)
-                + ((self.y_index as f32 - camera[1]) as f32).powi(2)
-                + ((self.z_index as f32 - camera[2]) as f32).powi(2))
+            ((self.x_index as f32 - camera[0]).powi(2)
+                + (self.y_index as f32 - camera[1]).powi(2)
+                + (self.z_index as f32 - camera[2]).powi(2))
             .sqrt()
         }
 
@@ -207,7 +207,7 @@ pub mod ocnode {
                 };
             }
 
-            return true;
+            true
         }
 
         pub fn toggle_voxel(&mut self, position: [i32; 3], value: bool, color: [f32; 4]) {
@@ -263,25 +263,23 @@ pub mod ocnode {
                     }
                     child_cubes
                 }
+            } else if self.active {
+                let scale = 1.0;
+                let mut cube = Cube::new();
+
+                cube.color = self.color;
+                cube.scale = scale;
+                cube.init();
+
+                let x = self.x_index as f32 * (scale);
+                let y = self.y_index as f32 * (scale);
+                let z = self.z_index as f32 * (scale);
+
+                cube.translate([x, y, z]);
+
+                vec![cube]
             } else {
-                if self.active {
-                    let scale = 1.0;
-                    let mut cube = Cube::new();
-
-                    cube.color = self.color;
-                    cube.scale = scale;
-                    cube.init();
-
-                    let x = self.x_index as f32 * (scale);
-                    let y = self.y_index as f32 * (scale);
-                    let z = self.z_index as f32 * (scale);
-
-                    cube.translate([x, y, z]);
-
-                    vec![cube]
-                } else {
-                    vec![]
-                }
+                vec![]
             }
         }
 

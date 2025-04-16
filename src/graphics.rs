@@ -65,9 +65,9 @@ pub mod graphics {
             gl.enable(WebGlRenderingContext::CULL_FACE);
 
             Graphics {
-                gl: gl,
-                canvas_width: canvas_width,
-                canvas_height: canvas_height,
+                gl,
+                canvas_width,
+                canvas_height,
                 camera_program: None,
                 light_program: None,
                 shadow_frame_buffer: None,
@@ -114,8 +114,8 @@ pub mod graphics {
             fragment_shader: &WebGlShader,
         ) -> WebGlProgram {
             let shader_program: WebGlProgram = self.gl.create_program().unwrap();
-            self.gl.attach_shader(&shader_program, &vertex_shader);
-            self.gl.attach_shader(&shader_program, &fragment_shader);
+            self.gl.attach_shader(&shader_program, vertex_shader);
+            self.gl.attach_shader(&shader_program, fragment_shader);
             self.gl.link_program(&shader_program);
 
             if self
@@ -248,14 +248,14 @@ pub mod graphics {
             shader_program: &WebGlProgram,
             is_camera: bool,
         ) {
-            let a_position: u32 = self.gl.get_attrib_location(&shader_program, "a_position") as u32;
+            let a_position: u32 = self.gl.get_attrib_location(shader_program, "a_position") as u32;
 
             let vertex_buffer = self.gl.create_buffer().unwrap();
             self.gl
                 .bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&vertex_buffer));
 
             unsafe {
-                let vertices_array = js_sys::Float32Array::view(&vertices);
+                let vertices_array = js_sys::Float32Array::view(vertices);
 
                 self.gl.buffer_data_with_array_buffer_view(
                     WebGlRenderingContext::ARRAY_BUFFER,
@@ -278,14 +278,14 @@ pub mod graphics {
 
             // Normals
             if is_camera {
-                let a_normal: u32 = self.gl.get_attrib_location(&shader_program, "a_normal") as u32;
+                let a_normal: u32 = self.gl.get_attrib_location(shader_program, "a_normal") as u32;
                 let normal_buffer = self.gl.create_buffer().unwrap();
 
                 self.gl
                     .bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&normal_buffer));
 
                 unsafe {
-                    let normals_array = js_sys::Float32Array::view(&normals);
+                    let normals_array = js_sys::Float32Array::view(normals);
 
                     self.gl.buffer_data_with_array_buffer_view(
                         WebGlRenderingContext::ARRAY_BUFFER,
@@ -530,8 +530,8 @@ pub mod graphics {
             };
             self.use_light_shader();
             self.setup_vertices(
-                &drawable.vertices(),
-                &drawable.normals(),
+                drawable.vertices(),
+                drawable.normals(),
                 shader.expect("fail"),
                 false,
             );
@@ -582,7 +582,7 @@ pub mod graphics {
                 );
                 let reduced_count = count / 3;
                 self.gl
-                    .draw_arrays(render_mode, chunk * chunk_size as i32, reduced_count);
+                    .draw_arrays(render_mode, chunk * chunk_size, reduced_count);
             }
             self.gl.flush();
         }
@@ -601,8 +601,8 @@ pub mod graphics {
             };
             self.use_camera_shader();
             self.setup_vertices(
-                &drawable.vertices(),
-                &drawable.normals(),
+                drawable.vertices(),
+                drawable.normals(),
                 shader.expect("fail"),
                 true,
             );

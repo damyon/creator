@@ -167,12 +167,12 @@ pub mod scene {
         pub fn handle_move_up(scene: &mut Scene) {
             scene.camera.eye = Point3::new(
                 scene.camera.eye.x,
-                scene.camera.eye.y + 0.1 as f32,
+                scene.camera.eye.y + 0.1_f32,
                 scene.camera.eye.z,
             );
             scene.camera.target = Point3::new(
                 scene.camera.target.x,
-                scene.camera.target.y + 0.1 as f32,
+                scene.camera.target.y + 0.1_f32,
                 scene.camera.target.z,
             );
 
@@ -183,12 +183,12 @@ pub mod scene {
         pub fn handle_move_down(scene: &mut Scene) {
             scene.camera.eye = Point3::new(
                 scene.camera.eye.x,
-                scene.camera.eye.y - 0.1 as f32,
+                scene.camera.eye.y - 0.1_f32,
                 scene.camera.eye.z,
             );
             scene.camera.target = Point3::new(
                 scene.camera.target.x,
-                scene.camera.target.y - 0.1 as f32,
+                scene.camera.target.y - 0.1_f32,
                 scene.camera.target.z,
             );
             let camera_eye = [scene.camera.eye.x, scene.camera.eye.y, scene.camera.eye.z];
@@ -548,7 +548,7 @@ pub mod scene {
             self.selection_cube.color = [0.8, 0.8, 0.8, 0.5];
             self.selection_cube.init();
             self.grid_xz.init();
-            self.grid_xz.rotate([(90.0 as f32).to_radians(), 0.0, 0.0]);
+            self.grid_xz.rotate([90.0_f32.to_radians(), 0.0, 0.0]);
 
             self.model.init();
 
@@ -567,8 +567,8 @@ pub mod scene {
                 log::info!("Key down");
                 Scene::queue_command(Command {
                     command_type: CommandType::KeyDown,
-                    data1: key_event.key_code() as u32,
-                    data2: key_event.key_code() as u32,
+                    data1: key_event.key_code(),
+                    data2: key_event.key_code(),
                 });
             });
 
@@ -595,9 +595,9 @@ pub mod scene {
                 let wheel_event = event.clone().dyn_into::<web_sys::WheelEvent>().unwrap();
 
                 let direction = if wheel_event.delta_y() < 0.0 {
-                    1 as u32
+                    1_u32
                 } else {
-                    0 as u32
+                    0_u32
                 };
                 Scene::queue_command(Command {
                     command_type: CommandType::MouseScroll,
