@@ -130,10 +130,21 @@ pub mod scene {
                 );
                 let current_camera_eye = scene.camera.eye;
                 let current_camera_target = scene.camera.target;
+                let current_camera_direction = current_camera_target - current_camera_eye;
+
+                let current_camera_distance = (current_camera_direction.x.powf(2.0f32)
+                    + current_camera_direction.z.powf(2.0f32))
+                .sqrt();
+                let scale = 20.0f32 / current_camera_distance;
+                let scaled_direction = scale * current_camera_direction;
+                let scaled_point =
+                    Point3::new(scaled_direction.x, scaled_direction.y, scaled_direction.z);
                 let blunting = 100.0;
                 let current_camera_eye_2d = Point2::new(current_camera_eye.x, current_camera_eye.z);
-                let current_camera_target_2d =
-                    Point2::new(current_camera_target.x, current_camera_target.z);
+                let current_camera_target_2d = Point2::new(
+                    scaled_point.x + current_camera_eye.x,
+                    scaled_point.z + current_camera_eye.z,
+                );
                 // rotate the eye around the target
                 let adjusted = Self::rotate_2d(
                     current_camera_eye_2d,
