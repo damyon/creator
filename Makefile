@@ -9,3 +9,9 @@ watch:
 
 dev:
 	cargo install bacon
+
+lint:
+	cargo clippy
+
+doc:
+	cargo doc

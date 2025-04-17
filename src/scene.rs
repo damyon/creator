@@ -22,6 +22,7 @@ extern crate nalgebra_glm as glm;
 
 use na::{Point2, Point3, Vector3};
 
+/// Simple list of supported selection shapes.
 #[derive(PartialEq, Eq, Copy, Clone)]
 pub enum SelectionShape {
     Sphere,
@@ -34,26 +35,44 @@ pub enum SelectionShape {
     CircleYZ,
 }
 
+/// This represents the data and the links to input/output required to render the scene.
 pub struct Scene {
+    /// The current camera.
     pub camera: Camera,
+    /// The current light.
     pub light: Camera,
+    /// The mouse info.
     mouse: Mouse,
+    /// A queue of commands waiting to be processed.
     command_input: CommandQueue,
+    /// A cube that is used to draw the selection shape.
     selection_cube: Cube,
+    /// We could show more, but only the flat grid is enough.
     grid_xz: Grid,
+    /// This is the octree of voxels.
     model: Model,
+    /// Where is the selection.
     selection_position: [i32; 3],
+    /// What is the size of the selection.
     selection_radius: u32,
+    /// What shape is the selection.
     selection_shape: SelectionShape,
+    /// What colour will we fill if the selection is toggled.
     material_color: [f32; 4],
+    /// Are we currently drawing a frame?
     drawing: bool,
+    /// Should we skip the next frame?
     throttle: u32,
+    /// Are we loading from browser?
     loading: bool,
+    /// Are there pending changes?
     smooth: bool,
+    /// Will the frame match the last rendered frame?
     dirty: bool,
 }
 
 impl Scene {
+    /// Helper function to rotate a point around an axis.
     fn rotate_2d(target: Point2<f32>, pivot: Point2<f32>, angle_radians: f32) -> Point2<f32> {
         // Precalculate the cosine
         let angle_sin = f32::sin(angle_radians);
@@ -71,6 +90,7 @@ impl Scene {
         Point2::new(rotated.x + pivot.x, rotated.y + pivot.y)
     }
 
+    /// Used to lock/release a global scene ref.
     fn access() -> MutexGuard<'static, Scene> {
         static GLOBSTATE: Mutex<Scene> = Mutex::new(Scene {
             camera: Camera::new(),
@@ -93,6 +113,7 @@ impl Scene {
         GLOBSTATE.lock().unwrap()
     }
 
+    /// Add a command to the queue of commands to process later.
     pub fn queue_command(command: Command) {
         let mut scene = Self::access();
         scene.dirty = true;
@@ -100,24 +121,29 @@ impl Scene {
         scene.command_input.queue_command(command);
     }
 
+    /// Change the global scene name.
     pub fn set_scene_name(name: String) {
         let mut scene = Self::access();
 
         scene.set_name(name);
     }
 
+    /// Change this scene name.
     pub fn set_name(&mut self, name: String) {
         self.model.set_name(name);
     }
 
+    /// Process a mouse down event.
     pub fn handle_mouse_down(scene: &mut Scene) {
         scene.mouse.is_pressed = true;
     }
 
+    /// Process a mouse up event.
     pub fn handle_mouse_up(scene: &mut Scene) {
         scene.mouse.is_pressed = false;
     }
 
+    /// Process a mouse moved event.
     pub fn handle_mouse_moved(command: &Command, scene: &mut Scene) {
         let current_position = Point2::new(command.data1 as i32, command.data2 as i32);
 
@@ -162,6 +188,7 @@ impl Scene {
         scene.mouse.last_position = current_position;
     }
 
+    /// The key was pressed to move up.
     pub fn handle_move_up(scene: &mut Scene) {
         scene.camera.eye = Point3::new(
             scene.camera.eye.x,
@@ -178,6 +205,7 @@ impl Scene {
         scene.model.optimize(camera_eye);
     }
 
+    /// The key was pressed to move down.
     pub fn handle_move_down(scene: &mut Scene) {
         scene.camera.eye = Point3::new(
             scene.camera.eye.x,
@@ -193,6 +221,7 @@ impl Scene {
         scene.model.optimize(camera_eye);
     }
 
+    /// The key was pressed to move left.
     pub fn handle_move_left(scene: &mut Scene) {
         let diff = scene.camera.target - scene.camera.eye;
         let blunting = 10.0;
@@ -205,6 +234,7 @@ impl Scene {
         scene.model.optimize(camera_eye);
     }
 
+    /// The key was pressed to move right.
     pub fn handle_move_right(scene: &mut Scene) {
         let diff = scene.camera.target - scene.camera.eye;
         let blunting = 10.0;
@@ -217,6 +247,7 @@ impl Scene {
         scene.model.optimize(camera_eye);
     }
 
+    /// The key was pressed to move forward.
     pub fn handle_move_forward(scene: &mut Scene) {
         let diff = scene.camera.target - scene.camera.eye;
         let blunting = 10.0;
@@ -228,6 +259,7 @@ impl Scene {
         scene.model.optimize(camera_eye);
     }
 
+    /// The key was pressed to move backwards.
     pub fn handle_move_backward(scene: &mut Scene) {
         let diff = scene.camera.target - scene.camera.eye;
         let blunting = 10.0;
@@ -239,6 +271,7 @@ impl Scene {
         scene.model.optimize(camera_eye);
     }
 
+    /// The key was pressed to toggle the state of the current selection.
     pub fn handle_toggle_voxel(scene: &mut Scene) {
         let selections = Self::selection_voxels(
             &scene.selection_position,
@@ -273,6 +306,7 @@ impl Scene {
         }
     }
 
+    /// Save the scene to the browser.
     pub async fn save_scene() {
         // The point of this scope shananigens is the model save operation is slow
         // and doesn't need access to anything from scope outside of the model.
@@ -283,42 +317,50 @@ impl Scene {
         model.save().await;
     }
 
+    /// Move the selection shape left.
     pub fn handle_move_selection_left(scene: &mut Scene) {
         scene.selection_cube.translate([-1.0, 0.0, 0.0]);
         scene.selection_position[0] -= 1;
     }
 
+    /// Move the selection shape right.
     pub fn handle_move_selection_right(scene: &mut Scene) {
         scene.selection_cube.translate([1.0, 0.0, 0.0]);
         scene.selection_position[0] += 1;
     }
 
+    /// Move the selection shape forward.
     pub fn handle_move_selection_forward(scene: &mut Scene) {
         scene.selection_cube.translate([0.0, 0.0, 1.0]);
         scene.selection_position[2] += 1;
     }
 
+    /// Move the selection shape backward.
     pub fn handle_move_selection_backward(scene: &mut Scene) {
         scene.selection_cube.translate([0.0, 0.0, -1.0]);
         scene.selection_position[2] -= 1;
     }
 
+    /// Move the selection shape up.
     pub fn handle_move_selection_up(scene: &mut Scene) {
         scene.selection_cube.translate([0.0, 1.0, 0.0]);
         scene.selection_position[1] += 1;
     }
 
+    /// Move the selection shape down.
     pub fn handle_move_selection_down(scene: &mut Scene) {
         scene.selection_cube.translate([0.0, -1.0, 0.0]);
         scene.selection_position[1] -= 1;
     }
 
+    /// Hide or show the selection shape for the global scene.
     pub fn scene_toggle_selection_shape() {
         let mut scene = Self::access();
 
         Self::handle_toggle_selection_shape(&mut scene);
     }
 
+    /// Hide or show the selection shape.
     pub fn handle_toggle_selection_shape(scene: &mut Scene) {
         scene.selection_shape = if scene.selection_shape == SelectionShape::Sphere {
             SelectionShape::Cube
@@ -339,6 +381,7 @@ impl Scene {
         }
     }
 
+    /// Handle the mouse scroll.
     pub fn handle_mouse_scroll(command: &Command, scene: &mut Scene) {
         let direction: u32 = command.data1;
         let max_selection_radius: u32 = 32;
@@ -351,6 +394,7 @@ impl Scene {
         }
     }
 
+    /// Handle a key press.
     pub fn handle_key_down(command: &Command, scene: &mut Scene) {
         let key = command.data1;
 
@@ -387,6 +431,7 @@ impl Scene {
         }
     }
 
+    /// Process the command queue.
     pub fn process_commands() {
         let mut scene = Self::access();
 
@@ -415,11 +460,13 @@ impl Scene {
         }
     }
 
+    /// Create a new scene.
     pub fn init_scene() {
         let mut scene = Self::access();
         scene.init();
     }
 
+    /// Should we render the current frame?
     pub fn throttle() -> bool {
         let mut scene = Self::access();
 
@@ -443,6 +490,7 @@ impl Scene {
         false
     }
 
+    /// Change the active color.
     pub fn set_scene_material_color(
         red_str: &str,
         green_str: &str,
@@ -453,6 +501,7 @@ impl Scene {
         scene.set_material_color(red_str, green_str, blue_str, alpha_str);
     }
 
+    /// Change the active color for this scene.
     pub fn set_material_color(
         &mut self,
         red_str: &str,
@@ -473,6 +522,7 @@ impl Scene {
         self.selection_cube.color = [red_f32, green_f32, blue_f32, 0.5];
     }
 
+    /// Load a scene from the browser.
     pub async fn load_scene() {
         let name = {
             let mut scene = Self::access();
@@ -495,6 +545,7 @@ impl Scene {
         }
     }
 
+    /// Delete a scene from the browser.
     pub async fn delete_scene() {
         let model = {
             let mut scene = Self::access();
@@ -505,16 +556,19 @@ impl Scene {
         model.delete_scene().await;
     }
 
+    /// Enable color noise.
     pub async fn toggle_noise() {
         let mut scene = Self::access();
         scene.smooth = false;
     }
 
+    /// Enable smoothing.
     pub async fn toggle_smooth() {
         let mut scene = Self::access();
         scene.smooth = true;
     }
 
+    /// Load the default scene.
     pub async fn load_first_scene() {
         let storage = Storage::new();
         let serial: Option<StoredOctree> = storage.load_first_scene().await;
@@ -534,6 +588,7 @@ impl Scene {
         }
     }
 
+    /// Init the scene.
     pub fn init(&mut self) {
         self.light.eye = Point3::new(15.0, 60.0, 14.0);
         self.light.target = Point3::new(0.0, 0.0, 0.0);
@@ -622,10 +677,12 @@ impl Scene {
         mouse_up_closure.forget();
     }
 
+    /// Quicker than distance - no sqrt.
     pub fn calculate_distance_squared(from: &[i32; 3], to: &[i32; 3]) -> i32 {
         (from[0] - to[0]).pow(2) + (from[1] - to[1]).pow(2) + (from[2] - to[2]).pow(2)
     }
 
+    /// Generate voxels based on selection.
     pub fn selection_voxels(
         center: &[i32; 3],
         radius: i32,
@@ -746,6 +803,7 @@ impl Scene {
         voxels
     }
 
+    /// Draw the scene.
     pub fn draw(graphics: &Graphics) {
         let mut scene = Self::access();
 

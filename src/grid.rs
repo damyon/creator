@@ -1,3 +1,4 @@
+/// A Grid is a drawable thing too.
 #[derive(Copy, Clone)]
 pub struct Grid {
     pub scale: u16,
@@ -14,6 +15,7 @@ pub struct Grid {
 use crate::drawable::Drawable;
 
 impl Grid {
+    /// Create a new default grid
     pub const fn new() -> Grid {
         Grid {
             scale: 64,
@@ -30,6 +32,7 @@ impl Grid {
 }
 
 impl Drawable for Grid {
+    /// Init a grid once it is created.
     fn init(&mut self) {
         let mut index = 0;
         let mut increment = || -> usize {
@@ -95,42 +98,51 @@ impl Drawable for Grid {
         self.vertices_count = 2 * (6 * (self.scale + 1));
     }
 
+    /// We calculated the number of vertices after we created it.
     fn count_vertices(&self) -> u16 {
         self.vertices_count
     }
 
+    /// Where is the grid.
     fn translation(&self) -> &[f32; 3] {
         &self.translation
     }
 
+    /// Move the grid.
     fn translate(&mut self, amount: [f32; 3]) {
         self.translation[0] += amount[0];
         self.translation[1] += amount[1];
         self.translation[2] += amount[2];
     }
 
+    /// Rotate the grid.
     fn rotate(&mut self, amount: [f32; 3]) {
         self.rotation[0] += amount[0];
         self.rotation[1] += amount[1];
         self.rotation[2] += amount[2];
     }
 
+    /// How is the grid rotated?
     fn rotation(&self) -> &[f32; 3] {
         &self.rotation
     }
 
+    /// Tell me the vertices to draw.
     fn vertices(&self) -> &[f32] {
         &self.vertices
     }
 
+    /// What color are the lines?
     fn color(&self) -> &[f32; 4] {
         &self.color
     }
 
+    /// Where are the normals facing.
     fn normals(&self) -> &[f32] {
         &self.normals
     }
 
+    /// Calculate the distance from the camera to the grid.
     fn depth(&self, camera: [f32; 3]) -> f32 {
         ((self.translation[0] - camera[0]).powi(2)
             + (self.translation[1] - camera[1]).powi(2)

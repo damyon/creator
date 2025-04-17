@@ -1,3 +1,8 @@
+//! # Creator
+//!
+//! `creator` is a 3d modelling application using voxels.
+//! It compiles to wasm and uses WebGL to render to a browser.
+
 use std::cell::RefCell;
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
@@ -26,16 +31,16 @@ use crate::scene::Scene;
 use crate::storage::Storage;
 extern crate nalgebra as na;
 
+/// Init the scene for the first time.
 #[wasm_bindgen]
 pub fn init_scene() -> Result<bool, JsValue> {
     wasm_logger::init(wasm_logger::Config::default());
     panic::set_hook(Box::new(console_error_panic_hook::hook));
-    log::debug!("Init scene");
     Scene::init_scene();
-    log::debug!("Init done");
     Ok(true)
 }
 
+/// Get the list of saved scenes.
 #[wasm_bindgen]
 pub async fn scene_names() -> Result<JsValue, JsValue> {
     let storage = Storage::new();
@@ -45,42 +50,49 @@ pub async fn scene_names() -> Result<JsValue, JsValue> {
     Ok(JsValue::from(names))
 }
 
+/// Save the current scene.
 #[wasm_bindgen]
 pub async fn save_scene() -> Result<JsValue, JsValue> {
     Scene::save_scene().await;
     Ok(JsValue::from(true))
 }
 
+/// Load the current scene.
 #[wasm_bindgen]
 pub async fn load_scene() -> Result<bool, JsValue> {
     Scene::load_scene().await;
     Ok(true)
 }
 
+/// Switch from solid to noise colours.
 #[wasm_bindgen]
 pub async fn toggle_noise() -> Result<bool, JsValue> {
     Scene::toggle_noise().await;
     Ok(true)
 }
 
+/// Switch from noise to solid colours.
 #[wasm_bindgen]
 pub async fn toggle_smooth() -> Result<bool, JsValue> {
     Scene::toggle_smooth().await;
     Ok(true)
 }
 
+/// Delete the current scene.
 #[wasm_bindgen]
 pub async fn delete_scene() -> Result<bool, JsValue> {
     Scene::delete_scene().await;
     Ok(true)
 }
 
+/// Change the name of the scene.
 #[wasm_bindgen]
 pub fn set_scene_name(name: &str) -> Result<bool, JsValue> {
     Scene::set_scene_name(name.to_string());
     Ok(true)
 }
 
+/// Load the default scene when the page loads.
 #[wasm_bindgen]
 pub async fn load_first_scene() -> Result<JsValue, JsValue> {
     Scene::load_first_scene().await;
@@ -105,6 +117,7 @@ pub async fn load_first_scene() -> Result<JsValue, JsValue> {
     Ok(JsValue::from(true))
 }
 
+/// Draw a new frame for the current scene.
 pub fn draw_scene() {
     if !Scene::throttle() {
         let mut graphics: Graphics = Graphics::new();
@@ -116,6 +129,7 @@ pub fn draw_scene() {
     }
 }
 
+/// Change the selection shape.
 #[wasm_bindgen]
 pub fn toggle_selection_shape() -> Result<bool, JsValue> {
     Scene::scene_toggle_selection_shape();
@@ -123,6 +137,7 @@ pub fn toggle_selection_shape() -> Result<bool, JsValue> {
     Ok(true)
 }
 
+/// Change what colour we use.
 #[wasm_bindgen]
 pub fn set_material_color(
     red: &str,
