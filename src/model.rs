@@ -37,8 +37,14 @@ impl Model {
     }
 
     /// Switch a single voxel between active/hidden
-    pub fn toggle_voxel(&mut self, position: [i32; 3], value: bool, color: [f32; 4]) {
-        self.voxels.toggle_voxel(position, value, color);
+    pub fn toggle_voxel(
+        &mut self,
+        position: [i32; 3],
+        value: bool,
+        color: [f32; 4],
+        camera_eye: [f32; 3],
+    ) {
+        self.voxels.toggle_voxel(position, value, color, camera_eye);
     }
 
     /// Determine if all voxels in the list are active.

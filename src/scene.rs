@@ -65,7 +65,7 @@ pub struct Scene {
     throttle: u32,
     /// Are we loading from browser?
     loading: bool,
-    /// Is the fill colour noisy?
+    /// Are there pending changes?
     smooth: bool,
     /// Will the frame match the last rendered frame?
     dirty: bool,
@@ -286,9 +286,8 @@ impl Scene {
         } else {
             log::info!("Toggle all voxels active: FALSE ${count}");
         }
-        let camera_eye = [scene.camera.eye.x, scene.camera.eye.y, scene.camera.eye.z];
-
         for selection in selections {
+            log::info!("Selection {:?}", selection);
             let bump = if scene.smooth {
                 0.0f32
             } else {
@@ -300,9 +299,11 @@ impl Scene {
                 (scene.material_color[2] + bump).clamp(0.0, 1.0),
                 (scene.material_color[3]).clamp(0.0, 1.0),
             ];
-            scene.model.toggle_voxel(selection, !value, color);
+            let camera_eye = [scene.camera.eye.x, scene.camera.eye.y, scene.camera.eye.z];
+            scene
+                .model
+                .toggle_voxel(selection, !value, color, camera_eye);
         }
-        scene.model.optimize(camera_eye);
     }
 
     /// Save the scene to the browser.

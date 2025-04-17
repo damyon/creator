@@ -179,7 +179,7 @@ impl Ocnode {
 
             let res = LEVELS.checked_sub(self.sub_division_level).expect("");
             let depth = self.depth(camera_eye) / res as f32;
-            let lod = 90.0;
+            let lod = 60.0;
 
             self.active = (has_peg && (depth > lod)) || (!has_hole && !not_uniform_color);
             let first = self.children.first();

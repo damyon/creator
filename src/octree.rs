@@ -72,8 +72,15 @@ impl Octree {
     }
 
     /// Change the active state of a single voxel.
-    pub fn toggle_voxel(&mut self, position: [i32; 3], value: bool, color: [f32; 4]) {
+    pub fn toggle_voxel(
+        &mut self,
+        position: [i32; 3],
+        value: bool,
+        color: [f32; 4],
+        camera_eye: [f32; 3],
+    ) {
         self.root.toggle_voxel(position, value, color);
+        self.root.optimize(camera_eye);
     }
 
     /// Serialize the tree.
