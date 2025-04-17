@@ -1,15 +1,48 @@
 /* tslint:disable */
 /* eslint-disable */
+/**
+ * Init the scene for the first time.
+ */
 export function init_scene(): boolean;
+/**
+ * Get the list of saved scenes.
+ */
 export function scene_names(): Promise<any>;
+/**
+ * Save the current scene.
+ */
 export function save_scene(): Promise<any>;
+/**
+ * Load the current scene.
+ */
 export function load_scene(): Promise<boolean>;
+/**
+ * Switch from solid to noise colours.
+ */
 export function toggle_noise(): Promise<boolean>;
+/**
+ * Switch from noise to solid colours.
+ */
 export function toggle_smooth(): Promise<boolean>;
+/**
+ * Delete the current scene.
+ */
 export function delete_scene(): Promise<boolean>;
+/**
+ * Change the name of the scene.
+ */
 export function set_scene_name(name: string): boolean;
+/**
+ * Load the default scene when the page loads.
+ */
 export function load_first_scene(): Promise<any>;
+/**
+ * Change the selection shape.
+ */
 export function toggle_selection_shape(): boolean;
+/**
+ * Change what colour we use.
+ */
 export function set_material_color(red: string, green: string, blue: string, alpha: string): boolean;
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
@@ -35,13 +68,13 @@ export interface InitOutput {
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __wbindgen_export_6: WebAssembly.Table;
   readonly __externref_table_dealloc: (a: number) => void;
-  readonly closure81_externref_shim_multivalue_shim: (a: number, b: number, c: any) => [number, number];
-  readonly closure131_externref_shim: (a: number, b: number, c: any) => void;
+  readonly closure92_externref_shim_multivalue_shim: (a: number, b: number, c: any) => [number, number];
+  readonly closure130_externref_shim: (a: number, b: number, c: any) => void;
   readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__he8d21531f809d811: (a: number, b: number) => void;
   readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hafc2f4123c64a717: (a: number, b: number) => void;
-  readonly closure152_externref_shim: (a: number, b: number, c: any) => void;
-  readonly closure164_externref_shim: (a: number, b: number, c: any) => void;
-  readonly closure184_externref_shim: (a: number, b: number, c: any, d: any) => void;
+  readonly closure151_externref_shim: (a: number, b: number, c: any) => void;
+  readonly closure163_externref_shim: (a: number, b: number, c: any) => void;
+  readonly closure183_externref_shim: (a: number, b: number, c: any, d: any) => void;
   readonly __wbindgen_start: () => void;
 }
 

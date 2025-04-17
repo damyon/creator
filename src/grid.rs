@@ -4,8 +4,8 @@ pub struct Grid {
     pub scale: u16,
     pub square_count: u16,
     pub vertices_count: u16,
-    pub vertices: [f32; 780],
-    pub normals: [f32; 780],
+    pub vertices: [f32; 1548],
+    pub normals: [f32; 1548],
     pub max_scale: u16,
     pub translation: [f32; 3],
     pub rotation: [f32; 3],
@@ -18,11 +18,11 @@ impl Grid {
     /// Create a new default grid
     pub const fn new() -> Grid {
         Grid {
-            scale: 64,
-            square_count: 4096,  // self.scale * self.scale
-            vertices_count: 780, // 2 * (6 * (self.scale+1))
-            vertices: [0.0; 780],
-            normals: [0.0; 780],
+            scale: 128,
+            square_count: 16384,  // self.scale * self.scale
+            vertices_count: 1548, // 2 * (6 * (self.scale+1))
+            vertices: [0.0; 1548],
+            normals: [0.0; 1548],
             max_scale: 200,
             translation: [0.0; 3],
             rotation: [0.0; 3],

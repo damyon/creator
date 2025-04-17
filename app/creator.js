@@ -223,6 +223,7 @@ function takeFromExternrefTable0(idx) {
     return value;
 }
 /**
+ * Init the scene for the first time.
  * @returns {boolean}
  */
 export function init_scene() {
@@ -234,6 +235,7 @@ export function init_scene() {
 }
 
 /**
+ * Get the list of saved scenes.
  * @returns {Promise<any>}
  */
 export function scene_names() {
@@ -242,6 +244,7 @@ export function scene_names() {
 }
 
 /**
+ * Save the current scene.
  * @returns {Promise<any>}
  */
 export function save_scene() {
@@ -250,6 +253,7 @@ export function save_scene() {
 }
 
 /**
+ * Load the current scene.
  * @returns {Promise<boolean>}
  */
 export function load_scene() {
@@ -258,6 +262,7 @@ export function load_scene() {
 }
 
 /**
+ * Switch from solid to noise colours.
  * @returns {Promise<boolean>}
  */
 export function toggle_noise() {
@@ -266,6 +271,7 @@ export function toggle_noise() {
 }
 
 /**
+ * Switch from noise to solid colours.
  * @returns {Promise<boolean>}
  */
 export function toggle_smooth() {
@@ -274,6 +280,7 @@ export function toggle_smooth() {
 }
 
 /**
+ * Delete the current scene.
  * @returns {Promise<boolean>}
  */
 export function delete_scene() {
@@ -282,6 +289,7 @@ export function delete_scene() {
 }
 
 /**
+ * Change the name of the scene.
  * @param {string} name
  * @returns {boolean}
  */
@@ -296,6 +304,7 @@ export function set_scene_name(name) {
 }
 
 /**
+ * Load the default scene when the page loads.
  * @returns {Promise<any>}
  */
 export function load_first_scene() {
@@ -304,6 +313,7 @@ export function load_first_scene() {
 }
 
 /**
+ * Change the selection shape.
  * @returns {boolean}
  */
 export function toggle_selection_shape() {
@@ -315,6 +325,7 @@ export function toggle_selection_shape() {
 }
 
 /**
+ * Change what colour we use.
  * @param {string} red
  * @param {string} green
  * @param {string} blue
@@ -338,14 +349,14 @@ export function set_material_color(red, green, blue, alpha) {
 }
 
 function __wbg_adapter_44(arg0, arg1, arg2) {
-    const ret = wasm.closure81_externref_shim_multivalue_shim(arg0, arg1, arg2);
+    const ret = wasm.closure92_externref_shim_multivalue_shim(arg0, arg1, arg2);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
 }
 
 function __wbg_adapter_47(arg0, arg1, arg2) {
-    wasm.closure131_externref_shim(arg0, arg1, arg2);
+    wasm.closure130_externref_shim(arg0, arg1, arg2);
 }
 
 function __wbg_adapter_50(arg0, arg1) {
@@ -357,15 +368,15 @@ function __wbg_adapter_53(arg0, arg1) {
 }
 
 function __wbg_adapter_56(arg0, arg1, arg2) {
-    wasm.closure152_externref_shim(arg0, arg1, arg2);
+    wasm.closure151_externref_shim(arg0, arg1, arg2);
 }
 
 function __wbg_adapter_59(arg0, arg1, arg2) {
-    wasm.closure164_externref_shim(arg0, arg1, arg2);
+    wasm.closure163_externref_shim(arg0, arg1, arg2);
 }
 
 function __wbg_adapter_339(arg0, arg1, arg2, arg3) {
-    wasm.closure184_externref_shim(arg0, arg1, arg2, arg3);
+    wasm.closure183_externref_shim(arg0, arg1, arg2, arg3);
 }
 
 const __wbindgen_enum_IdbRequestReadyState = ["pending", "done"];
@@ -1090,28 +1101,28 @@ function __wbg_get_imports() {
         const ret = false;
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper322 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 82, __wbg_adapter_44);
+    imports.wbg.__wbindgen_closure_wrapper319 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 93, __wbg_adapter_44);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper478 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 132, __wbg_adapter_47);
+    imports.wbg.__wbindgen_closure_wrapper473 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 131, __wbg_adapter_47);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper480 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 132, __wbg_adapter_50);
+    imports.wbg.__wbindgen_closure_wrapper475 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 131, __wbg_adapter_50);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper515 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 149, __wbg_adapter_53);
+    imports.wbg.__wbindgen_closure_wrapper510 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 148, __wbg_adapter_53);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper519 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 153, __wbg_adapter_56);
+    imports.wbg.__wbindgen_closure_wrapper514 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 152, __wbg_adapter_56);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper544 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 165, __wbg_adapter_59);
+    imports.wbg.__wbindgen_closure_wrapper539 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 164, __wbg_adapter_59);
         return ret;
     };
     imports.wbg.__wbindgen_debug_string = function(arg0, arg1) {
