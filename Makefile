@@ -14,4 +14,4 @@ lint:
 	cargo clippy
 
 doc:
-	cargo doc
+	cargo doc --document-private-items
