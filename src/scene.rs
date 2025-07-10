@@ -65,8 +65,10 @@ pub struct Scene {
     throttle: u32,
     /// Are we loading from browser?
     loading: bool,
-    /// Are there pending changes?
+    /// Is the color smooth?
     smooth: bool,
+    /// Is the material fluid?
+    fluid: bool,
     /// Will the frame match the last rendered frame?
     dirty: bool,
 }
@@ -108,6 +110,7 @@ impl Scene {
             throttle: 10,
             loading: true,
             smooth: true,
+            fluid: false,
             dirty: true,
         });
         GLOBSTATE.lock().unwrap()
@@ -566,6 +569,18 @@ impl Scene {
     pub async fn toggle_smooth() {
         let mut scene = Self::access();
         scene.smooth = true;
+    }
+
+    /// Enable solid material.
+    pub async fn toggle_solid() {
+        let mut scene = Self::access();
+        scene.fluid = false;
+    }
+
+    /// Enable fluid.
+    pub async fn toggle_fluid() {
+        let mut scene = Self::access();
+        scene.fluid = true;
     }
 
     /// Load the default scene.

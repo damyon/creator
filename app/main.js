@@ -10,6 +10,8 @@ import init, {
   set_scene_name,
   toggle_noise,
   toggle_smooth,
+  toggle_solid,
+  toggle_fluid,
 } from "./creator.js";
 
 const CANVAS_ID = "scene";
@@ -18,7 +20,9 @@ const DELETE_ID = "delete";
 const LOAD_ID = "load";
 const NAME_ID = "name";
 const NOISE_ID = "noise";
+const FLAT_ID = "flat";
 const SOLID_ID = "solid";
+const FLUID_ID = "fluid";
 const COLOR_ID = "color";
 const ALPHA_ID = "alpha";
 const SCENE_LIST_ID = "scene-list";
@@ -82,9 +86,9 @@ function hex_to_rgb(hex) {
   return result ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)] : null;
 }
 
-document.getElementById(SOLID_ID).onclick = function (event) {
+document.getElementById(FLAT_ID).onclick = function (event) {
   toggle_noise();
-  document.getElementById(SOLID_ID).style.display = "none";
+  document.getElementById(FLAT_ID).style.display = "none";
   document.getElementById(NOISE_ID).style.display = "block";
 
   document.getElementById(CANVAS_ID).focus();
@@ -93,6 +97,22 @@ document.getElementById(SOLID_ID).onclick = function (event) {
 document.getElementById(NOISE_ID).onclick = function (event) {
   toggle_smooth();
   document.getElementById(NOISE_ID).style.display = "none";
+  document.getElementById(FLAT_ID).style.display = "block";
+
+  document.getElementById(CANVAS_ID).focus();
+};
+
+document.getElementById(SOLID_ID).onclick = function (event) {
+  toggle_solid();
+  document.getElementById(SOLID_ID).style.display = "none";
+  document.getElementById(FLUID_ID).style.display = "block";
+
+  document.getElementById(CANVAS_ID).focus();
+};
+
+document.getElementById(FLUID_ID).onclick = function (event) {
+  toggle_fluid();
+  document.getElementById(FLUID_ID).style.display = "none";
   document.getElementById(SOLID_ID).style.display = "block";
 
   document.getElementById(CANVAS_ID).focus();
