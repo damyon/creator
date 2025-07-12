@@ -901,6 +901,6 @@ impl Scene {
         }
 
         graphics.finish_camera_frame();
-        //scene.dirty = false;
+        scene.dirty = false;
     }
 }
