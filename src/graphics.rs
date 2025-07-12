@@ -392,6 +392,7 @@ impl Graphics {
                 uniform mat4 u_light_PMatrix;
                 uniform mat4 u_light_MVMatrix;
                 varying vec4 positionFromLightPov;
+                varying vec4 worldPosition;
                 varying vec3 v_normal;
 
                 void main(void) {
@@ -399,6 +400,8 @@ impl Graphics {
                     gl_Position = uPMatrix * uMVMatrix * a_position;
 
                     positionFromLightPov = u_light_PMatrix * u_light_MVMatrix * a_position;
+                    // This is incorrect on purpose because a voxel grid aligns with the axis.
+                    worldPosition = uMVMatrix * a_position;
                     v_normal = a_normal;
                 }
                 ";
@@ -407,14 +410,20 @@ impl Graphics {
                 precision mediump float;
                 uniform vec4 u_color;
                 uniform bool u_fluid;
+                uniform float u_time;
                 uniform int u_shadow_texture_size;
                 uniform sampler2D shadowMap;
                 varying vec4 positionFromLightPov;
                 varying vec4 positionFromLightMV;
+                varying vec4 worldPosition;
                 varying vec3 v_normal;
 
                 float rand(vec2 co){
                     return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
+                }
+
+                float animateFluid() {
+                    return sin(worldPosition.x + u_time * 3.0) * sin(worldPosition.y + u_time * 5.0) * sin(worldPosition.z + u_time * 7.0) * 0.5 + 0.5;
                 }
 
                 void main(void) {
@@ -461,12 +470,12 @@ impl Graphics {
                     //shadowNess = 0.0;
                     //shade = 0.0;
                     float combined = ambientLight + 0.6 * shade - 0.2 * shadowNess;
+                    float fluidCompensation = 1.0;
 
                     if (u_fluid) {
-                        gl_FragColor = vec4(0.0, 0.0, 0.0, u_color.a);
-                    } else {
-                        gl_FragColor = vec4(u_color.rgb * combined, u_color.a);
+                        fluidCompensation = animateFluid();
                     }
+                    gl_FragColor = vec4(u_color.rgb * combined * fluidCompensation, u_color.a);
                 }
                 ";
 
@@ -600,7 +609,14 @@ impl Graphics {
     }
 
     /// Render to the actual color buffer.
-    pub fn draw(&self, drawable: &impl Drawable, render_mode: u32, camera: Camera, light: Camera) {
+    pub fn draw(
+        &self,
+        drawable: &impl Drawable,
+        render_mode: u32,
+        camera: Camera,
+        light: Camera,
+        elapsed: f32,
+    ) {
         let shader = if self.swap_shaders {
             self.light_program.as_ref()
         } else {
@@ -628,6 +644,17 @@ impl Graphics {
         if fluid_location_opt.is_some() {
             self.gl
                 .uniform1i(fluid_location_opt.as_ref(), drawable.fluid());
+        }
+
+        let time_location_opt = self
+            .gl
+            .get_uniform_location(shader.expect("fail"), "u_time");
+
+        let world_time = elapsed;
+        //log::debug!("Set time to {world_time}");
+
+        if time_location_opt.is_some() {
+            self.gl.uniform1f(time_location_opt.as_ref(), world_time);
         }
 
         let u_shadow_texture_size_location_opt = self

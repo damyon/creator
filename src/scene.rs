@@ -71,6 +71,8 @@ pub struct Scene {
     fluid: i32,
     /// Will the frame match the last rendered frame?
     dirty: bool,
+    /// Approximation of time
+    elapsed: f32,
 }
 
 impl Scene {
@@ -112,6 +114,7 @@ impl Scene {
             smooth: true,
             fluid: 0,
             dirty: true,
+            elapsed: 0.0,
         });
         GLOBSTATE.lock().unwrap()
     }
@@ -825,6 +828,7 @@ impl Scene {
     pub fn draw(graphics: &Graphics) {
         let mut scene = Self::access();
 
+        scene.elapsed += 0.01;
         graphics.prepare_shadow_frame();
 
         let light = if !graphics.swap_cameras {
@@ -865,9 +869,16 @@ impl Scene {
                 WebGlRenderingContext::TRIANGLES,
                 camera,
                 light,
+                scene.elapsed,
             );
         }
-        graphics.draw(&scene.grid_xz, WebGlRenderingContext::LINES, camera, light);
+        graphics.draw(
+            &scene.grid_xz,
+            WebGlRenderingContext::LINES,
+            camera,
+            light,
+            scene.elapsed,
+        );
 
         let mut drawables = scene.model.drawables();
 
@@ -880,10 +891,16 @@ impl Scene {
         });
 
         for voxel in drawables.iter() {
-            graphics.draw(voxel, WebGlRenderingContext::TRIANGLES, camera, light);
+            graphics.draw(
+                voxel,
+                WebGlRenderingContext::TRIANGLES,
+                camera,
+                light,
+                scene.elapsed,
+            );
         }
 
         graphics.finish_camera_frame();
-        scene.dirty = false;
+        //scene.dirty = false;
     }
 }
