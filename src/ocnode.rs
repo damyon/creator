@@ -35,6 +35,8 @@ pub struct Ocnode {
     has_children: bool,
     /// The color of the cube including alpha channel.
     color: [f32; 4],
+    /// Render this node with fluid animation
+    fluid: i32,
 }
 
 impl Ocnode {
@@ -49,6 +51,7 @@ impl Ocnode {
             children: [None, None, None, None, None, None, None, None],
             has_children: false,
             color: [0.8, 0.8, 0.8, 0.8],
+            fluid: 0,
         }
     }
 
@@ -114,6 +117,7 @@ impl Ocnode {
             // We got a match. Apply it.
             self.active = node.active;
             self.color = node.color;
+            self.fluid = node.fluid;
         }
         let squirts = self.children.each_mut();
 
@@ -159,22 +163,25 @@ impl Ocnode {
                 .any(|child| !child.as_ref().expect("child").active);
             let squirts = self.children.each_mut();
             let mut color = [0.0, 0.0, 0.0, 0.0];
+            let mut fluid = 0;
             match squirts[0] {
                 None => {
                     log::debug!("Should not get here")
                 }
                 Some(node) => {
                     color = node.color;
+                    fluid = node.fluid;
                 }
             };
             let squirts = self.children.each_mut();
             let not_uniform_color = squirts.into_iter().any(|child| {
                 let compare = child.as_ref().expect("child").color;
-
+                let compare_fluid = child.as_ref().expect("child").fluid;
                 compare[0] != color[0]
                     || compare[1] != color[1]
                     || compare[2] != color[2]
                     || compare[3] != color[3]
+                    || compare_fluid != fluid
             });
 
             let res = LEVELS.checked_sub(self.sub_division_level).expect("");
@@ -188,6 +195,7 @@ impl Ocnode {
                 None => {}
                 Some(node) => {
                     self.color = node.as_ref().unwrap().color;
+                    self.fluid = node.as_ref().unwrap().fluid;
                 }
             }
         }
@@ -222,7 +230,7 @@ impl Ocnode {
     }
 
     /// Search this node and it's children and switch the toggle state if the posistion is correct.
-    pub fn toggle_voxel(&mut self, position: [i32; 3], value: bool, color: [f32; 4]) {
+    pub fn toggle_voxel(&mut self, position: [i32; 3], value: bool, color: [f32; 4], fluid: i32) {
         if self.x_index == position[0]
             && self.y_index == position[1]
             && self.z_index == position[2]
@@ -230,6 +238,7 @@ impl Ocnode {
         {
             self.active = value;
             self.color = color;
+            self.fluid = fluid;
         }
         let squirts = self.children.each_mut();
 
@@ -237,7 +246,7 @@ impl Ocnode {
             match node_opt {
                 None => {}
                 Some(node) => {
-                    node.toggle_voxel(position, value, color);
+                    node.toggle_voxel(position, value, color, fluid);
                 }
             };
         }
@@ -251,6 +260,7 @@ impl Ocnode {
                 let mut cube = Cube::new();
 
                 cube.color = self.color;
+                cube.fluid = self.fluid;
                 cube.scale = scale;
                 cube.init();
 
@@ -281,6 +291,7 @@ impl Ocnode {
             let mut cube = Cube::new();
 
             cube.color = self.color;
+            cube.fluid = self.fluid;
             cube.scale = scale;
             cube.init();
 
@@ -329,6 +340,7 @@ impl Ocnode {
             children: [None, None, None, None, None, None, None, None],
             has_children: false,
             color: self.color,
+            fluid: self.fluid,
         }));
 
         self.children[1] = Some(Box::new(Ocnode {
@@ -340,6 +352,7 @@ impl Ocnode {
             children: [None, None, None, None, None, None, None, None],
             has_children: false,
             color: self.color,
+            fluid: self.fluid,
         }));
         self.children[2] = Some(Box::new(Ocnode {
             x_index: self.x_index,
@@ -350,6 +363,7 @@ impl Ocnode {
             children: [None, None, None, None, None, None, None, None],
             has_children: false,
             color: self.color,
+            fluid: self.fluid,
         }));
         self.children[3] = Some(Box::new(Ocnode {
             x_index: self.x_index,
@@ -360,6 +374,7 @@ impl Ocnode {
             children: [None, None, None, None, None, None, None, None],
             has_children: false,
             color: self.color,
+            fluid: self.fluid,
         }));
         self.children[4] = Some(Box::new(Ocnode {
             x_index: self.x_index + self.resolution(self.sub_division_level + 1) as i32,
@@ -370,6 +385,7 @@ impl Ocnode {
             children: [None, None, None, None, None, None, None, None],
             has_children: false,
             color: self.color,
+            fluid: self.fluid,
         }));
         self.children[5] = Some(Box::new(Ocnode {
             x_index: self.x_index,
@@ -380,6 +396,7 @@ impl Ocnode {
             children: [None, None, None, None, None, None, None, None],
             has_children: false,
             color: self.color,
+            fluid: self.fluid,
         }));
         self.children[6] = Some(Box::new(Ocnode {
             x_index: self.x_index + self.resolution(self.sub_division_level + 1) as i32,
@@ -390,6 +407,7 @@ impl Ocnode {
             children: [None, None, None, None, None, None, None, None],
             has_children: false,
             color: self.color,
+            fluid: self.fluid,
         }));
         self.children[7] = Some(Box::new(Ocnode {
             x_index: self.x_index + self.resolution(self.sub_division_level + 1) as i32,
@@ -400,6 +418,7 @@ impl Ocnode {
             children: [None, None, None, None, None, None, None, None],
             has_children: false,
             color: self.color,
+            fluid: self.fluid,
         }));
     }
 }

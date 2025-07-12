@@ -68,7 +68,7 @@ pub struct Scene {
     /// Is the color smooth?
     smooth: bool,
     /// Is the material fluid?
-    fluid: bool,
+    fluid: i32,
     /// Will the frame match the last rendered frame?
     dirty: bool,
 }
@@ -110,7 +110,7 @@ impl Scene {
             throttle: 10,
             loading: true,
             smooth: true,
-            fluid: false,
+            fluid: 0,
             dirty: true,
         });
         GLOBSTATE.lock().unwrap()
@@ -284,10 +284,11 @@ impl Scene {
 
         let value: bool = scene.model.all_voxels_active(&selections);
         let count = selections.len();
+        let fluid = scene.fluid;
         if value {
-            log::info!("Toggle all voxels active: TRUE ${count}");
+            log::info!("Toggle all voxels active: TRUE {count} {fluid}");
         } else {
-            log::info!("Toggle all voxels active: FALSE ${count}");
+            log::info!("Toggle all voxels active: FALSE {count} {fluid}");
         }
         for selection in selections {
             log::info!("Selection {:?}", selection);
@@ -305,7 +306,7 @@ impl Scene {
             let camera_eye = [scene.camera.eye.x, scene.camera.eye.y, scene.camera.eye.z];
             scene
                 .model
-                .toggle_voxel(selection, !value, color, camera_eye);
+                .toggle_voxel(selection, !value, color, camera_eye, scene.fluid);
         }
     }
 
@@ -574,13 +575,15 @@ impl Scene {
     /// Enable solid material.
     pub async fn toggle_solid() {
         let mut scene = Self::access();
-        scene.fluid = false;
+        log::error!("Fluid goes off");
+        scene.fluid = 0;
     }
 
     /// Enable fluid.
     pub async fn toggle_fluid() {
         let mut scene = Self::access();
-        scene.fluid = true;
+        log::error!("Fluid goes on");
+        scene.fluid = 1;
     }
 
     /// Load the default scene.

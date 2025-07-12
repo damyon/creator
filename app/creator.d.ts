@@ -17,11 +17,11 @@ export function save_scene(): Promise<any>;
  */
 export function load_scene(): Promise<boolean>;
 /**
- * Switch from solid to fluid material.
+ * Switch from fluid to solid material.
  */
 export function toggle_fluid(): Promise<boolean>;
 /**
- * Switch from fluid to solid material.
+ * Switch from solid to fluid material.
  */
 export function toggle_solid(): Promise<boolean>;
 /**
@@ -78,13 +78,13 @@ export interface InitOutput {
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __wbindgen_export_6: WebAssembly.Table;
   readonly __externref_table_dealloc: (a: number) => void;
-  readonly closure93_externref_shim_multivalue_shim: (a: number, b: number, c: any) => [number, number];
-  readonly closure136_externref_shim: (a: number, b: number, c: any) => void;
+  readonly closure94_externref_shim_multivalue_shim: (a: number, b: number, c: any) => [number, number];
+  readonly closure137_externref_shim: (a: number, b: number, c: any) => void;
   readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__he8d21531f809d811: (a: number, b: number) => void;
   readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__hafc2f4123c64a717: (a: number, b: number) => void;
-  readonly closure157_externref_shim: (a: number, b: number, c: any) => void;
-  readonly closure169_externref_shim: (a: number, b: number, c: any) => void;
-  readonly closure189_externref_shim: (a: number, b: number, c: any, d: any) => void;
+  readonly closure158_externref_shim: (a: number, b: number, c: any) => void;
+  readonly closure170_externref_shim: (a: number, b: number, c: any) => void;
+  readonly closure190_externref_shim: (a: number, b: number, c: any, d: any) => void;
   readonly __wbindgen_start: () => void;
 }
 

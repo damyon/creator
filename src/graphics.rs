@@ -406,6 +406,7 @@ impl Graphics {
         let fragment_shader_source = "
                 precision mediump float;
                 uniform vec4 u_color;
+                uniform bool u_fluid;
                 uniform int u_shadow_texture_size;
                 uniform sampler2D shadowMap;
                 varying vec4 positionFromLightPov;
@@ -461,7 +462,11 @@ impl Graphics {
                     //shade = 0.0;
                     float combined = ambientLight + 0.6 * shade - 0.2 * shadowNess;
 
-                    gl_FragColor = vec4(u_color.rgb * combined, u_color.a);
+                    if (u_fluid) {
+                        gl_FragColor = vec4(0.0, 0.0, 0.0, u_color.a);
+                    } else {
+                        gl_FragColor = vec4(u_color.rgb * combined, u_color.a);
+                    }
                 }
                 ";
 
@@ -617,6 +622,14 @@ impl Graphics {
                 .uniform4fv_with_f32_array(color_location_opt.as_ref(), drawable.color());
         }
 
+        let fluid_location_opt = self
+            .gl
+            .get_uniform_location(shader.expect("fail"), "u_fluid");
+        if fluid_location_opt.is_some() {
+            self.gl
+                .uniform1i(fluid_location_opt.as_ref(), drawable.fluid());
+        }
+
         let u_shadow_texture_size_location_opt = self
             .gl
             .get_uniform_location(shader.expect("fail"), "u_shadow_texture_size");
@@ -709,6 +722,9 @@ impl Graphics {
             self.gl.draw_arrays(render_mode, 0, reduced_count);
         }
         self.gl.flush();
+        if drawable.fluid() != 0 {
+            log::error!("Render a fluid thing:")
+        }
     }
 
     /// Prepare to draw the shadow.

@@ -9,6 +9,7 @@ pub struct Cube {
     pub color: [f32; 4],
     pub scale: f32,
     pub floor: f32,
+    pub fluid: i32,
 }
 
 use crate::drawable::Drawable;
@@ -25,6 +26,7 @@ impl Cube {
             color: [0.3, 0.3, 0.1, 1.0],
             scale: 0.9999, // The scale is slightly smaller than 1 to prevent z-fighting
             floor: 0.0001,
+            fluid: 0,
         }
     }
 }
@@ -307,6 +309,10 @@ impl Drawable for Cube {
     /// Cubes have a colour - including alphas.
     fn color(&self) -> &[f32; 4] {
         &self.color
+    }
+
+    fn fluid(&self) -> i32 {
+        self.fluid
     }
 
     /// Move a cube.

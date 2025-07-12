@@ -43,8 +43,10 @@ impl Model {
         value: bool,
         color: [f32; 4],
         camera_eye: [f32; 3],
+        fluid: i32,
     ) {
-        self.voxels.toggle_voxel(position, value, color, camera_eye);
+        self.voxels
+            .toggle_voxel(position, value, color, camera_eye, fluid);
     }
 
     /// Determine if all voxels in the list are active.

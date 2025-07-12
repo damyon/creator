@@ -78,8 +78,9 @@ impl Octree {
         value: bool,
         color: [f32; 4],
         camera_eye: [f32; 3],
+        fluid: i32,
     ) {
-        self.root.toggle_voxel(position, value, color);
+        self.root.toggle_voxel(position, value, color, fluid);
         self.root.optimize(camera_eye);
     }
 

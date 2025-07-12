@@ -64,17 +64,17 @@ pub async fn load_scene() -> Result<bool, JsValue> {
     Ok(true)
 }
 
-/// Switch from solid to fluid material.
+/// Switch from fluid to solid material.
 #[wasm_bindgen]
 pub async fn toggle_fluid() -> Result<bool, JsValue> {
-    Scene::toggle_fluid().await;
+    Scene::toggle_solid().await;
     Ok(true)
 }
 
-/// Switch from fluid to solid material.
+/// Switch from solid to fluid material.
 #[wasm_bindgen]
 pub async fn toggle_solid() -> Result<bool, JsValue> {
-    Scene::toggle_solid().await;
+    Scene::toggle_fluid().await;
     Ok(true)
 }
 

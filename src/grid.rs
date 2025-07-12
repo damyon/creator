@@ -10,6 +10,7 @@ pub struct Grid {
     pub translation: [f32; 3],
     pub rotation: [f32; 3],
     pub color: [f32; 4],
+    pub fluid: i32,
 }
 
 use crate::drawable::Drawable;
@@ -27,6 +28,7 @@ impl Grid {
             translation: [0.0; 3],
             rotation: [0.0; 3],
             color: [0.5, 0.5, 0.5, 0.2],
+            fluid: 0,
         }
     }
 }
@@ -135,6 +137,10 @@ impl Drawable for Grid {
     /// What color are the lines?
     fn color(&self) -> &[f32; 4] {
         &self.color
+    }
+
+    fn fluid(&self) -> i32 {
+        self.fluid
     }
 
     /// Where are the normals facing.
