@@ -294,7 +294,7 @@ impl Scene {
             log::info!("Toggle all voxels active: FALSE {count} {fluid}");
         }
         for selection in selections {
-            log::info!("Selection {:?}", selection);
+            //log::info!("Selection {:?}", selection);
             let bump = if scene.smooth {
                 0.0f32
             } else {
