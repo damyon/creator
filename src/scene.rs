@@ -901,6 +901,8 @@ impl Scene {
         }
 
         graphics.finish_camera_frame();
-        scene.dirty = false;
+        // We are only rendering when idle, so we can skip the throttling.
+        // Continuous rendering is needed to animate the fluid.
+        //scene.dirty = false;
     }
 }
