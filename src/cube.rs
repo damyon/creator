@@ -10,6 +10,7 @@ pub struct Cube {
     pub scale: f32,
     pub floor: f32,
     pub fluid: i32,
+    pub noise: i32,
 }
 
 use crate::drawable::Drawable;
@@ -27,6 +28,7 @@ impl Cube {
             scale: 0.9999, // The scale is slightly smaller than 1 to prevent z-fighting
             floor: 0.0001,
             fluid: 0,
+            noise: 0,
         }
     }
 }
@@ -313,6 +315,10 @@ impl Drawable for Cube {
 
     fn fluid(&self) -> i32 {
         self.fluid
+    }
+
+    fn noise(&self) -> i32 {
+        self.noise
     }
 
     /// Move a cube.

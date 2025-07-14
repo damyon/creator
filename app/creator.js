@@ -948,10 +948,6 @@ function __wbg_get_imports() {
         const ret = arg0.queueMicrotask;
         return ret;
     };
-    imports.wbg.__wbg_random_3ad904d98382defe = function() {
-        const ret = Math.random();
-        return ret;
-    };
     imports.wbg.__wbg_readyState_4013cfdf4f22afb0 = function(arg0) {
         const ret = arg0.readyState;
         return (__wbindgen_enum_IdbRequestReadyState.indexOf(ret) + 1 || 3) - 1;
@@ -1122,27 +1118,27 @@ function __wbg_get_imports() {
         const ret = false;
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper356 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper361 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 99, __wbg_adapter_44);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper481 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper480 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 136, __wbg_adapter_47);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper483 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper482 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 136, __wbg_adapter_50);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper518 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper517 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 153, __wbg_adapter_53);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper522 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper521 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 157, __wbg_adapter_56);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper547 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbindgen_closure_wrapper546 = function(arg0, arg1, arg2) {
         const ret = makeMutClosure(arg0, arg1, 169, __wbg_adapter_59);
         return ret;
     };

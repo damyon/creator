@@ -11,6 +11,7 @@ pub struct Grid {
     pub rotation: [f32; 3],
     pub color: [f32; 4],
     pub fluid: i32,
+    pub noise: i32,
 }
 
 use crate::drawable::Drawable;
@@ -29,6 +30,7 @@ impl Grid {
             rotation: [0.0; 3],
             color: [0.5, 0.5, 0.5, 0.2],
             fluid: 0,
+            noise: 0,
         }
     }
 }
@@ -141,6 +143,10 @@ impl Drawable for Grid {
 
     fn fluid(&self) -> i32 {
         self.fluid
+    }
+
+    fn noise(&self) -> i32 {
+        self.noise
     }
 
     /// Where are the normals facing.

@@ -1,4 +1,3 @@
-use js_sys::Math::random;
 use std::cmp::{max, min};
 use std::sync::{Mutex, MutexGuard};
 use web_sys::WebGlRenderingContext;
@@ -65,10 +64,10 @@ pub struct Scene {
     throttle: u32,
     /// Are we loading from browser?
     loading: bool,
-    /// Is the color smooth?
-    smooth: bool,
     /// Is the material fluid?
     fluid: i32,
+    /// Is the material noisy?
+    noise: i32,
     /// Will the frame match the last rendered frame?
     dirty: bool,
     /// Approximation of time
@@ -111,8 +110,8 @@ impl Scene {
             drawing: false,
             throttle: 10,
             loading: true,
-            smooth: true,
             fluid: 0,
+            noise: 0,
             dirty: true,
             elapsed: 0.0,
         });
@@ -288,28 +287,29 @@ impl Scene {
         let value: bool = scene.model.all_voxels_active(&selections);
         let count = selections.len();
         let fluid = scene.fluid;
+        let noise = scene.noise;
         if value {
-            log::info!("Toggle all voxels active: TRUE {count} {fluid}");
+            log::info!("Toggle all voxels active: TRUE {count} {fluid} {noise}");
         } else {
-            log::info!("Toggle all voxels active: FALSE {count} {fluid}");
+            log::info!("Toggle all voxels active: FALSE {count} {fluid} {noise}");
         }
         for selection in selections {
             //log::info!("Selection {:?}", selection);
-            let bump = if scene.smooth {
-                0.0f32
-            } else {
-                random() as f32 / 10.0 - 0.05
-            };
             let color = [
-                (scene.material_color[0] + bump).clamp(0.0, 1.0),
-                (scene.material_color[1] + bump).clamp(0.0, 1.0),
-                (scene.material_color[2] + bump).clamp(0.0, 1.0),
+                (scene.material_color[0]).clamp(0.0, 1.0),
+                (scene.material_color[1]).clamp(0.0, 1.0),
+                (scene.material_color[2]).clamp(0.0, 1.0),
                 (scene.material_color[3]).clamp(0.0, 1.0),
             ];
             let camera_eye = [scene.camera.eye.x, scene.camera.eye.y, scene.camera.eye.z];
-            scene
-                .model
-                .toggle_voxel(selection, !value, color, camera_eye, scene.fluid);
+            scene.model.toggle_voxel(
+                selection,
+                !value,
+                color,
+                camera_eye,
+                scene.fluid,
+                scene.noise,
+            );
         }
     }
 
@@ -566,13 +566,13 @@ impl Scene {
     /// Enable color noise.
     pub async fn toggle_noise() {
         let mut scene = Self::access();
-        scene.smooth = false;
+        scene.noise = 1;
     }
 
     /// Enable smoothing.
     pub async fn toggle_smooth() {
         let mut scene = Self::access();
-        scene.smooth = true;
+        scene.noise = 0;
     }
 
     /// Enable solid material.
