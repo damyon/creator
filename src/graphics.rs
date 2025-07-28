@@ -384,6 +384,7 @@ impl Graphics {
                 attribute vec3 a_normal;
                 uniform mat4 uPMatrix;
                 uniform mat4 uMVMatrix;
+                uniform mat4 uMMatrix;
                 uniform mat4 u_light_PMatrix;
                 uniform mat4 u_light_MVMatrix;
                 varying vec4 positionFromLightPov;
@@ -396,7 +397,7 @@ impl Graphics {
 
                     positionFromLightPov = u_light_PMatrix * u_light_MVMatrix * a_position;
                     // This is incorrect on purpose because a voxel grid aligns with the axis.
-                    worldPosition = uMVMatrix * a_position;
+                    worldPosition = uPMatrix * uMMatrix * a_position;
                     v_normal = a_normal;
                 }
                 ";
@@ -419,7 +420,31 @@ impl Graphics {
                 }
 
                 float animateFluid() {
-                    return sin(worldPosition.x + u_time * 3.0) * sin(worldPosition.y + u_time * 5.0) * sin(worldPosition.z + u_time * 7.0) * 0.5 + 0.5;
+                    // We calculate the distance between the point and 3 ripple source locations
+                    // and combine 3 sinewaves from the 3 distances.
+                    vec3 ripple1 = vec3(100.0, 40.0, 10.0);
+                    vec3 ripple2 = vec3(50.0, -40.0, 30.0);
+                    vec3 ripple3 = vec3(-40.0, 40.0, -80.0);
+                    vec3 ripple4 = vec3(34.0, 23.0, 12.0);
+                    vec3 ripple5 = vec3(8.0, -13.0, 73.0);
+                    vec3 ripple6 = vec3(-25.0, 67.0, -34.0);
+                    float period = 4.0;
+                    float distance1 = length(worldPosition.xyz - ripple1) * period;
+                    float distance2 = length(worldPosition.xyz - ripple2) * period;
+                    float distance3 = length(worldPosition.xyz - ripple3) * period;
+                    float distance4 = length(worldPosition.xyz - ripple4) * period;
+                    float distance5 = length(worldPosition.xyz - ripple5) * period;
+                    float distance6 = length(worldPosition.xyz - ripple6) * period;
+                    float speed = 10.0;
+                    float scale = u_time * speed;
+                    return (
+                        sin(distance1 + scale) +
+                        sin(distance2 + scale) +
+                        sin(distance3 + scale) +
+                        sin(distance4 + scale) +
+                        sin(distance5 + scale) +
+                        sin(distance6 + scale)
+                        );
                 }
 
                 void main(void) {
@@ -455,27 +480,23 @@ impl Graphics {
 
                     shadowNess /= blendLength;
 
-                    //if (shadow) {
-                    //    shadowNess = 0.0;
-                    //}
                     // Diffuse
                     vec3 lightDir = normalize(-(vec3(-3.0, -10.0, 5.0)));
                     vec3 normal = normalize(v_normal);
                     float shade = max(dot(normal, lightDir), 0.0);
 
-                    //shadowNess = 0.0;
-                    //shade = 0.0;
+
                     float combined = ambientLight + 0.6 * shade - 0.2 * shadowNess;
                     float fluidCompensation = 1.0;
                     float noiseCompensation = 1.0;
 
                     if (u_fluid) {
-                        fluidCompensation = animateFluid();
+                        fluidCompensation = animateFluid() * 0.2 + 0.9;
                     }
                     if (u_noise) {
                         noiseCompensation = rand(worldPosition.xy) * 0.2 + 0.9;
                     }
-                    gl_FragColor = vec4(u_color.rgb * combined * fluidCompensation * noiseCompensation, u_color.a);
+                    gl_FragColor = vec4(u_color.rgb * combined * noiseCompensation, u_color.a * fluidCompensation);
                 }
                 ";
 
@@ -579,12 +600,22 @@ impl Graphics {
 
         let projection = self.build_light_projection();
         let model_view = (view * model).to_homogeneous();
+        let model_matrix = model.to_homogeneous();
+
         let u_mv_matrix_location = self
             .gl
             .get_uniform_location(shader.expect("fail"), "uMVMatrix");
         if let Some(u) = u_mv_matrix_location {
             self.gl
                 .uniform_matrix4fv_with_f32_array(Some(&u), false, model_view.as_slice());
+        }
+
+        let u_m_matrix_location = self
+            .gl
+            .get_uniform_location(shader.expect("fail"), "uMMatrix");
+        if let Some(u) = u_m_matrix_location {
+            self.gl
+                .uniform_matrix4fv_with_f32_array(Some(&u), false, model_matrix.as_slice());
         }
 
         let u_p_matrix_location = self
@@ -693,6 +724,7 @@ impl Graphics {
 
         let projection_matrix = self.build_camera_projection();
         let model_view = (view * model).to_homogeneous();
+        let model_matrix = model.to_homogeneous();
         let u_mv_matrix_location = self
             .gl
             .get_uniform_location(shader.expect("fail"), "uMVMatrix")
@@ -701,6 +733,16 @@ impl Graphics {
             Some(&u_mv_matrix_location),
             false,
             model_view.as_slice(),
+        );
+
+        let u_m_matrix_location = self
+            .gl
+            .get_uniform_location(shader.expect("fail"), "uMMatrix")
+            .unwrap();
+        self.gl.uniform_matrix4fv_with_f32_array(
+            Some(&u_m_matrix_location),
+            false,
+            model_matrix.as_slice(),
         );
 
         let u_p_matrix_location = self
