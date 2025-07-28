@@ -1,5 +1,3 @@
-extern crate nalgebra as na;
-
 use na::Point3;
 
 /// A camera contains 2 points, the location and the target

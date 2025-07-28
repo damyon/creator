@@ -8,12 +8,7 @@ use web_sys::WebGlFramebuffer;
 use web_sys::WebGlTexture;
 use web_sys::{WebGlProgram, WebGlRenderingContext, WebGlShader};
 
-extern crate nalgebra as na;
-extern crate nalgebra_glm as glm;
-
 use na::{Isometry3, Matrix4, Orthographic3, Perspective3, Vector3};
-
-extern crate js_sys;
 
 /// All the things we need to know to render to the screen.
 pub struct Graphics {

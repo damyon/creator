@@ -14,12 +14,8 @@ use crate::storage::Storage;
 use crate::stored_octree::StoredOctree;
 use crate::{camera::Camera, cube::Cube};
 use gloo::events::EventListener;
-use wasm_bindgen::JsCast;
-
-extern crate nalgebra as na;
-extern crate nalgebra_glm as glm;
-
 use na::{Point2, Point3, Vector3};
+use wasm_bindgen::JsCast;
 
 /// Simple list of supported selection shapes.
 #[derive(PartialEq, Eq, Copy, Clone)]

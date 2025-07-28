@@ -4,12 +4,9 @@
 //! It compiles to wasm and uses WebGL to render to a browser.
 
 use std::cell::RefCell;
+use std::panic;
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
-extern crate console_error_panic_hook;
-use std::panic;
-
-extern crate js_sys;
 
 mod camera;
 mod command;

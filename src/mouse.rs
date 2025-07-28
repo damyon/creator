@@ -1,5 +1,3 @@
-extern crate nalgebra as na;
-
 use na::Point2;
 
 /// A reference to the state of the mouse.
