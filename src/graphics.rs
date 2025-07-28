@@ -532,7 +532,9 @@ impl Graphics {
             WebGlRenderingContext::SRC_ALPHA,
             WebGlRenderingContext::ONE_MINUS_SRC_ALPHA,
         );
-
+        self.gl.enable(WebGlRenderingContext::CULL_FACE);
+        self.gl.front_face(WebGlRenderingContext::CCW);
+        self.gl.cull_face(WebGlRenderingContext::BACK);
         if !self.swap_shaders {
             self.gl.use_program(self.camera_program.as_ref());
         } else {
