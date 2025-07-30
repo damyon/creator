@@ -1,4 +1,4 @@
-use na::Point2;
+use nalgebra::Point2;
 
 /// A reference to the state of the mouse.
 pub struct Mouse {

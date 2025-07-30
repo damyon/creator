@@ -2,13 +2,12 @@ use std::cmp::min;
 
 use crate::camera::Camera;
 use crate::drawable::Drawable;
+use nalgebra::*;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::WebGlFramebuffer;
 use web_sys::WebGlTexture;
 use web_sys::{WebGlProgram, WebGlRenderingContext, WebGlShader};
-
-use na::{Isometry3, Matrix4, Orthographic3, Perspective3, Vector3};
 
 /// All the things we need to know to render to the screen.
 pub struct Graphics {

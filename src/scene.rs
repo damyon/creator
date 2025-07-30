@@ -14,7 +14,7 @@ use crate::storage::Storage;
 use crate::stored_octree::StoredOctree;
 use crate::{camera::Camera, cube::Cube};
 use gloo::events::EventListener;
-use na::{Point2, Point3, Vector3};
+use nalgebra::{Point2, Point3, Vector3};
 use wasm_bindgen::JsCast;
 
 /// Simple list of supported selection shapes.

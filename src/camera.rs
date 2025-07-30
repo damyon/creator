@@ -1,4 +1,5 @@
 use na::Point3;
+use nalgebra as na;
 
 /// A camera contains 2 points, the location and the target
 #[derive(Copy, Clone)]

@@ -26,7 +26,6 @@ mod stored_octree;
 use crate::graphics::Graphics;
 use crate::scene::Scene;
 use crate::storage::Storage;
-extern crate nalgebra as na;
 
 /// Init the scene for the first time.
 #[wasm_bindgen]
