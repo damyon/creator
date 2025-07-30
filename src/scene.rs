@@ -416,18 +416,18 @@ impl Scene {
             83 | 88 | 40 => Self::handle_move_backward(scene),
             // SPACEBAR
             32 => Self::handle_toggle_voxel(scene),
-            // 4
-            100 => Self::handle_move_selection_left(scene),
-            // 6
-            102 => Self::handle_move_selection_right(scene),
-            // 2
-            98 => Self::handle_move_selection_forward(scene),
-            // 8
-            104 => Self::handle_move_selection_backward(scene),
-            // 9
-            105 => Self::handle_move_selection_up(scene),
-            // 3
-            99 => Self::handle_move_selection_down(scene),
+            // 4 or J
+            100 | 74 => Self::handle_move_selection_left(scene),
+            // 6 or L
+            102 | 76 => Self::handle_move_selection_right(scene),
+            // 2 or I
+            98 | 73 => Self::handle_move_selection_forward(scene),
+            // 8 or K
+            104 | 75 => Self::handle_move_selection_backward(scene),
+            // 9 | O
+            105 | 79 => Self::handle_move_selection_up(scene),
+            // 3 | P
+            99 | 80 => Self::handle_move_selection_down(scene),
             // T
             //84 => Self::handle_toggle_selection_shape(scene),
             _ => log::info!("Unhandled key press: {}", key),
