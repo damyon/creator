@@ -367,14 +367,14 @@ export function set_material_color(red, green, blue, alpha) {
 }
 
 function __wbg_adapter_46(arg0, arg1, arg2) {
-    const ret = wasm.closure88_externref_shim_multivalue_shim(arg0, arg1, arg2);
+    const ret = wasm.closure84_externref_shim_multivalue_shim(arg0, arg1, arg2);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
 }
 
 function __wbg_adapter_49(arg0, arg1, arg2) {
-    wasm.closure92_externref_shim(arg0, arg1, arg2);
+    wasm.closure88_externref_shim(arg0, arg1, arg2);
 }
 
 function __wbg_adapter_52(arg0, arg1) {
@@ -1134,16 +1134,16 @@ function __wbg_get_imports() {
         const ret = false;
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper324 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 89, __wbg_adapter_46);
+    imports.wbg.__wbindgen_closure_wrapper284 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 85, __wbg_adapter_46);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper326 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 89, __wbg_adapter_49);
+    imports.wbg.__wbindgen_closure_wrapper286 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 85, __wbg_adapter_49);
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper328 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 89, __wbg_adapter_52);
+    imports.wbg.__wbindgen_closure_wrapper288 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 85, __wbg_adapter_52);
         return ret;
     };
     imports.wbg.__wbindgen_closure_wrapper464 = function(arg0, arg1, arg2) {

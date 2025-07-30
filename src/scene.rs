@@ -289,24 +289,24 @@ impl Scene {
         } else {
             log::info!("Toggle all voxels active: FALSE {count} {fluid} {noise}");
         }
-        for selection in selections {
-            //log::info!("Selection {:?}", selection);
-            let color = [
-                (scene.material_color[0]).clamp(0.0, 1.0),
-                (scene.material_color[1]).clamp(0.0, 1.0),
-                (scene.material_color[2]).clamp(0.0, 1.0),
-                (scene.material_color[3]).clamp(0.0, 1.0),
-            ];
-            let camera_eye = [scene.camera.eye.x, scene.camera.eye.y, scene.camera.eye.z];
-            scene.model.toggle_voxel(
-                selection,
-                !value,
-                color,
-                camera_eye,
-                scene.fluid,
-                scene.noise,
-            );
-        }
+        //for selection in selections {
+        //log::info!("Selection {:?}", selection);
+        let color = [
+            (scene.material_color[0]).clamp(0.0, 1.0),
+            (scene.material_color[1]).clamp(0.0, 1.0),
+            (scene.material_color[2]).clamp(0.0, 1.0),
+            (scene.material_color[3]).clamp(0.0, 1.0),
+        ];
+        let camera_eye = [scene.camera.eye.x, scene.camera.eye.y, scene.camera.eye.z];
+        scene.model.toggle_voxels(
+            selections,
+            !value,
+            color,
+            camera_eye,
+            scene.fluid,
+            scene.noise,
+        );
+        //}
     }
 
     /// Save the scene to the browser.

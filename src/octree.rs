@@ -71,17 +71,17 @@ impl Octree {
         self.root.decimate(sub_division_level);
     }
 
-    /// Change the active state of a single voxel.
-    pub fn toggle_voxel(
+    pub fn toggle_voxels(
         &mut self,
-        position: [i32; 3],
+        positions: Vec<[i32; 3]>,
         value: bool,
         color: [f32; 4],
         camera_eye: [f32; 3],
         fluid: i32,
         noise: i32,
     ) {
-        self.root.toggle_voxel(position, value, color, fluid, noise);
+        self.root
+            .toggle_voxels(&positions, value, color, fluid, noise);
         self.root.optimize(camera_eye);
     }
 

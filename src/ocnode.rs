@@ -261,24 +261,26 @@ impl Ocnode {
         true
     }
 
-    /// Search this node and it's children and switch the toggle state if the posistion is correct.
-    pub fn toggle_voxel(
+    pub fn toggle_voxels(
         &mut self,
-        position: [i32; 3],
+        positions: &Vec<[i32; 3]>,
         value: bool,
         color: [f32; 4],
         fluid: i32,
         noise: i32,
     ) {
-        if self.x_index == position[0]
-            && self.y_index == position[1]
-            && self.z_index == position[2]
-            && self.sub_division_level == LEVELS
-        {
-            self.active = value;
-            self.color = color;
-            self.fluid = fluid;
-            self.noise = noise;
+        if self.sub_division_level == LEVELS {
+            for position in positions {
+                if self.x_index == position[0]
+                    && self.y_index == position[1]
+                    && self.z_index == position[2]
+                {
+                    self.active = value;
+                    self.color = color;
+                    self.fluid = fluid;
+                    self.noise = noise;
+                }
+            }
         }
         let squirts = self.children.each_mut();
 
@@ -286,7 +288,7 @@ impl Ocnode {
             match node_opt {
                 None => {}
                 Some(node) => {
-                    node.toggle_voxel(position, value, color, fluid, noise);
+                    node.toggle_voxels(positions, value, color, fluid, noise);
                 }
             };
         }
