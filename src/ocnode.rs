@@ -66,9 +66,12 @@ impl Ocnode {
                 return None;
             }
         } else {
-            if (x < self.x_index + self.resolution(self.sub_division_level + 1) as i32)
-                && (y < self.y_index + self.resolution(self.sub_division_level + 1) as i32)
-                && (z < self.z_index + self.resolution(self.sub_division_level + 1) as i32)
+            if (x >= self.x_index
+                && x <= self.x_index + self.resolution(self.sub_division_level + 1) as i32)
+                && y >= self.y_index
+                && (y <= self.y_index + self.resolution(self.sub_division_level + 1) as i32)
+                && z >= self.z_index
+                && (z <= self.z_index + self.resolution(self.sub_division_level + 1) as i32)
             {
                 if self.has_children {
                     let squirts = self.children.each_ref();
