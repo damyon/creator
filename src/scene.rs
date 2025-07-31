@@ -285,9 +285,9 @@ impl Scene {
         let fluid = scene.fluid;
         let noise = scene.noise;
         if value {
-            log::info!("Toggle all voxels active: TRUE {count} {fluid} {noise}");
-        } else {
             log::info!("Toggle all voxels active: FALSE {count} {fluid} {noise}");
+        } else {
+            log::info!("Toggle all voxels active: TRUE {count} {fluid} {noise}");
         }
         //for selection in selections {
         //log::info!("Selection {:?}", selection);

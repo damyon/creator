@@ -66,12 +66,12 @@ impl Ocnode {
                 return None;
             }
         } else {
-            if (x >= self.x_index
-                && x <= self.x_index + self.resolution(self.sub_division_level + 1) as i32)
+            if x >= self.x_index
+                && (x <= self.x_index + self.resolution(self.sub_division_level) as i32)
                 && y >= self.y_index
-                && (y <= self.y_index + self.resolution(self.sub_division_level + 1) as i32)
+                && (y <= self.y_index + self.resolution(self.sub_division_level) as i32)
                 && z >= self.z_index
-                && (z <= self.z_index + self.resolution(self.sub_division_level + 1) as i32)
+                && (z <= self.z_index + self.resolution(self.sub_division_level) as i32)
             {
                 if self.has_children {
                     let squirts = self.children.each_ref();
@@ -252,9 +252,12 @@ impl Ocnode {
     pub fn all_voxels_active(&self, positions: &Vec<[i32; 3]>) -> bool {
         for position in positions {
             let found = self.find_by_index(position[0], position[1], position[2], LEVELS);
-
-            if found.is_some() && !found.unwrap().active {
-                return false;
+            if found.is_some() {
+                if !found.unwrap().active {
+                    return false;
+                }
+            } else {
+                log::error!("position could not be found: {:?}", position);
             }
         }
 
