@@ -11,6 +11,8 @@ pub struct Cube {
     pub floor: f32,
     pub fluid: i32,
     pub noise: i32,
+    pub top_occluded: bool,
+    pub bottom_occluded: bool,
 }
 
 use crate::drawable::Drawable;
@@ -29,6 +31,8 @@ impl Cube {
             floor: 0.0001,
             fluid: 0,
             noise: 0,
+            top_occluded: false,
+            bottom_occluded: false,
         }
     }
 }
@@ -300,7 +304,11 @@ impl Drawable for Cube {
 
     /// A cube always has the same number of vertices
     fn count_vertices(&self) -> u16 {
-        self.vertices_count - 18
+        let mut occluded = 0;
+        if self.top_occluded {
+            occluded = 18;
+        }
+        self.vertices_count - occluded
     }
 
     /// We can move a cube
@@ -348,7 +356,15 @@ impl Drawable for Cube {
         let front = &self.vertices[54..72];
         let back = &self.vertices[72..90];
         let top = &self.vertices[90..108];
-        [bottom, left, right, back, top].concat()
+        let mut valid = [left, right, back, front].concat();
+
+        if !self.top_occluded {
+            valid.extend_from_slice(top);
+        }
+        if !self.bottom_occluded {
+            valid.extend_from_slice(bottom);
+        }
+        valid
     }
 
     /// Get an array of normals.
@@ -359,7 +375,15 @@ impl Drawable for Cube {
         let front = &self.normals[54..72];
         let back = &self.normals[72..90];
         let top = &self.normals[90..108];
-        [bottom, left, right, back, top].concat()
+        let mut valid = [left, right, back, front].concat();
+
+        if !self.top_occluded {
+            valid.extend_from_slice(top);
+        }
+        if !self.bottom_occluded {
+            valid.extend_from_slice(bottom);
+        }
+        valid
     }
 
     /// Calculate the distance between the cube and the camera.

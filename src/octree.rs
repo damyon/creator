@@ -82,7 +82,6 @@ impl Octree {
     ) {
         self.root
             .toggle_voxels(&positions, value, color, fluid, noise);
-        self.root.update_occlusion(&positions);
         self.root.optimize(camera_eye);
     }
 

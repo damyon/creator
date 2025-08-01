@@ -96,6 +96,32 @@ impl Ocnode {
         }
     }
 
+    pub fn top_occluded(&self) -> bool {
+        let maybe_top = self.find_by_index(
+            self.x_index,
+            self.y_index + self.resolution(self.sub_division_level) as i32,
+            self.z_index,
+            self.sub_division_level,
+        );
+        if maybe_top.is_some() {
+            return maybe_top.unwrap().active;
+        }
+        false
+    }
+
+    pub fn bottom_occluded(&self) -> bool {
+        let maybe_bottom = self.find_by_index(
+            self.x_index,
+            self.y_index - self.resolution(self.sub_division_level) as i32,
+            self.z_index,
+            self.sub_division_level,
+        );
+        if maybe_bottom.is_some() {
+            return maybe_bottom.unwrap().active;
+        }
+        false
+    }
+
     pub fn find_mut_by_index(&mut self, x: i32, y: i32, z: i32, level: u32) -> Option<&mut Ocnode> {
         if level == self.sub_division_level {
             if self.x_index == x && self.y_index == y && self.z_index == z {
@@ -299,8 +325,6 @@ impl Ocnode {
         true
     }
 
-    pub fn update_occlusion(&mut self, positions: &Vec<[i32; 3]>) {}
-
     pub fn toggle_voxels(
         &mut self,
         positions: &Vec<[i32; 3]>,
@@ -309,7 +333,6 @@ impl Ocnode {
         fluid: i32,
         noise: i32,
     ) {
-        //if self.sub_division_level == LEVELS {
         for position in positions {
             let maybe = self.find_mut_by_index(position[0], position[1], position[2], LEVELS);
             let actual = maybe.expect("node exists");
@@ -318,18 +341,6 @@ impl Ocnode {
             actual.fluid = fluid;
             actual.noise = noise;
         }
-        //}
-        /*
-        let squirts = self.children.each_mut();
-
-        for node_opt in squirts {
-            match node_opt {
-                None => {}
-                Some(node) => {
-                    node.toggle_voxels(positions, value, color, fluid, noise);
-                }
-            };
-        }*/
     }
 
     /// Generate a list of drawables from the active cubes in this one.
@@ -343,6 +354,8 @@ impl Ocnode {
                 cube.fluid = self.fluid;
                 cube.noise = self.noise;
                 cube.scale = scale;
+                cube.top_occluded = self.top_occluded();
+                cube.bottom_occluded = self.bottom_occluded();
                 cube.init();
 
                 let x = self.x_index as f32 * (1.0);
@@ -375,6 +388,8 @@ impl Ocnode {
             cube.fluid = self.fluid;
             cube.noise = self.noise;
             cube.scale = scale;
+            cube.top_occluded = self.top_occluded();
+            cube.bottom_occluded = self.bottom_occluded();
             cube.init();
 
             let x = self.x_index as f32 * (scale);
