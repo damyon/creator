@@ -96,6 +96,44 @@ impl Ocnode {
         }
     }
 
+    pub fn find_mut_by_index(&mut self, x: i32, y: i32, z: i32, level: u32) -> Option<&mut Ocnode> {
+        if level == self.sub_division_level {
+            if self.x_index == x && self.y_index == y && self.z_index == z {
+                return Some(self);
+            } else {
+                return None;
+            }
+        } else {
+            if x >= self.x_index
+                && (x <= self.x_index + self.resolution(self.sub_division_level) as i32)
+                && y >= self.y_index
+                && (y <= self.y_index + self.resolution(self.sub_division_level) as i32)
+                && z >= self.z_index
+                && (z <= self.z_index + self.resolution(self.sub_division_level) as i32)
+            {
+                if self.has_children {
+                    let squirts = self.children.each_mut();
+
+                    for node_opt in squirts {
+                        match node_opt {
+                            None => {
+                                log::debug!("Should not get here")
+                            }
+                            Some(node) => {
+                                let child = node.find_mut_by_index(x, y, z, level);
+                                if child.is_some() {
+                                    return child;
+                                }
+                            }
+                        };
+                    }
+                    return None;
+                }
+            }
+            return None;
+        }
+    }
+
     /// Return the coordinate range. The actual positions go from -range to +range
     pub const fn range() -> i32 {
         2i32.pow(LEVELS - 1) / 2
@@ -261,6 +299,8 @@ impl Ocnode {
         true
     }
 
+    pub fn update_occlusion(&mut self, positions: &Vec<[i32; 3]>) {}
+
     pub fn toggle_voxels(
         &mut self,
         positions: &Vec<[i32; 3]>,
@@ -269,19 +309,17 @@ impl Ocnode {
         fluid: i32,
         noise: i32,
     ) {
-        if self.sub_division_level == LEVELS {
-            for position in positions {
-                if self.x_index == position[0]
-                    && self.y_index == position[1]
-                    && self.z_index == position[2]
-                {
-                    self.active = value;
-                    self.color = color;
-                    self.fluid = fluid;
-                    self.noise = noise;
-                }
-            }
+        //if self.sub_division_level == LEVELS {
+        for position in positions {
+            let maybe = self.find_mut_by_index(position[0], position[1], position[2], LEVELS);
+            let actual = maybe.expect("node exists");
+            actual.active = value;
+            actual.color = color;
+            actual.fluid = fluid;
+            actual.noise = noise;
         }
+        //}
+        /*
         let squirts = self.children.each_mut();
 
         for node_opt in squirts {
@@ -291,7 +329,7 @@ impl Ocnode {
                     node.toggle_voxels(positions, value, color, fluid, noise);
                 }
             };
-        }
+        }*/
     }
 
     /// Generate a list of drawables from the active cubes in this one.

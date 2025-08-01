@@ -300,7 +300,7 @@ impl Drawable for Cube {
 
     /// A cube always has the same number of vertices
     fn count_vertices(&self) -> u16 {
-        self.vertices_count
+        self.vertices_count - 18
     }
 
     /// We can move a cube
@@ -341,13 +341,25 @@ impl Drawable for Cube {
     }
 
     /// Get an array of vertices.
-    fn vertices(&self) -> &[f32] {
-        &self.vertices
+    fn vertices(&self) -> Vec<f32> {
+        let bottom = &self.vertices[0..18];
+        let left = &self.vertices[18..36];
+        let right = &self.vertices[36..54];
+        let front = &self.vertices[54..72];
+        let back = &self.vertices[72..90];
+        let top = &self.vertices[90..108];
+        [bottom, left, right, back, top].concat()
     }
 
     /// Get an array of normals.
-    fn normals(&self) -> &[f32] {
-        &self.normals
+    fn normals(&self) -> Vec<f32> {
+        let bottom = &self.normals[0..18];
+        let left = &self.normals[18..36];
+        let right = &self.normals[36..54];
+        let front = &self.normals[54..72];
+        let back = &self.normals[72..90];
+        let top = &self.normals[90..108];
+        [bottom, left, right, back, top].concat()
     }
 
     /// Calculate the distance between the cube and the camera.

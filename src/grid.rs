@@ -132,8 +132,8 @@ impl Drawable for Grid {
     }
 
     /// Tell me the vertices to draw.
-    fn vertices(&self) -> &[f32] {
-        &self.vertices
+    fn vertices(&self) -> Vec<f32> {
+        self.vertices.to_vec()
     }
 
     /// What color are the lines?
@@ -150,8 +150,8 @@ impl Drawable for Grid {
     }
 
     /// Where are the normals facing.
-    fn normals(&self) -> &[f32] {
-        &self.normals
+    fn normals(&self) -> Vec<f32> {
+        self.normals.to_vec()
     }
 
     /// Calculate the distance from the camera to the grid.

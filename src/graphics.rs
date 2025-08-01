@@ -240,8 +240,8 @@ impl Graphics {
     /// Format the vertices for WebGL.
     pub fn setup_vertices(
         &self,
-        vertices: &[f32],
-        normals: &[f32],
+        vertices: Vec<f32>,
+        normals: Vec<f32>,
         shader_program: &WebGlProgram,
         is_camera: bool,
     ) {
@@ -252,7 +252,7 @@ impl Graphics {
             .bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&vertex_buffer));
 
         unsafe {
-            let vertices_array = js_sys::Float32Array::view(vertices);
+            let vertices_array = js_sys::Float32Array::view(vertices.as_slice());
 
             self.gl.buffer_data_with_array_buffer_view(
                 WebGlRenderingContext::ARRAY_BUFFER,
@@ -282,7 +282,7 @@ impl Graphics {
                 .bind_buffer(WebGlRenderingContext::ARRAY_BUFFER, Some(&normal_buffer));
 
             unsafe {
-                let normals_array = js_sys::Float32Array::view(normals);
+                let normals_array = js_sys::Float32Array::view(normals.as_slice());
 
                 self.gl.buffer_data_with_array_buffer_view(
                     WebGlRenderingContext::ARRAY_BUFFER,
