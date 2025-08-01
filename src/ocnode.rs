@@ -203,20 +203,19 @@ impl Ocnode {
             let has_hole = squirts
                 .into_iter()
                 .any(|child| !child.as_ref().expect("child").active);
-            let squirts = self.children.each_mut();
+            //let squirts = self.children.each_mut();
             let mut color = [0.0, 0.0, 0.0, 0.0];
             let mut fluid = 0;
             let mut noise = 0;
-            match squirts[0] {
-                None => {
-                    log::debug!("Should not get here")
-                }
-                Some(node) => {
+            for i in self.children.each_mut() {
+                let node = i.as_ref().expect("child");
+                if node.active {
                     color = node.color;
                     fluid = node.fluid;
                     noise = node.noise;
                 }
-            };
+            }
+
             let squirts = self.children.each_mut();
             let not_uniform_color = squirts.into_iter().any(|child| {
                 let compare = child.as_ref().expect("child").color;
@@ -235,14 +234,12 @@ impl Ocnode {
             let lod = 60.0;
 
             self.active = (has_peg && (depth > lod)) || (!has_hole && !not_uniform_color);
-            let first = self.children.first();
-
-            match first {
-                None => {}
-                Some(node) => {
-                    self.color = node.as_ref().unwrap().color;
-                    self.fluid = node.as_ref().unwrap().fluid;
-                    self.noise = node.as_ref().unwrap().noise;
+            for i in self.children.each_mut() {
+                let node = i.as_ref().expect("child");
+                if node.active {
+                    self.color = node.color;
+                    self.fluid = node.fluid;
+                    self.noise = node.noise;
                 }
             }
         }
