@@ -116,13 +116,13 @@ pub async fn load_first_scene() -> Result<JsValue, JsValue> {
 
         // We choose to render when idle, not as fast as possible so we don't overload the browser.
         window
-            .request_idle_callback(f.borrow().as_ref().unwrap().as_ref().unchecked_ref())
+            .request_animation_frame(f.borrow().as_ref().unwrap().as_ref().unchecked_ref())
             .expect("failed requesting idle callback");
     }) as Box<dyn FnMut()>));
 
     let window = web_sys::window().unwrap();
     window
-        .request_idle_callback(outer_f.borrow().as_ref().unwrap().as_ref().unchecked_ref())
+        .request_animation_frame(outer_f.borrow().as_ref().unwrap().as_ref().unchecked_ref())
         .expect("failed requesting idle callback");
 
     Ok(JsValue::from(true))
