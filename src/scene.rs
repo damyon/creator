@@ -1,6 +1,7 @@
 use std::cmp::{max, min};
 use std::sync::{Mutex, MutexGuard};
 use web_sys::WebGlRenderingContext;
+use web_time::{Duration, Instant};
 
 use crate::command::{Command, CommandType};
 use crate::command_queue::CommandQueue;
@@ -58,6 +59,8 @@ pub struct Scene {
     drawing: bool,
     /// Should we skip the next frame?
     throttle: u32,
+    /// Timestamp from last render.
+    last_draw: Option<Instant>,
     /// Are we loading from browser?
     loading: bool,
     /// Is the material fluid?
@@ -110,6 +113,7 @@ impl Scene {
             noise: 0,
             dirty: true,
             elapsed: 0.0,
+            last_draw: None,
         });
         GLOBSTATE.lock().unwrap()
     }
@@ -490,6 +494,18 @@ impl Scene {
             return true;
         }
         scene.throttle = 2;
+
+        let now = Instant::now();
+        let target_fps = 10;
+        let target_delay = Duration::from_millis(1000 / target_fps);
+        let last = scene
+            .last_draw
+            .or(Instant::now().checked_sub(target_delay))
+            .expect("last render frame");
+        if now.duration_since(last).cmp(&target_delay).is_lt() {
+            return true;
+        }
+        scene.last_draw = Some(now);
         false
     }
 

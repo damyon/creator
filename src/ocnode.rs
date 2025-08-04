@@ -96,21 +96,8 @@ impl Ocnode {
         }
     }
 
-    pub fn top_occluded(&self) -> bool {
-        let maybe_top = self.find_by_index(
-            self.x_index,
-            self.y_index + self.resolution(self.sub_division_level) as i32,
-            self.z_index,
-            self.sub_division_level,
-        );
-        if maybe_top.is_some() {
-            return maybe_top.unwrap().active;
-        }
-        false
-    }
-
-    pub fn bottom_occluded(&self) -> bool {
-        let maybe_bottom = self.find_by_index(
+    pub fn bottom_occluded(&self, root: &Ocnode) -> bool {
+        let maybe_bottom = root.find_by_index(
             self.x_index,
             self.y_index - self.resolution(self.sub_division_level) as i32,
             self.z_index,
@@ -118,6 +105,74 @@ impl Ocnode {
         );
         if maybe_bottom.is_some() {
             return maybe_bottom.unwrap().active;
+        }
+        false
+    }
+
+    pub fn left_occluded(&self, root: &Ocnode) -> bool {
+        let maybe_left = root.find_by_index(
+            self.x_index - self.resolution(self.sub_division_level) as i32,
+            self.y_index,
+            self.z_index,
+            self.sub_division_level,
+        );
+        if maybe_left.is_some() {
+            return maybe_left.unwrap().active;
+        }
+        false
+    }
+
+    pub fn right_occluded(&self, root: &Ocnode) -> bool {
+        let maybe_right = root.find_by_index(
+            self.x_index + self.resolution(self.sub_division_level) as i32,
+            self.y_index,
+            self.z_index,
+            self.sub_division_level,
+        );
+        if maybe_right.is_some() {
+            return maybe_right.unwrap().active;
+        }
+        false
+    }
+
+    pub fn front_occluded(&self, root: &Ocnode) -> bool {
+        let maybe_front = root.find_by_index(
+            self.x_index,
+            self.y_index,
+            self.z_index - self.resolution(self.sub_division_level) as i32,
+            self.sub_division_level,
+        );
+        if maybe_front.is_some() {
+            if maybe_front.unwrap().active {
+                log::debug!("Front occluded");
+            }
+            return maybe_front.unwrap().active;
+        }
+        false
+    }
+
+    pub fn back_occluded(&self, root: &Ocnode) -> bool {
+        let maybe_back = root.find_by_index(
+            self.x_index,
+            self.y_index,
+            self.z_index + self.resolution(self.sub_division_level) as i32,
+            self.sub_division_level,
+        );
+        if maybe_back.is_some() {
+            return maybe_back.unwrap().active;
+        }
+        false
+    }
+
+    pub fn top_occluded(&self, root: &Ocnode) -> bool {
+        let maybe_top = root.find_by_index(
+            self.x_index,
+            self.y_index + self.resolution(self.sub_division_level) as i32,
+            self.z_index,
+            self.sub_division_level,
+        );
+        if maybe_top.is_some() {
+            return maybe_top.unwrap().active;
         }
         false
     }
@@ -344,7 +399,7 @@ impl Ocnode {
     }
 
     /// Generate a list of drawables from the active cubes in this one.
-    pub fn drawables(&mut self) -> Vec<Cube> {
+    pub fn drawables(&mut self, root: &Ocnode) -> Vec<Cube> {
         if self.has_children {
             if self.active {
                 let scale = self.resolution(self.sub_division_level) as f32;
@@ -354,8 +409,13 @@ impl Ocnode {
                 cube.fluid = self.fluid;
                 cube.noise = self.noise;
                 cube.scale = scale;
-                cube.top_occluded = self.top_occluded();
-                cube.bottom_occluded = self.bottom_occluded();
+
+                cube.bottom_occluded = self.bottom_occluded(root);
+                cube.left_occluded = self.left_occluded(root);
+                cube.right_occluded = self.right_occluded(root);
+                cube.front_occluded = self.front_occluded(root);
+                cube.back_occluded = self.back_occluded(root);
+                cube.top_occluded = self.top_occluded(root);
                 cube.init();
 
                 let x = self.x_index as f32 * (1.0);
@@ -372,7 +432,7 @@ impl Ocnode {
                     match node_opt {
                         None => {}
                         Some(node) => {
-                            let mut cube = node.drawables();
+                            let mut cube = node.drawables(root);
 
                             child_cubes.append(&mut cube);
                         }
@@ -388,8 +448,13 @@ impl Ocnode {
             cube.fluid = self.fluid;
             cube.noise = self.noise;
             cube.scale = scale;
-            cube.top_occluded = self.top_occluded();
-            cube.bottom_occluded = self.bottom_occluded();
+
+            cube.bottom_occluded = self.bottom_occluded(root);
+            cube.left_occluded = self.left_occluded(root);
+            cube.right_occluded = self.right_occluded(root);
+            cube.front_occluded = self.front_occluded(root);
+            cube.back_occluded = self.back_occluded(root);
+            cube.top_occluded = self.top_occluded(root);
             cube.init();
 
             let x = self.x_index as f32 * (scale);
