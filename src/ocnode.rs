@@ -96,6 +96,18 @@ impl Ocnode {
         }
     }
 
+    pub fn uniform(&self, compare: &Ocnode) -> bool {
+        let compare_color = compare.color;
+        let compare_fluid = compare.fluid;
+        let compare_noise = compare.noise;
+        compare_color[0] != self.color[0]
+            || compare_color[1] != self.color[1]
+            || compare_color[2] != self.color[2]
+            || compare_color[3] != self.color[3]
+            || compare_fluid != self.fluid
+            || compare_noise != self.noise
+    }
+
     pub fn bottom_occluded(&self, root: &Ocnode) -> bool {
         let maybe_bottom = root.find_by_index(
             self.x_index,
@@ -104,7 +116,10 @@ impl Ocnode {
             self.sub_division_level,
         );
         if maybe_bottom.is_some() {
-            return maybe_bottom.unwrap().active;
+            let bottom = maybe_bottom.unwrap();
+            if bottom.active {
+                return self.uniform(bottom);
+            }
         }
         false
     }
@@ -117,7 +132,10 @@ impl Ocnode {
             self.sub_division_level,
         );
         if maybe_left.is_some() {
-            return maybe_left.unwrap().active;
+            let left = maybe_left.unwrap();
+            if left.active {
+                return self.uniform(left);
+            }
         }
         false
     }
@@ -130,7 +148,10 @@ impl Ocnode {
             self.sub_division_level,
         );
         if maybe_right.is_some() {
-            return maybe_right.unwrap().active;
+            let right = maybe_right.unwrap();
+            if right.active {
+                return self.uniform(right);
+            }
         }
         false
     }
@@ -143,10 +164,10 @@ impl Ocnode {
             self.sub_division_level,
         );
         if maybe_front.is_some() {
-            if maybe_front.unwrap().active {
-                log::debug!("Front occluded");
+            let front = maybe_front.unwrap();
+            if front.active {
+                return self.uniform(front);
             }
-            return maybe_front.unwrap().active;
         }
         false
     }
@@ -159,7 +180,10 @@ impl Ocnode {
             self.sub_division_level,
         );
         if maybe_back.is_some() {
-            return maybe_back.unwrap().active;
+            let back = maybe_back.unwrap();
+            if back.active {
+                return self.uniform(back);
+            }
         }
         false
     }
@@ -172,7 +196,10 @@ impl Ocnode {
             self.sub_division_level,
         );
         if maybe_top.is_some() {
-            return maybe_top.unwrap().active;
+            let top = maybe_top.unwrap();
+            if top.active {
+                return self.uniform(top);
+            }
         }
         false
     }
