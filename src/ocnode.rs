@@ -100,12 +100,12 @@ impl Ocnode {
         let compare_color = compare.color;
         let compare_fluid = compare.fluid;
         let compare_noise = compare.noise;
-        compare_color[0] != self.color[0]
+        !(compare_color[0] != self.color[0]
             || compare_color[1] != self.color[1]
             || compare_color[2] != self.color[2]
             || compare_color[3] != self.color[3]
             || compare_fluid != self.fluid
-            || compare_noise != self.noise
+            || compare_noise != self.noise)
     }
 
     pub fn bottom_occluded(&self, root: &Ocnode) -> bool {
@@ -329,7 +329,8 @@ impl Ocnode {
 
     /// Set the active state to match the combined active state of all children.
     pub fn optimize(&mut self, camera_eye: [f32; 3]) {
-        if self.has_children {
+
+        /*if self.has_children {
             // Optimize leaf first then move up the tree.
             let squirts = self.children.each_mut();
             for child in squirts {
@@ -388,7 +389,7 @@ impl Ocnode {
                     self.noise = node.noise;
                 }
             }
-        }
+        }*/
     }
 
     /// Are all the nodes in the list of nodes active?
