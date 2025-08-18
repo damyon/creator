@@ -25,6 +25,14 @@ export function toggle_fluid(): Promise<boolean>;
  */
 export function toggle_solid(): Promise<boolean>;
 /**
+ * Show the grid.
+ */
+export function toggle_show_grid(): Promise<boolean>;
+/**
+ * Do not display the grid.
+ */
+export function toggle_hide_grid(): Promise<boolean>;
+/**
  * Switch from solid to noise colours.
  */
 export function toggle_noise(): Promise<boolean>;
@@ -63,6 +71,8 @@ export interface InitOutput {
   readonly load_scene: () => any;
   readonly toggle_fluid: () => any;
   readonly toggle_solid: () => any;
+  readonly toggle_show_grid: () => any;
+  readonly toggle_hide_grid: () => any;
   readonly toggle_noise: () => any;
   readonly toggle_smooth: () => any;
   readonly delete_scene: () => any;
@@ -78,12 +88,12 @@ export interface InitOutput {
   readonly __wbindgen_free: (a: number, b: number, c: number) => void;
   readonly __wbindgen_export_6: WebAssembly.Table;
   readonly __externref_table_dealloc: (a: number) => void;
-  readonly closure88_externref_shim_multivalue_shim: (a: number, b: number, c: any) => [number, number];
+  readonly closure113_externref_shim_multivalue_shim: (a: number, b: number, c: any) => [number, number];
   readonly _dyn_core__ops__function__FnMut_____Output___R_as_wasm_bindgen__closure__WasmClosure___describe__invoke__h687c20b4a0270c8a: (a: number, b: number) => void;
-  readonly closure151_externref_shim: (a: number, b: number, c: any) => void;
-  readonly closure156_externref_shim: (a: number, b: number, c: any) => void;
-  readonly closure168_externref_shim: (a: number, b: number, c: any) => void;
-  readonly closure188_externref_shim: (a: number, b: number, c: any, d: any) => void;
+  readonly closure157_externref_shim: (a: number, b: number, c: any) => void;
+  readonly closure162_externref_shim: (a: number, b: number, c: any) => void;
+  readonly closure174_externref_shim: (a: number, b: number, c: any) => void;
+  readonly closure194_externref_shim: (a: number, b: number, c: any, d: any) => void;
   readonly __wbindgen_start: () => void;
 }
 

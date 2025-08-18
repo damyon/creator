@@ -74,6 +74,20 @@ pub async fn toggle_solid() -> Result<bool, JsValue> {
     Ok(true)
 }
 
+/// Show the grid.
+#[wasm_bindgen]
+pub async fn toggle_show_grid() -> Result<bool, JsValue> {
+    Scene::toggle_show_grid().await;
+    Ok(true)
+}
+
+/// Do not display the grid.
+#[wasm_bindgen]
+pub async fn toggle_hide_grid() -> Result<bool, JsValue> {
+    Scene::toggle_hide_grid().await;
+    Ok(true)
+}
+
 /// Switch from solid to noise colours.
 #[wasm_bindgen]
 pub async fn toggle_noise() -> Result<bool, JsValue> {

@@ -12,6 +12,8 @@ import init, {
   toggle_smooth,
   toggle_solid,
   toggle_fluid,
+  toggle_show_grid,
+  toggle_hide_grid,
 } from "./creator.js";
 
 const CANVAS_ID = "scene";
@@ -25,6 +27,8 @@ const SOLID_ID = "solid";
 const FLUID_ID = "fluid";
 const COLOR_ID = "color";
 const ALPHA_ID = "alpha";
+const GRID_VISIBLE_ID = "grid-visible";
+const GRID_HIDDEN_ID = "grid-hidden";
 const SCENE_LIST_ID = "scene-list";
 
 const SPHERE_ID = "sphere";
@@ -90,6 +94,22 @@ document.getElementById(FLAT_ID).onclick = function (event) {
   toggle_noise();
   document.getElementById(FLAT_ID).style.display = "none";
   document.getElementById(NOISE_ID).style.display = "block";
+
+  document.getElementById(CANVAS_ID).focus();
+};
+
+document.getElementById(GRID_VISIBLE_ID).onclick = function (event) {
+  toggle_hide_grid();
+  document.getElementById(GRID_VISIBLE_ID).style.display = "none";
+  document.getElementById(GRID_HIDDEN_ID).style.display = "block";
+
+  document.getElementById(CANVAS_ID).focus();
+};
+
+document.getElementById(GRID_HIDDEN_ID).onclick = function (event) {
+  toggle_show_grid();
+  document.getElementById(GRID_HIDDEN_ID).style.display = "none";
+  document.getElementById(GRID_VISIBLE_ID).style.display = "block";
 
   document.getElementById(CANVAS_ID).focus();
 };

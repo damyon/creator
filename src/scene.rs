@@ -71,6 +71,8 @@ pub struct Scene {
     dirty: bool,
     /// Approximation of time
     elapsed: f32,
+    /// Render the grid
+    grid_visible: bool,
 }
 
 impl Scene {
@@ -114,6 +116,7 @@ impl Scene {
             dirty: true,
             elapsed: 0.0,
             last_draw: None,
+            grid_visible: true,
         });
         GLOBSTATE.lock().unwrap()
     }
@@ -594,6 +597,20 @@ impl Scene {
         scene.fluid = 0;
     }
 
+    /// Show grid.
+    pub async fn toggle_show_grid() {
+        let mut scene = Self::access();
+        log::error!("Grid goes on");
+        scene.grid_visible = true;
+    }
+
+    /// Show grid.
+    pub async fn toggle_hide_grid() {
+        let mut scene = Self::access();
+        log::error!("Grid goes off");
+        scene.grid_visible = false;
+    }
+
     /// Enable fluid.
     pub async fn toggle_fluid() {
         let mut scene = Self::access();
@@ -884,13 +901,15 @@ impl Scene {
                 scene.elapsed,
             );
         }
-        graphics.draw(
-            &scene.grid_xz,
-            WebGlRenderingContext::LINES,
-            camera,
-            light,
-            scene.elapsed,
-        );
+        if scene.grid_visible {
+            graphics.draw(
+                &scene.grid_xz,
+                WebGlRenderingContext::LINES,
+                camera,
+                light,
+                scene.elapsed,
+            );
+        }
 
         let mut drawables = scene.model.drawables();
 
