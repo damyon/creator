@@ -320,7 +320,7 @@ impl Ocnode {
     }
 
     /// Determine the distance between this cube and the camera.
-    fn depth(&self, camera: [f32; 3]) -> f32 {
+    fn _depth(&self, camera: [f32; 3]) -> f32 {
         ((self.x_index as f32 - camera[0]).powi(2)
             + (self.y_index as f32 - camera[1]).powi(2)
             + (self.z_index as f32 - camera[2]).powi(2))
@@ -328,7 +328,7 @@ impl Ocnode {
     }
 
     /// Set the active state to match the combined active state of all children.
-    pub fn optimize(&mut self, camera_eye: [f32; 3]) {
+    pub fn optimize(&mut self, _camera_eye: [f32; 3]) {
 
         /*if self.has_children {
             // Optimize leaf first then move up the tree.
