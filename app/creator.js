@@ -385,7 +385,7 @@ export function set_material_color(red, green, blue, alpha) {
 }
 
 function __wbg_adapter_46(arg0, arg1, arg2) {
-    const ret = wasm.closure109_externref_shim_multivalue_shim(arg0, arg1, arg2);
+    const ret = wasm.closure111_externref_shim_multivalue_shim(arg0, arg1, arg2);
     if (ret[1]) {
         throw takeFromExternrefTable0(ret[0]);
     }
@@ -1156,8 +1156,8 @@ function __wbg_get_imports() {
         const ret = false;
         return ret;
     };
-    imports.wbg.__wbindgen_closure_wrapper360 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 110, __wbg_adapter_46);
+    imports.wbg.__wbindgen_closure_wrapper389 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 112, __wbg_adapter_46);
         return ret;
     };
     imports.wbg.__wbindgen_closure_wrapper508 = function(arg0, arg1, arg2) {

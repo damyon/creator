@@ -122,24 +122,139 @@ impl Drawable for Cube {
             } else {
                 self.floor
             },
-            self.floor,
-            self.floor,
+            if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.floor
+            },
+            if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.floor
+            },
         ];
-        let luf = [self.floor, self.scale, self.floor];
+        let luf = [
+            if self.smooth && !self.front_occluded && !self.top_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.floor
+            },
+            if self.smooth && !self.front_occluded && !self.top_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.scale
+            },
+            if self.smooth && !self.front_occluded && !self.top_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.floor
+            },
+        ];
         let ldb = [
             if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.left_occluded {
                 self.center
             } else {
                 self.floor
             },
-            self.floor,
-            self.scale,
+            if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.floor
+            },
+            if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.scale
+            },
         ];
-        let lub = [self.floor, self.scale, self.scale];
-        let rdf = [self.scale, self.floor, self.floor];
-        let ruf = [self.scale, self.scale, self.floor];
-        let rdb = [self.scale, self.floor, self.scale];
-        let rub = [self.scale, self.scale, self.scale];
+        let lub = [
+            if self.smooth && !self.back_occluded && !self.top_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.floor
+            },
+            if self.smooth && !self.back_occluded && !self.top_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.scale
+            },
+            if self.smooth && !self.back_occluded && !self.top_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.scale
+            },
+        ];
+        let rdf = [
+            if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.right_occluded
+            {
+                self.center
+            } else {
+                self.scale
+            },
+            if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.right_occluded
+            {
+                self.center
+            } else {
+                self.floor
+            },
+            if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.right_occluded
+            {
+                self.center
+            } else {
+                self.floor
+            },
+        ];
+        let ruf = [
+            if self.smooth && !self.front_occluded && !self.top_occluded && !self.right_occluded {
+                self.center
+            } else {
+                self.scale
+            },
+            if self.smooth && !self.front_occluded && !self.top_occluded && !self.right_occluded {
+                self.center
+            } else {
+                self.scale
+            },
+            if self.smooth && !self.front_occluded && !self.top_occluded && !self.right_occluded {
+                self.center
+            } else {
+                self.floor
+            },
+        ];
+        let rdb = [
+            if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.right_occluded {
+                self.center
+            } else {
+                self.scale
+            },
+            if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.right_occluded {
+                self.center
+            } else {
+                self.floor
+            },
+            if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.right_occluded {
+                self.center
+            } else {
+                self.scale
+            },
+        ];
+        let rub = [
+            if self.smooth && !self.back_occluded && !self.top_occluded && !self.right_occluded {
+                self.center
+            } else {
+                self.scale
+            },
+            if self.smooth && !self.back_occluded && !self.top_occluded && !self.right_occluded {
+                self.center
+            } else {
+                self.scale
+            },
+            if self.smooth && !self.back_occluded && !self.top_occluded && !self.right_occluded {
+                self.center
+            } else {
+                self.scale
+            },
+        ];
 
         let mut index: usize = 0;
         let mut increment = || -> usize {
