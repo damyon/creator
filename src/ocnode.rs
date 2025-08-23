@@ -437,6 +437,7 @@ impl Ocnode {
                 cube.fluid = self.fluid;
                 cube.noise = self.noise;
                 cube.scale = scale;
+                cube.smooth = true;
 
                 cube.bottom_occluded = self.bottom_occluded(root);
                 cube.left_occluded = self.left_occluded(root);
@@ -476,6 +477,7 @@ impl Ocnode {
             cube.fluid = self.fluid;
             cube.noise = self.noise;
             cube.scale = scale;
+            cube.smooth = true;
 
             cube.bottom_occluded = self.bottom_occluded(root);
             cube.left_occluded = self.left_occluded(root);

@@ -16,6 +16,7 @@ pub struct Cube {
     pub front_occluded: bool,
     pub back_occluded: bool,
     pub top_occluded: bool,
+    pub smooth: bool,
 }
 
 use crate::drawable::Drawable;
@@ -39,6 +40,7 @@ impl Cube {
             front_occluded: false,
             back_occluded: false,
             top_occluded: false,
+            smooth: false,
         }
     }
 }
@@ -114,9 +116,25 @@ impl Drawable for Cube {
         // Start by calcuting the points.
         // naming is l/r u/d f/b
         // which is -x/+x -y/+y / -z/+z
-        let ldf = [self.floor, self.floor, self.floor];
+        let ldf = [
+            if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.floor
+            },
+            self.floor,
+            self.floor,
+        ];
         let luf = [self.floor, self.scale, self.floor];
-        let ldb = [self.floor, self.floor, self.scale];
+        let ldb = [
+            if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.floor
+            },
+            self.floor,
+            self.scale,
+        ];
         let lub = [self.floor, self.scale, self.scale];
         let rdf = [self.scale, self.floor, self.floor];
         let ruf = [self.scale, self.scale, self.floor];
