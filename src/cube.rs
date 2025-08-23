@@ -2,7 +2,6 @@
 #[derive(Copy, Clone)]
 pub struct Cube {
     pub vertices_count: u16,
-    pub normals: [f32; 108],
     pub translation: [f32; 3],
     pub rotation: [f32; 3],
     pub color: [f32; 4],
@@ -26,7 +25,6 @@ impl Cube {
     pub const fn new() -> Cube {
         Cube {
             vertices_count: 108,
-            normals: [0.0; 108],
             translation: [0.0; 3],
             rotation: [0.0; 3],
             color: [0.3, 0.3, 0.1, 1.0],
@@ -47,136 +45,7 @@ impl Cube {
 
 impl Drawable for Cube {
     /// Init a new cube so it's ready to draw.
-    fn init(&mut self) {
-        let mut normal_index: usize = 0;
-        let mut normal_increment = || -> usize {
-            let normal_result = normal_index;
-            normal_index += 1;
-            normal_result
-        };
-
-        // Bottom - UPDATE TO NORMALS FROM VERTS
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = -1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = -1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = -1.0;
-        self.normals[normal_increment()] = 0.0;
-
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = -1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = -1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = -1.0;
-        self.normals[normal_increment()] = 0.0;
-        // Left
-        self.normals[normal_increment()] = -1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = -1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = -1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-
-        self.normals[normal_increment()] = -1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = -1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = -1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        // Right
-        self.normals[normal_increment()] = 1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-
-        self.normals[normal_increment()] = 1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-
-        // Front
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = -1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = -1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = -1.0;
-
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = -1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = -1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = -1.0;
-        // Back
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 1.0;
-
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 1.0;
-        // Top
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 1.0;
-        self.normals[normal_increment()] = 0.0;
-
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 1.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 0.0;
-        self.normals[normal_increment()] = 1.0;
-        self.normals[normal_increment()] = 0.0;
-    }
+    fn init(&mut self) {}
 
     /// A cube always has the same number of vertices minus oclusion
     fn count_vertices(&self) -> u16 {
@@ -260,15 +129,8 @@ impl Drawable for Cube {
             index += 1;
             result
         };
-        let mut normal_index: usize = 0;
-        let mut normal_increment = || -> usize {
-            let normal_result = normal_index;
-            normal_index += 1;
-            normal_result
-        };
 
         let mut vertices = [0.0; 108];
-        let mut normals = [0.0; 108];
         // Bottom
         vertices[increment()] = ldf[0];
         vertices[increment()] = ldf[1];
@@ -424,12 +286,152 @@ impl Drawable for Cube {
 
     /// Get an array of normals.
     fn normals(&self) -> Vec<f32> {
-        let bottom = &self.normals[0..18];
-        let left = &self.normals[18..36];
-        let right = &self.normals[36..54];
-        let front = &self.normals[54..72];
-        let back = &self.normals[72..90];
-        let top = &self.normals[90..108];
+        let mut normal_index: usize = 0;
+        let mut normal_increment = || -> usize {
+            let normal_result = normal_index;
+            normal_index += 1;
+            normal_result
+        };
+
+        let left = [-1.0, 0.0, 0.0];
+        let down = [0.0, -1.0, 0.0];
+        let front = [0.0, 0.0, -1.0];
+        let right = [1.0, 0.0, 0.0];
+        let up = [0.0, 1.0, 0.0];
+        let back = [0.0, 0.0, 1.0];
+
+        let mut normals = [0.0; 108];
+
+        // Bottom
+        normals[normal_increment()] = down[0];
+        normals[normal_increment()] = down[1];
+        normals[normal_increment()] = down[2];
+        normals[normal_increment()] = down[0];
+        normals[normal_increment()] = down[1];
+        normals[normal_increment()] = down[2];
+        normals[normal_increment()] = down[0];
+        normals[normal_increment()] = down[1];
+        normals[normal_increment()] = down[2];
+
+        normals[normal_increment()] = down[0];
+        normals[normal_increment()] = down[1];
+        normals[normal_increment()] = down[2];
+        normals[normal_increment()] = down[0];
+        normals[normal_increment()] = down[1];
+        normals[normal_increment()] = down[2];
+        normals[normal_increment()] = down[0];
+        normals[normal_increment()] = down[1];
+        normals[normal_increment()] = down[2];
+
+        // Left
+        normals[normal_increment()] = left[0];
+        normals[normal_increment()] = left[1];
+        normals[normal_increment()] = left[2];
+        normals[normal_increment()] = left[0];
+        normals[normal_increment()] = left[1];
+        normals[normal_increment()] = left[2];
+        normals[normal_increment()] = left[0];
+        normals[normal_increment()] = left[1];
+        normals[normal_increment()] = left[2];
+
+        normals[normal_increment()] = left[0];
+        normals[normal_increment()] = left[1];
+        normals[normal_increment()] = left[2];
+        normals[normal_increment()] = left[0];
+        normals[normal_increment()] = left[1];
+        normals[normal_increment()] = left[2];
+        normals[normal_increment()] = left[0];
+        normals[normal_increment()] = left[1];
+        normals[normal_increment()] = left[2];
+
+        // Right
+        normals[normal_increment()] = right[0];
+        normals[normal_increment()] = right[1];
+        normals[normal_increment()] = right[2];
+        normals[normal_increment()] = right[0];
+        normals[normal_increment()] = right[1];
+        normals[normal_increment()] = right[2];
+        normals[normal_increment()] = right[0];
+        normals[normal_increment()] = right[1];
+        normals[normal_increment()] = right[2];
+
+        normals[normal_increment()] = right[0];
+        normals[normal_increment()] = right[1];
+        normals[normal_increment()] = right[2];
+        normals[normal_increment()] = right[0];
+        normals[normal_increment()] = right[1];
+        normals[normal_increment()] = right[2];
+        normals[normal_increment()] = right[0];
+        normals[normal_increment()] = right[1];
+        normals[normal_increment()] = right[2];
+
+        // Back
+        normals[normal_increment()] = back[0];
+        normals[normal_increment()] = back[1];
+        normals[normal_increment()] = back[2];
+        normals[normal_increment()] = back[0];
+        normals[normal_increment()] = back[1];
+        normals[normal_increment()] = back[2];
+        normals[normal_increment()] = back[0];
+        normals[normal_increment()] = back[1];
+        normals[normal_increment()] = back[2];
+
+        normals[normal_increment()] = back[0];
+        normals[normal_increment()] = back[1];
+        normals[normal_increment()] = back[2];
+        normals[normal_increment()] = back[0];
+        normals[normal_increment()] = back[1];
+        normals[normal_increment()] = back[2];
+        normals[normal_increment()] = back[0];
+        normals[normal_increment()] = back[1];
+        normals[normal_increment()] = back[2];
+        // Front
+        normals[normal_increment()] = front[0];
+        normals[normal_increment()] = front[1];
+        normals[normal_increment()] = front[2];
+        normals[normal_increment()] = front[0];
+        normals[normal_increment()] = front[1];
+        normals[normal_increment()] = front[2];
+        normals[normal_increment()] = front[0];
+        normals[normal_increment()] = front[1];
+        normals[normal_increment()] = front[2];
+
+        normals[normal_increment()] = front[0];
+        normals[normal_increment()] = front[1];
+        normals[normal_increment()] = front[2];
+        normals[normal_increment()] = front[0];
+        normals[normal_increment()] = front[1];
+        normals[normal_increment()] = front[2];
+        normals[normal_increment()] = front[0];
+        normals[normal_increment()] = front[1];
+        normals[normal_increment()] = front[2];
+        // Top
+        normals[normal_increment()] = up[0];
+        normals[normal_increment()] = up[1];
+        normals[normal_increment()] = up[2];
+        normals[normal_increment()] = up[0];
+        normals[normal_increment()] = up[1];
+        normals[normal_increment()] = up[2];
+        normals[normal_increment()] = up[0];
+        normals[normal_increment()] = up[1];
+        normals[normal_increment()] = up[2];
+
+        normals[normal_increment()] = up[0];
+        normals[normal_increment()] = up[1];
+        normals[normal_increment()] = up[2];
+        normals[normal_increment()] = up[0];
+        normals[normal_increment()] = up[1];
+        normals[normal_increment()] = up[2];
+        normals[normal_increment()] = up[0];
+        normals[normal_increment()] = up[1];
+        normals[normal_increment()] = up[2];
+
+        let bottom = &normals[0..18];
+        let left = &normals[18..36];
+        let right = &normals[36..54];
+        let front = &normals[54..72];
+        let back = &normals[72..90];
+        let top = &normals[90..108];
         let mut valid = vec![];
 
         if !self.bottom_occluded {
