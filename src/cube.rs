@@ -19,6 +19,8 @@ pub struct Cube {
     pub smooth: bool,
 }
 
+use nalgebra_glm::Vec3;
+
 use crate::drawable::Drawable;
 
 impl Cube {
@@ -426,138 +428,321 @@ impl Drawable for Cube {
             normal_result
         };
 
-        let left = [-1.0, 0.0, 0.0];
-        let down = [0.0, -1.0, 0.0];
-        let front = [0.0, 0.0, -1.0];
-        let right = [1.0, 0.0, 0.0];
-        let up = [0.0, 1.0, 0.0];
-        let back = [0.0, 0.0, 1.0];
+        let ldf = [
+            if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.floor
+            },
+            if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.floor
+            },
+            if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.floor
+            },
+        ];
+        let luf = [
+            if self.smooth && !self.front_occluded && !self.top_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.floor
+            },
+            if self.smooth && !self.front_occluded && !self.top_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.scale
+            },
+            if self.smooth && !self.front_occluded && !self.top_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.floor
+            },
+        ];
+        let ldb = [
+            if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.floor
+            },
+            if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.floor
+            },
+            if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.scale
+            },
+        ];
+        let lub = [
+            if self.smooth && !self.back_occluded && !self.top_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.floor
+            },
+            if self.smooth && !self.back_occluded && !self.top_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.scale
+            },
+            if self.smooth && !self.back_occluded && !self.top_occluded && !self.left_occluded {
+                self.center
+            } else {
+                self.scale
+            },
+        ];
+        let rdf = [
+            if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.right_occluded
+            {
+                self.center
+            } else {
+                self.scale
+            },
+            if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.right_occluded
+            {
+                self.center
+            } else {
+                self.floor
+            },
+            if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.right_occluded
+            {
+                self.center
+            } else {
+                self.floor
+            },
+        ];
+        let ruf = [
+            if self.smooth && !self.front_occluded && !self.top_occluded && !self.right_occluded {
+                self.center
+            } else {
+                self.scale
+            },
+            if self.smooth && !self.front_occluded && !self.top_occluded && !self.right_occluded {
+                self.center
+            } else {
+                self.scale
+            },
+            if self.smooth && !self.front_occluded && !self.top_occluded && !self.right_occluded {
+                self.center
+            } else {
+                self.floor
+            },
+        ];
+        let rdb = [
+            if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.right_occluded {
+                self.center
+            } else {
+                self.scale
+            },
+            if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.right_occluded {
+                self.center
+            } else {
+                self.floor
+            },
+            if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.right_occluded {
+                self.center
+            } else {
+                self.scale
+            },
+        ];
+        let rub = [
+            if self.smooth && !self.back_occluded && !self.top_occluded && !self.right_occluded {
+                self.center
+            } else {
+                self.scale
+            },
+            if self.smooth && !self.back_occluded && !self.top_occluded && !self.right_occluded {
+                self.center
+            } else {
+                self.scale
+            },
+            if self.smooth && !self.back_occluded && !self.top_occluded && !self.right_occluded {
+                self.center
+            } else {
+                self.scale
+            },
+        ];
 
         let mut normals = [0.0; 108];
 
         // Bottom
-        normals[normal_increment()] = down[0];
-        normals[normal_increment()] = down[1];
-        normals[normal_increment()] = down[2];
-        normals[normal_increment()] = down[0];
-        normals[normal_increment()] = down[1];
-        normals[normal_increment()] = down[2];
-        normals[normal_increment()] = down[0];
-        normals[normal_increment()] = down[1];
-        normals[normal_increment()] = down[2];
+        // ldf, rdf, rdb
+        let b11 = Vec3::new(rdf[0] - ldf[0], rdf[1] - ldf[1], rdf[2] - ldf[2]);
+        let b12 = Vec3::new(rdb[0] - ldf[0], rdb[1] - ldf[1], rdb[2] - ldf[2]);
+        let bc1 = b11.cross(&b12);
+        normals[normal_increment()] = bc1[0];
+        normals[normal_increment()] = bc1[1];
+        normals[normal_increment()] = bc1[2];
+        normals[normal_increment()] = bc1[0];
+        normals[normal_increment()] = bc1[1];
+        normals[normal_increment()] = bc1[2];
+        normals[normal_increment()] = bc1[0];
+        normals[normal_increment()] = bc1[1];
+        normals[normal_increment()] = bc1[2];
 
-        normals[normal_increment()] = down[0];
-        normals[normal_increment()] = down[1];
-        normals[normal_increment()] = down[2];
-        normals[normal_increment()] = down[0];
-        normals[normal_increment()] = down[1];
-        normals[normal_increment()] = down[2];
-        normals[normal_increment()] = down[0];
-        normals[normal_increment()] = down[1];
-        normals[normal_increment()] = down[2];
+        // ldf, rdb, ldb
+        let b21 = Vec3::new(rdb[0] - ldf[0], rdb[1] - ldf[1], rdb[2] - ldf[2]);
+        let b22 = Vec3::new(ldb[0] - ldf[0], ldb[1] - ldf[1], ldb[2] - ldf[2]);
+        let bc2 = b21.cross(&b22);
+
+        normals[normal_increment()] = bc2[0];
+        normals[normal_increment()] = bc2[1];
+        normals[normal_increment()] = bc2[2];
+        normals[normal_increment()] = bc2[0];
+        normals[normal_increment()] = bc2[1];
+        normals[normal_increment()] = bc2[2];
+        normals[normal_increment()] = bc2[0];
+        normals[normal_increment()] = bc2[1];
+        normals[normal_increment()] = bc2[2];
 
         // Left
-        normals[normal_increment()] = left[0];
-        normals[normal_increment()] = left[1];
-        normals[normal_increment()] = left[2];
-        normals[normal_increment()] = left[0];
-        normals[normal_increment()] = left[1];
-        normals[normal_increment()] = left[2];
-        normals[normal_increment()] = left[0];
-        normals[normal_increment()] = left[1];
-        normals[normal_increment()] = left[2];
+        // ldf, ldb, lub
+        let l11 = Vec3::new(ldb[0] - ldf[0], ldb[1] - ldf[1], ldb[2] - ldf[2]);
+        let l12 = Vec3::new(lub[0] - ldf[0], lub[1] - ldf[1], lub[2] - ldf[2]);
+        let lc1 = l11.cross(&l12);
 
-        normals[normal_increment()] = left[0];
-        normals[normal_increment()] = left[1];
-        normals[normal_increment()] = left[2];
-        normals[normal_increment()] = left[0];
-        normals[normal_increment()] = left[1];
-        normals[normal_increment()] = left[2];
-        normals[normal_increment()] = left[0];
-        normals[normal_increment()] = left[1];
-        normals[normal_increment()] = left[2];
+        normals[normal_increment()] = lc1[0];
+        normals[normal_increment()] = lc1[1];
+        normals[normal_increment()] = lc1[2];
+        normals[normal_increment()] = lc1[0];
+        normals[normal_increment()] = lc1[1];
+        normals[normal_increment()] = lc1[2];
+        normals[normal_increment()] = lc1[0];
+        normals[normal_increment()] = lc1[1];
+        normals[normal_increment()] = lc1[2];
+
+        // ldf, lub, luf
+        let l21 = Vec3::new(lub[0] - ldf[0], lub[1] - ldf[1], lub[2] - ldf[2]);
+        let l22 = Vec3::new(luf[0] - ldf[0], luf[1] - ldf[1], luf[2] - ldf[2]);
+        let lc2 = l21.cross(&l22);
+
+        normals[normal_increment()] = lc2[0];
+        normals[normal_increment()] = lc2[1];
+        normals[normal_increment()] = lc2[2];
+        normals[normal_increment()] = lc2[0];
+        normals[normal_increment()] = lc2[1];
+        normals[normal_increment()] = lc2[2];
+        normals[normal_increment()] = lc2[0];
+        normals[normal_increment()] = lc2[1];
+        normals[normal_increment()] = lc2[2];
 
         // Right
-        normals[normal_increment()] = right[0];
-        normals[normal_increment()] = right[1];
-        normals[normal_increment()] = right[2];
-        normals[normal_increment()] = right[0];
-        normals[normal_increment()] = right[1];
-        normals[normal_increment()] = right[2];
-        normals[normal_increment()] = right[0];
-        normals[normal_increment()] = right[1];
-        normals[normal_increment()] = right[2];
+        // rdf, ruf, rub
+        let r11 = Vec3::new(ruf[0] - rdf[0], ruf[1] - rdf[1], ruf[2] - rdf[2]);
+        let r12 = Vec3::new(rub[0] - rdf[0], rub[1] - rdf[1], rub[2] - rdf[2]);
+        let rc1 = r11.cross(&r12);
+        normals[normal_increment()] = rc1[0];
+        normals[normal_increment()] = rc1[1];
+        normals[normal_increment()] = rc1[2];
+        normals[normal_increment()] = rc1[0];
+        normals[normal_increment()] = rc1[1];
+        normals[normal_increment()] = rc1[2];
+        normals[normal_increment()] = rc1[0];
+        normals[normal_increment()] = rc1[1];
+        normals[normal_increment()] = rc1[2];
 
-        normals[normal_increment()] = right[0];
-        normals[normal_increment()] = right[1];
-        normals[normal_increment()] = right[2];
-        normals[normal_increment()] = right[0];
-        normals[normal_increment()] = right[1];
-        normals[normal_increment()] = right[2];
-        normals[normal_increment()] = right[0];
-        normals[normal_increment()] = right[1];
-        normals[normal_increment()] = right[2];
+        // rdf, rub, rdb
+        let r21 = Vec3::new(rub[0] - rdf[0], rub[1] - rdf[1], rub[2] - rdf[2]);
+        let r22 = Vec3::new(rdb[0] - rdf[0], rdb[1] - rdf[1], rdb[2] - rdf[2]);
+        let rc2 = r21.cross(&r22);
+        normals[normal_increment()] = rc2[0];
+        normals[normal_increment()] = rc2[1];
+        normals[normal_increment()] = rc2[2];
+        normals[normal_increment()] = rc2[0];
+        normals[normal_increment()] = rc2[1];
+        normals[normal_increment()] = rc2[2];
+        normals[normal_increment()] = rc2[0];
+        normals[normal_increment()] = rc2[1];
+        normals[normal_increment()] = rc2[2];
 
         // Back
-        normals[normal_increment()] = back[0];
-        normals[normal_increment()] = back[1];
-        normals[normal_increment()] = back[2];
-        normals[normal_increment()] = back[0];
-        normals[normal_increment()] = back[1];
-        normals[normal_increment()] = back[2];
-        normals[normal_increment()] = back[0];
-        normals[normal_increment()] = back[1];
-        normals[normal_increment()] = back[2];
+        // ldb, rdb, rub
+        let b11 = Vec3::new(rdb[0] - ldb[0], rdb[1] - ldb[1], rdb[2] - ldb[2]);
+        let b12 = Vec3::new(rub[0] - ldb[0], rub[1] - ldb[1], rub[2] - ldb[2]);
+        let bc1 = b11.cross(&b12);
+        normals[normal_increment()] = bc1[0];
+        normals[normal_increment()] = bc1[1];
+        normals[normal_increment()] = bc1[2];
+        normals[normal_increment()] = bc1[0];
+        normals[normal_increment()] = bc1[1];
+        normals[normal_increment()] = bc1[2];
+        normals[normal_increment()] = bc1[0];
+        normals[normal_increment()] = bc1[1];
+        normals[normal_increment()] = bc1[2];
 
-        normals[normal_increment()] = back[0];
-        normals[normal_increment()] = back[1];
-        normals[normal_increment()] = back[2];
-        normals[normal_increment()] = back[0];
-        normals[normal_increment()] = back[1];
-        normals[normal_increment()] = back[2];
-        normals[normal_increment()] = back[0];
-        normals[normal_increment()] = back[1];
-        normals[normal_increment()] = back[2];
+        // ldb, rub, lub
+        let b21 = Vec3::new(rub[0] - ldb[0], rub[1] - ldb[1], rub[2] - ldb[2]);
+        let b22 = Vec3::new(lub[0] - ldb[0], lub[1] - ldb[1], lub[2] - ldb[2]);
+        let bc2 = b21.cross(&b22);
+        normals[normal_increment()] = bc2[0];
+        normals[normal_increment()] = bc2[1];
+        normals[normal_increment()] = bc2[2];
+        normals[normal_increment()] = bc2[0];
+        normals[normal_increment()] = bc2[1];
+        normals[normal_increment()] = bc2[2];
+        normals[normal_increment()] = bc2[0];
+        normals[normal_increment()] = bc2[1];
+        normals[normal_increment()] = bc2[2];
         // Front
-        normals[normal_increment()] = front[0];
-        normals[normal_increment()] = front[1];
-        normals[normal_increment()] = front[2];
-        normals[normal_increment()] = front[0];
-        normals[normal_increment()] = front[1];
-        normals[normal_increment()] = front[2];
-        normals[normal_increment()] = front[0];
-        normals[normal_increment()] = front[1];
-        normals[normal_increment()] = front[2];
+        // ldf, luf, ruf
+        let f11 = Vec3::new(luf[0] - ldf[0], luf[1] - ldf[1], luf[2] - ldf[2]);
+        let f12 = Vec3::new(ruf[0] - ldf[0], ruf[1] - ldf[1], ruf[2] - ldf[2]);
+        let fc1 = f11.cross(&f12);
+        normals[normal_increment()] = fc1[0];
+        normals[normal_increment()] = fc1[1];
+        normals[normal_increment()] = fc1[2];
+        normals[normal_increment()] = fc1[0];
+        normals[normal_increment()] = fc1[1];
+        normals[normal_increment()] = fc1[2];
+        normals[normal_increment()] = fc1[0];
+        normals[normal_increment()] = fc1[1];
+        normals[normal_increment()] = fc1[2];
 
-        normals[normal_increment()] = front[0];
-        normals[normal_increment()] = front[1];
-        normals[normal_increment()] = front[2];
-        normals[normal_increment()] = front[0];
-        normals[normal_increment()] = front[1];
-        normals[normal_increment()] = front[2];
-        normals[normal_increment()] = front[0];
-        normals[normal_increment()] = front[1];
-        normals[normal_increment()] = front[2];
+        // ldf, ruf, rdf
+        let f21 = Vec3::new(ruf[0] - ldf[0], ruf[1] - ldf[1], ruf[2] - ldf[2]);
+        let f22 = Vec3::new(rdf[0] - ldf[0], rdf[1] - ldf[1], rdf[2] - ldf[2]);
+        let fc2 = f21.cross(&f22);
+        normals[normal_increment()] = fc2[0];
+        normals[normal_increment()] = fc2[1];
+        normals[normal_increment()] = fc2[2];
+        normals[normal_increment()] = fc2[0];
+        normals[normal_increment()] = fc2[1];
+        normals[normal_increment()] = fc2[2];
+        normals[normal_increment()] = fc2[0];
+        normals[normal_increment()] = fc2[1];
+        normals[normal_increment()] = fc2[2];
         // Top
-        normals[normal_increment()] = up[0];
-        normals[normal_increment()] = up[1];
-        normals[normal_increment()] = up[2];
-        normals[normal_increment()] = up[0];
-        normals[normal_increment()] = up[1];
-        normals[normal_increment()] = up[2];
-        normals[normal_increment()] = up[0];
-        normals[normal_increment()] = up[1];
-        normals[normal_increment()] = up[2];
-
-        normals[normal_increment()] = up[0];
-        normals[normal_increment()] = up[1];
-        normals[normal_increment()] = up[2];
-        normals[normal_increment()] = up[0];
-        normals[normal_increment()] = up[1];
-        normals[normal_increment()] = up[2];
-        normals[normal_increment()] = up[0];
-        normals[normal_increment()] = up[1];
-        normals[normal_increment()] = up[2];
+        // luf, lub, rub
+        let t11 = Vec3::new(lub[0] - luf[0], lub[1] - luf[1], lub[2] - luf[2]);
+        let t12 = Vec3::new(rub[0] - luf[0], rub[1] - luf[1], rub[2] - luf[2]);
+        let tc1 = t11.cross(&t12);
+        normals[normal_increment()] = tc1[0];
+        normals[normal_increment()] = tc1[1];
+        normals[normal_increment()] = tc1[2];
+        normals[normal_increment()] = tc1[0];
+        normals[normal_increment()] = tc1[1];
+        normals[normal_increment()] = tc1[2];
+        normals[normal_increment()] = tc1[0];
+        normals[normal_increment()] = tc1[1];
+        normals[normal_increment()] = tc1[2];
+        // luf, rub, ruf
+        let t21 = Vec3::new(rub[0] - luf[0], rub[1] - luf[1], rub[2] - luf[2]);
+        let t22 = Vec3::new(ruf[0] - luf[0], ruf[1] - luf[1], ruf[2] - luf[2]);
+        let tc2 = t21.cross(&t22);
+        normals[normal_increment()] = tc2[0];
+        normals[normal_increment()] = tc2[1];
+        normals[normal_increment()] = tc2[2];
+        normals[normal_increment()] = tc2[0];
+        normals[normal_increment()] = tc2[1];
+        normals[normal_increment()] = tc2[2];
+        normals[normal_increment()] = tc2[0];
+        normals[normal_increment()] = tc2[1];
+        normals[normal_increment()] = tc2[2];
 
         let bottom = &normals[0..18];
         let left = &normals[18..36];

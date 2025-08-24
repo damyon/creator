@@ -418,11 +418,13 @@ impl Ocnode {
     ) {
         for position in positions {
             let maybe = self.find_mut_by_index(position[0], position[1], position[2], LEVELS);
-            let actual = maybe.expect("node exists");
-            actual.active = value;
-            actual.color = color;
-            actual.fluid = fluid;
-            actual.noise = noise;
+            if maybe.is_some() {
+                let actual = maybe.unwrap();
+                actual.active = value;
+                actual.color = color;
+                actual.fluid = fluid;
+                actual.noise = noise;
+            }
         }
     }
 
