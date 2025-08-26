@@ -27,7 +27,7 @@ impl Cube {
     /// Create a new default cube.
     pub const fn new() -> Cube {
         Cube {
-            vertices_count: 108,
+            vertices_count: 216,
             translation: [0.0; 3],
             rotation: [0.0; 3],
             color: [0.3, 0.3, 0.1, 1.0],
@@ -55,22 +55,22 @@ impl Drawable for Cube {
     fn count_vertices(&self) -> u16 {
         let mut occluded = self.vertices_count;
         if self.bottom_occluded {
-            occluded -= 18;
+            occluded -= 36;
         }
         if self.left_occluded {
-            occluded -= 18;
+            occluded -= 36;
         }
         if self.right_occluded {
-            occluded -= 18;
+            occluded -= 36;
         }
         if self.front_occluded {
-            occluded -= 18;
+            occluded -= 36;
         }
         if self.back_occluded {
-            occluded -= 18;
+            occluded -= 36;
         }
         if self.top_occluded {
-            occluded -= 18;
+            occluded -= 36;
         }
         occluded
     }
@@ -118,6 +118,98 @@ impl Drawable for Cube {
         // Start by calcuting the points.
         // naming is l/r u/d f/b
         // which is -x/+x -y/+y / -z/+z
+        let lc = [
+            if self.smooth
+                && !self.front_occluded
+                && !self.bottom_occluded
+                && !self.left_occluded
+                && !self.back_occluded
+                && !self.top_occluded
+            {
+                self.center
+            } else {
+                self.floor
+            },
+            self.center,
+            self.center,
+        ];
+        let rc = [
+            if self.smooth
+                && !self.front_occluded
+                && !self.bottom_occluded
+                && !self.right_occluded
+                && !self.back_occluded
+                && !self.top_occluded
+            {
+                self.center
+            } else {
+                self.scale
+            },
+            self.center,
+            self.center,
+        ];
+        let fc = [
+            self.center,
+            self.center,
+            if self.smooth
+                && !self.front_occluded
+                && !self.bottom_occluded
+                && !self.right_occluded
+                && !self.left_occluded
+                && !self.top_occluded
+            {
+                self.center
+            } else {
+                self.floor
+            },
+        ];
+        let bc = [
+            self.center,
+            self.center,
+            if self.smooth
+                && !self.back_occluded
+                && !self.bottom_occluded
+                && !self.right_occluded
+                && !self.left_occluded
+                && !self.top_occluded
+            {
+                self.center
+            } else {
+                self.scale
+            },
+        ];
+        let dc = [
+            self.center,
+            if self.smooth
+                && !self.back_occluded
+                && !self.bottom_occluded
+                && !self.right_occluded
+                && !self.left_occluded
+                && !self.front_occluded
+            {
+                self.center
+            } else {
+                self.floor
+            },
+            self.center,
+        ];
+
+        let uc = [
+            self.center,
+            if self.smooth
+                && !self.back_occluded
+                && !self.top_occluded
+                && !self.right_occluded
+                && !self.left_occluded
+                && !self.front_occluded
+            {
+                self.center
+            } else {
+                self.scale
+            },
+            self.center,
+        ];
+
         let ldf = [
             if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.left_occluded {
                 self.center
@@ -265,7 +357,7 @@ impl Drawable for Cube {
             result
         };
 
-        let mut vertices = [0.0; 108];
+        let mut vertices = [0.0; 216];
         // Bottom
         vertices[increment()] = ldf[0];
         vertices[increment()] = ldf[1];
@@ -273,19 +365,39 @@ impl Drawable for Cube {
         vertices[increment()] = rdf[0];
         vertices[increment()] = rdf[1];
         vertices[increment()] = rdf[2];
+        vertices[increment()] = dc[0];
+        vertices[increment()] = dc[1];
+        vertices[increment()] = dc[2];
+
+        vertices[increment()] = rdf[0];
+        vertices[increment()] = rdf[1];
+        vertices[increment()] = rdf[2];
         vertices[increment()] = rdb[0];
         vertices[increment()] = rdb[1];
         vertices[increment()] = rdb[2];
+        vertices[increment()] = dc[0];
+        vertices[increment()] = dc[1];
+        vertices[increment()] = dc[2];
 
-        vertices[increment()] = ldf[0];
-        vertices[increment()] = ldf[1];
-        vertices[increment()] = ldf[2];
         vertices[increment()] = rdb[0];
         vertices[increment()] = rdb[1];
         vertices[increment()] = rdb[2];
         vertices[increment()] = ldb[0];
         vertices[increment()] = ldb[1];
         vertices[increment()] = ldb[2];
+        vertices[increment()] = dc[0];
+        vertices[increment()] = dc[1];
+        vertices[increment()] = dc[2];
+
+        vertices[increment()] = ldb[0];
+        vertices[increment()] = ldb[1];
+        vertices[increment()] = ldb[2];
+        vertices[increment()] = ldf[0];
+        vertices[increment()] = ldf[1];
+        vertices[increment()] = ldf[2];
+        vertices[increment()] = dc[0];
+        vertices[increment()] = dc[1];
+        vertices[increment()] = dc[2];
 
         // Left
         vertices[increment()] = ldf[0];
@@ -294,19 +406,39 @@ impl Drawable for Cube {
         vertices[increment()] = ldb[0];
         vertices[increment()] = ldb[1];
         vertices[increment()] = ldb[2];
-        vertices[increment()] = lub[0];
-        vertices[increment()] = lub[1];
-        vertices[increment()] = lub[2];
+        vertices[increment()] = lc[0];
+        vertices[increment()] = lc[1];
+        vertices[increment()] = lc[2];
 
+        vertices[increment()] = luf[0];
+        vertices[increment()] = luf[1];
+        vertices[increment()] = luf[2];
         vertices[increment()] = ldf[0];
         vertices[increment()] = ldf[1];
         vertices[increment()] = ldf[2];
+        vertices[increment()] = lc[0];
+        vertices[increment()] = lc[1];
+        vertices[increment()] = lc[2];
+
         vertices[increment()] = lub[0];
         vertices[increment()] = lub[1];
         vertices[increment()] = lub[2];
         vertices[increment()] = luf[0];
         vertices[increment()] = luf[1];
         vertices[increment()] = luf[2];
+        vertices[increment()] = lc[0];
+        vertices[increment()] = lc[1];
+        vertices[increment()] = lc[2];
+
+        vertices[increment()] = ldb[0];
+        vertices[increment()] = ldb[1];
+        vertices[increment()] = ldb[2];
+        vertices[increment()] = lub[0];
+        vertices[increment()] = lub[1];
+        vertices[increment()] = lub[2];
+        vertices[increment()] = lc[0];
+        vertices[increment()] = lc[1];
+        vertices[increment()] = lc[2];
         // Right
         vertices[increment()] = rdf[0];
         vertices[increment()] = rdf[1];
@@ -314,19 +446,39 @@ impl Drawable for Cube {
         vertices[increment()] = ruf[0];
         vertices[increment()] = ruf[1];
         vertices[increment()] = ruf[2];
+        vertices[increment()] = rc[0];
+        vertices[increment()] = rc[1];
+        vertices[increment()] = rc[2];
+
+        vertices[increment()] = ruf[0];
+        vertices[increment()] = ruf[1];
+        vertices[increment()] = ruf[2];
         vertices[increment()] = rub[0];
         vertices[increment()] = rub[1];
         vertices[increment()] = rub[2];
+        vertices[increment()] = rc[0];
+        vertices[increment()] = rc[1];
+        vertices[increment()] = rc[2];
 
-        vertices[increment()] = rdf[0];
-        vertices[increment()] = rdf[1];
-        vertices[increment()] = rdf[2];
         vertices[increment()] = rub[0];
         vertices[increment()] = rub[1];
         vertices[increment()] = rub[2];
         vertices[increment()] = rdb[0];
         vertices[increment()] = rdb[1];
         vertices[increment()] = rdb[2];
+        vertices[increment()] = rc[0];
+        vertices[increment()] = rc[1];
+        vertices[increment()] = rc[2];
+
+        vertices[increment()] = rdb[0];
+        vertices[increment()] = rdb[1];
+        vertices[increment()] = rdb[2];
+        vertices[increment()] = rdf[0];
+        vertices[increment()] = rdf[1];
+        vertices[increment()] = rdf[2];
+        vertices[increment()] = rc[0];
+        vertices[increment()] = rc[1];
+        vertices[increment()] = rc[2];
         // Back
         vertices[increment()] = ldb[0];
         vertices[increment()] = ldb[1];
@@ -334,19 +486,39 @@ impl Drawable for Cube {
         vertices[increment()] = rdb[0];
         vertices[increment()] = rdb[1];
         vertices[increment()] = rdb[2];
+        vertices[increment()] = bc[0];
+        vertices[increment()] = bc[1];
+        vertices[increment()] = bc[2];
+
+        vertices[increment()] = rdb[0];
+        vertices[increment()] = rdb[1];
+        vertices[increment()] = rdb[2];
         vertices[increment()] = rub[0];
         vertices[increment()] = rub[1];
         vertices[increment()] = rub[2];
+        vertices[increment()] = bc[0];
+        vertices[increment()] = bc[1];
+        vertices[increment()] = bc[2];
 
-        vertices[increment()] = ldb[0];
-        vertices[increment()] = ldb[1];
-        vertices[increment()] = ldb[2];
         vertices[increment()] = rub[0];
         vertices[increment()] = rub[1];
         vertices[increment()] = rub[2];
         vertices[increment()] = lub[0];
         vertices[increment()] = lub[1];
         vertices[increment()] = lub[2];
+        vertices[increment()] = bc[0];
+        vertices[increment()] = bc[1];
+        vertices[increment()] = bc[2];
+
+        vertices[increment()] = lub[0];
+        vertices[increment()] = lub[1];
+        vertices[increment()] = lub[2];
+        vertices[increment()] = ldb[0];
+        vertices[increment()] = ldb[1];
+        vertices[increment()] = ldb[2];
+        vertices[increment()] = bc[0];
+        vertices[increment()] = bc[1];
+        vertices[increment()] = bc[2];
 
         // Front
         vertices[increment()] = ldf[0];
@@ -355,19 +527,40 @@ impl Drawable for Cube {
         vertices[increment()] = luf[0];
         vertices[increment()] = luf[1];
         vertices[increment()] = luf[2];
+        vertices[increment()] = fc[0];
+        vertices[increment()] = fc[1];
+        vertices[increment()] = fc[2];
+
+        vertices[increment()] = luf[0];
+        vertices[increment()] = luf[1];
+        vertices[increment()] = luf[2];
         vertices[increment()] = ruf[0];
         vertices[increment()] = ruf[1];
         vertices[increment()] = ruf[2];
+        vertices[increment()] = fc[0];
+        vertices[increment()] = fc[1];
+        vertices[increment()] = fc[2];
 
-        vertices[increment()] = ldf[0];
-        vertices[increment()] = ldf[1];
-        vertices[increment()] = ldf[2];
         vertices[increment()] = ruf[0];
         vertices[increment()] = ruf[1];
         vertices[increment()] = ruf[2];
         vertices[increment()] = rdf[0];
         vertices[increment()] = rdf[1];
         vertices[increment()] = rdf[2];
+        vertices[increment()] = fc[0];
+        vertices[increment()] = fc[1];
+        vertices[increment()] = fc[2];
+
+        vertices[increment()] = rdf[0];
+        vertices[increment()] = rdf[1];
+        vertices[increment()] = rdf[2];
+        vertices[increment()] = ldf[0];
+        vertices[increment()] = ldf[1];
+        vertices[increment()] = ldf[2];
+        vertices[increment()] = fc[0];
+        vertices[increment()] = fc[1];
+        vertices[increment()] = fc[2];
+
         // Top
         vertices[increment()] = luf[0];
         vertices[increment()] = luf[1];
@@ -375,26 +568,46 @@ impl Drawable for Cube {
         vertices[increment()] = lub[0];
         vertices[increment()] = lub[1];
         vertices[increment()] = lub[2];
+        vertices[increment()] = uc[0];
+        vertices[increment()] = uc[1];
+        vertices[increment()] = uc[2];
+
+        vertices[increment()] = lub[0];
+        vertices[increment()] = lub[1];
+        vertices[increment()] = lub[2];
         vertices[increment()] = rub[0];
         vertices[increment()] = rub[1];
         vertices[increment()] = rub[2];
+        vertices[increment()] = uc[0];
+        vertices[increment()] = uc[1];
+        vertices[increment()] = uc[2];
 
-        vertices[increment()] = luf[0];
-        vertices[increment()] = luf[1];
-        vertices[increment()] = luf[2];
         vertices[increment()] = rub[0];
         vertices[increment()] = rub[1];
         vertices[increment()] = rub[2];
         vertices[increment()] = ruf[0];
         vertices[increment()] = ruf[1];
         vertices[increment()] = ruf[2];
+        vertices[increment()] = uc[0];
+        vertices[increment()] = uc[1];
+        vertices[increment()] = uc[2];
 
-        let bottom = &vertices[0..18];
-        let left = &vertices[18..36];
-        let right = &vertices[36..54];
-        let back = &vertices[54..72];
-        let front = &vertices[72..90];
-        let top = &vertices[90..108];
+        vertices[increment()] = ruf[0];
+        vertices[increment()] = ruf[1];
+        vertices[increment()] = ruf[2];
+        vertices[increment()] = luf[0];
+        vertices[increment()] = luf[1];
+        vertices[increment()] = luf[2];
+        vertices[increment()] = uc[0];
+        vertices[increment()] = uc[1];
+        vertices[increment()] = uc[2];
+
+        let bottom = &vertices[0..36];
+        let left = &vertices[36..72];
+        let right = &vertices[72..108];
+        let back = &vertices[108..144];
+        let front = &vertices[144..180];
+        let top = &vertices[180..216];
         let mut valid = vec![];
 
         if !self.bottom_occluded {
@@ -427,6 +640,98 @@ impl Drawable for Cube {
             normal_index += 1;
             normal_result
         };
+
+        let lc = [
+            if self.smooth
+                && !self.front_occluded
+                && !self.bottom_occluded
+                && !self.left_occluded
+                && !self.back_occluded
+                && !self.top_occluded
+            {
+                self.center
+            } else {
+                self.floor
+            },
+            self.center,
+            self.center,
+        ];
+        let rc = [
+            if self.smooth
+                && !self.front_occluded
+                && !self.bottom_occluded
+                && !self.right_occluded
+                && !self.back_occluded
+                && !self.top_occluded
+            {
+                self.center
+            } else {
+                self.scale
+            },
+            self.center,
+            self.center,
+        ];
+        let fc = [
+            self.center,
+            self.center,
+            if self.smooth
+                && !self.front_occluded
+                && !self.bottom_occluded
+                && !self.right_occluded
+                && !self.left_occluded
+                && !self.top_occluded
+            {
+                self.center
+            } else {
+                self.floor
+            },
+        ];
+        let bc = [
+            self.center,
+            self.center,
+            if self.smooth
+                && !self.back_occluded
+                && !self.bottom_occluded
+                && !self.right_occluded
+                && !self.left_occluded
+                && !self.top_occluded
+            {
+                self.center
+            } else {
+                self.scale
+            },
+        ];
+        let dc = [
+            self.center,
+            if self.smooth
+                && !self.back_occluded
+                && !self.bottom_occluded
+                && !self.right_occluded
+                && !self.left_occluded
+                && !self.front_occluded
+            {
+                self.center
+            } else {
+                self.floor
+            },
+            self.center,
+        ];
+
+        let uc = [
+            self.center,
+            if self.smooth
+                && !self.back_occluded
+                && !self.top_occluded
+                && !self.right_occluded
+                && !self.left_occluded
+                && !self.front_occluded
+            {
+                self.center
+            } else {
+                self.scale
+            },
+            self.center,
+        ];
 
         let ldf = [
             if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.left_occluded {
@@ -568,12 +873,12 @@ impl Drawable for Cube {
             },
         ];
 
-        let mut normals = [0.0; 108];
+        let mut normals = [0.0; 216];
 
         // Bottom
-        // ldf, rdf, rdb
-        let b11 = Vec3::new(rdf[0] - ldf[0], rdf[1] - ldf[1], rdf[2] - ldf[2]);
-        let b12 = Vec3::new(rdb[0] - ldf[0], rdb[1] - ldf[1], rdb[2] - ldf[2]);
+        // ldf, rdf, dc
+        let b11 = Vec3::new(ldf[0] - dc[0], ldf[1] - dc[1], ldf[2] - dc[2]);
+        let b12 = Vec3::new(rdf[0] - dc[0], rdf[1] - dc[1], rdf[2] - dc[2]);
         let bc1 = b11.cross(&b12);
         normals[normal_increment()] = bc1[0];
         normals[normal_increment()] = bc1[1];
@@ -585,9 +890,9 @@ impl Drawable for Cube {
         normals[normal_increment()] = bc1[1];
         normals[normal_increment()] = bc1[2];
 
-        // ldf, rdb, ldb
-        let b21 = Vec3::new(rdb[0] - ldf[0], rdb[1] - ldf[1], rdb[2] - ldf[2]);
-        let b22 = Vec3::new(ldb[0] - ldf[0], ldb[1] - ldf[1], ldb[2] - ldf[2]);
+        // rdf, rdb, dc
+        let b21 = Vec3::new(rdf[0] - dc[0], rdf[1] - dc[1], rdf[2] - dc[2]);
+        let b22 = Vec3::new(rdb[0] - dc[0], rdb[1] - dc[1], rdb[2] - dc[2]);
         let bc2 = b21.cross(&b22);
 
         normals[normal_increment()] = bc2[0];
@@ -600,10 +905,40 @@ impl Drawable for Cube {
         normals[normal_increment()] = bc2[1];
         normals[normal_increment()] = bc2[2];
 
+        // rdb, ldb, dc
+        let b31 = Vec3::new(rdb[0] - dc[0], rdb[1] - dc[1], rdb[2] - dc[2]);
+        let b32 = Vec3::new(ldb[0] - dc[0], ldb[1] - dc[1], ldb[2] - dc[2]);
+        let bc3 = b31.cross(&b32);
+
+        normals[normal_increment()] = bc3[0];
+        normals[normal_increment()] = bc3[1];
+        normals[normal_increment()] = bc3[2];
+        normals[normal_increment()] = bc3[0];
+        normals[normal_increment()] = bc3[1];
+        normals[normal_increment()] = bc3[2];
+        normals[normal_increment()] = bc3[0];
+        normals[normal_increment()] = bc3[1];
+        normals[normal_increment()] = bc3[2];
+
+        // ldb, ldf, dc
+        let b41 = Vec3::new(ldb[0] - dc[0], ldb[1] - dc[1], ldb[2] - dc[2]);
+        let b42 = Vec3::new(ldf[0] - dc[0], ldf[1] - dc[1], ldf[2] - dc[2]);
+        let bc4 = b41.cross(&b42);
+
+        normals[normal_increment()] = bc4[0];
+        normals[normal_increment()] = bc4[1];
+        normals[normal_increment()] = bc4[2];
+        normals[normal_increment()] = bc4[0];
+        normals[normal_increment()] = bc4[1];
+        normals[normal_increment()] = bc4[2];
+        normals[normal_increment()] = bc4[0];
+        normals[normal_increment()] = bc4[1];
+        normals[normal_increment()] = bc4[2];
+
         // Left
-        // ldf, ldb, lub
-        let l11 = Vec3::new(ldb[0] - ldf[0], ldb[1] - ldf[1], ldb[2] - ldf[2]);
-        let l12 = Vec3::new(lub[0] - ldf[0], lub[1] - ldf[1], lub[2] - ldf[2]);
+        // ldf, ldb, lc
+        let l11 = Vec3::new(ldf[0] - lc[0], ldf[1] - lc[1], ldf[2] - lc[2]);
+        let l12 = Vec3::new(ldb[0] - lc[0], ldb[1] - lc[1], ldb[2] - lc[2]);
         let lc1 = l11.cross(&l12);
 
         normals[normal_increment()] = lc1[0];
@@ -616,9 +951,9 @@ impl Drawable for Cube {
         normals[normal_increment()] = lc1[1];
         normals[normal_increment()] = lc1[2];
 
-        // ldf, lub, luf
-        let l21 = Vec3::new(lub[0] - ldf[0], lub[1] - ldf[1], lub[2] - ldf[2]);
-        let l22 = Vec3::new(luf[0] - ldf[0], luf[1] - ldf[1], luf[2] - ldf[2]);
+        // luf, ldf, lc
+        let l21 = Vec3::new(luf[0] - lc[0], luf[1] - lc[1], luf[2] - lc[2]);
+        let l22 = Vec3::new(ldf[0] - lc[0], ldf[1] - lc[1], ldf[2] - lc[2]);
         let lc2 = l21.cross(&l22);
 
         normals[normal_increment()] = lc2[0];
@@ -631,10 +966,40 @@ impl Drawable for Cube {
         normals[normal_increment()] = lc2[1];
         normals[normal_increment()] = lc2[2];
 
+        // lub, luf, lc
+        let l31 = Vec3::new(lub[0] - lc[0], lub[1] - lc[1], lub[2] - lc[2]);
+        let l32 = Vec3::new(luf[0] - lc[0], luf[1] - lc[1], luf[2] - lc[2]);
+        let lc3 = l31.cross(&l32);
+
+        normals[normal_increment()] = lc3[0];
+        normals[normal_increment()] = lc3[1];
+        normals[normal_increment()] = lc3[2];
+        normals[normal_increment()] = lc3[0];
+        normals[normal_increment()] = lc3[1];
+        normals[normal_increment()] = lc3[2];
+        normals[normal_increment()] = lc3[0];
+        normals[normal_increment()] = lc3[1];
+        normals[normal_increment()] = lc3[2];
+
+        // ldb, lub, lc
+        let l41 = Vec3::new(ldb[0] - lc[0], ldb[1] - lc[1], ldb[2] - lc[2]);
+        let l42 = Vec3::new(lub[0] - lc[0], lub[1] - lc[1], lub[2] - lc[2]);
+        let lc4 = l41.cross(&l42);
+
+        normals[normal_increment()] = lc4[0];
+        normals[normal_increment()] = lc4[1];
+        normals[normal_increment()] = lc4[2];
+        normals[normal_increment()] = lc4[0];
+        normals[normal_increment()] = lc4[1];
+        normals[normal_increment()] = lc4[2];
+        normals[normal_increment()] = lc4[0];
+        normals[normal_increment()] = lc4[1];
+        normals[normal_increment()] = lc4[2];
+
         // Right
-        // rdf, ruf, rub
-        let r11 = Vec3::new(ruf[0] - rdf[0], ruf[1] - rdf[1], ruf[2] - rdf[2]);
-        let r12 = Vec3::new(rub[0] - rdf[0], rub[1] - rdf[1], rub[2] - rdf[2]);
+        // rdf, ruf, rc
+        let r11 = Vec3::new(rdf[0] - rc[0], rdf[1] - rc[1], rdf[2] - rc[2]);
+        let r12 = Vec3::new(ruf[0] - rc[0], ruf[1] - rc[1], ruf[2] - rc[2]);
         let rc1 = r11.cross(&r12);
         normals[normal_increment()] = rc1[0];
         normals[normal_increment()] = rc1[1];
@@ -646,9 +1011,9 @@ impl Drawable for Cube {
         normals[normal_increment()] = rc1[1];
         normals[normal_increment()] = rc1[2];
 
-        // rdf, rub, rdb
-        let r21 = Vec3::new(rub[0] - rdf[0], rub[1] - rdf[1], rub[2] - rdf[2]);
-        let r22 = Vec3::new(rdb[0] - rdf[0], rdb[1] - rdf[1], rdb[2] - rdf[2]);
+        // ruf, rub, rc
+        let r21 = Vec3::new(ruf[0] - rc[0], ruf[1] - rc[1], ruf[2] - rc[2]);
+        let r22 = Vec3::new(rub[0] - rc[0], rub[1] - rc[1], rub[2] - rc[2]);
         let rc2 = r21.cross(&r22);
         normals[normal_increment()] = rc2[0];
         normals[normal_increment()] = rc2[1];
@@ -660,11 +1025,40 @@ impl Drawable for Cube {
         normals[normal_increment()] = rc2[1];
         normals[normal_increment()] = rc2[2];
 
+        // rub, rdb, rc
+        let r31 = Vec3::new(rub[0] - rc[0], rub[1] - rc[1], rub[2] - rc[2]);
+        let r32 = Vec3::new(rdb[0] - rc[0], rdb[1] - rc[1], rdb[2] - rc[2]);
+        let rc3 = r31.cross(&r32);
+        normals[normal_increment()] = rc3[0];
+        normals[normal_increment()] = rc3[1];
+        normals[normal_increment()] = rc3[2];
+        normals[normal_increment()] = rc3[0];
+        normals[normal_increment()] = rc3[1];
+        normals[normal_increment()] = rc3[2];
+        normals[normal_increment()] = rc3[0];
+        normals[normal_increment()] = rc3[1];
+        normals[normal_increment()] = rc3[2];
+
+        // rdb, rdf, rc
+        let r41 = Vec3::new(rdb[0] - rc[0], rdb[1] - rc[1], rdb[2] - rc[2]);
+        let r42 = Vec3::new(rdf[0] - rc[0], rdf[1] - rc[1], rdf[2] - rc[2]);
+        let rc4 = r41.cross(&r42);
+        normals[normal_increment()] = rc4[0];
+        normals[normal_increment()] = rc4[1];
+        normals[normal_increment()] = rc4[2];
+        normals[normal_increment()] = rc4[0];
+        normals[normal_increment()] = rc4[1];
+        normals[normal_increment()] = rc4[2];
+        normals[normal_increment()] = rc4[0];
+        normals[normal_increment()] = rc4[1];
+        normals[normal_increment()] = rc4[2];
+
         // Back
-        // ldb, rdb, rub
-        let b11 = Vec3::new(rdb[0] - ldb[0], rdb[1] - ldb[1], rdb[2] - ldb[2]);
-        let b12 = Vec3::new(rub[0] - ldb[0], rub[1] - ldb[1], rub[2] - ldb[2]);
+        // ldb, rdb, bc
+        let b11 = Vec3::new(rdb[0] - bc[0], rdb[1] - bc[1], rdb[2] - bc[2]);
+        let b12 = Vec3::new(rub[0] - bc[0], rub[1] - bc[1], rub[2] - bc[2]);
         let bc1 = b11.cross(&b12);
+
         normals[normal_increment()] = bc1[0];
         normals[normal_increment()] = bc1[1];
         normals[normal_increment()] = bc1[2];
@@ -675,10 +1069,11 @@ impl Drawable for Cube {
         normals[normal_increment()] = bc1[1];
         normals[normal_increment()] = bc1[2];
 
-        // ldb, rub, lub
-        let b21 = Vec3::new(rub[0] - ldb[0], rub[1] - ldb[1], rub[2] - ldb[2]);
-        let b22 = Vec3::new(lub[0] - ldb[0], lub[1] - ldb[1], lub[2] - ldb[2]);
+        // rdb, rub, bc
+        let b21 = Vec3::new(rdb[0] - bc[0], rdb[1] - bc[1], rdb[2] - bc[2]);
+        let b22 = Vec3::new(rub[0] - bc[0], rub[1] - bc[1], rub[2] - bc[2]);
         let bc2 = b21.cross(&b22);
+
         normals[normal_increment()] = bc2[0];
         normals[normal_increment()] = bc2[1];
         normals[normal_increment()] = bc2[2];
@@ -688,11 +1083,43 @@ impl Drawable for Cube {
         normals[normal_increment()] = bc2[0];
         normals[normal_increment()] = bc2[1];
         normals[normal_increment()] = bc2[2];
+
+        // rub, lub, bc
+        let b31 = Vec3::new(rub[0] - bc[0], rub[1] - bc[1], rub[2] - bc[2]);
+        let b32 = Vec3::new(lub[0] - bc[0], lub[1] - bc[1], lub[2] - bc[2]);
+        let bc3 = b31.cross(&b32);
+
+        normals[normal_increment()] = bc3[0];
+        normals[normal_increment()] = bc3[1];
+        normals[normal_increment()] = bc3[2];
+        normals[normal_increment()] = bc3[0];
+        normals[normal_increment()] = bc3[1];
+        normals[normal_increment()] = bc3[2];
+        normals[normal_increment()] = bc3[0];
+        normals[normal_increment()] = bc3[1];
+        normals[normal_increment()] = bc3[2];
+
+        // lub, ldb, bc
+        let b41 = Vec3::new(lub[0] - bc[0], lub[1] - bc[1], lub[2] - bc[2]);
+        let b42 = Vec3::new(ldb[0] - bc[0], ldb[1] - bc[1], ldb[2] - bc[2]);
+        let bc4 = b41.cross(&b42);
+
+        normals[normal_increment()] = bc4[0];
+        normals[normal_increment()] = bc4[1];
+        normals[normal_increment()] = bc4[2];
+        normals[normal_increment()] = bc4[0];
+        normals[normal_increment()] = bc4[1];
+        normals[normal_increment()] = bc4[2];
+        normals[normal_increment()] = bc4[0];
+        normals[normal_increment()] = bc4[1];
+        normals[normal_increment()] = bc4[2];
+
         // Front
-        // ldf, luf, ruf
-        let f11 = Vec3::new(luf[0] - ldf[0], luf[1] - ldf[1], luf[2] - ldf[2]);
-        let f12 = Vec3::new(ruf[0] - ldf[0], ruf[1] - ldf[1], ruf[2] - ldf[2]);
+        // ldf, luf, fc
+        let f11 = Vec3::new(ldf[0] - fc[0], ldf[1] - fc[1], ldf[2] - fc[2]);
+        let f12 = Vec3::new(luf[0] - fc[0], luf[1] - fc[1], luf[2] - fc[2]);
         let fc1 = f11.cross(&f12);
+
         normals[normal_increment()] = fc1[0];
         normals[normal_increment()] = fc1[1];
         normals[normal_increment()] = fc1[2];
@@ -703,10 +1130,11 @@ impl Drawable for Cube {
         normals[normal_increment()] = fc1[1];
         normals[normal_increment()] = fc1[2];
 
-        // ldf, ruf, rdf
-        let f21 = Vec3::new(ruf[0] - ldf[0], ruf[1] - ldf[1], ruf[2] - ldf[2]);
-        let f22 = Vec3::new(rdf[0] - ldf[0], rdf[1] - ldf[1], rdf[2] - ldf[2]);
+        // luf, ruf, fc
+        let f21 = Vec3::new(luf[0] - fc[0], luf[1] - fc[1], luf[2] - fc[2]);
+        let f22 = Vec3::new(ruf[0] - fc[0], ruf[1] - fc[1], ruf[2] - fc[2]);
         let fc2 = f21.cross(&f22);
+
         normals[normal_increment()] = fc2[0];
         normals[normal_increment()] = fc2[1];
         normals[normal_increment()] = fc2[2];
@@ -716,10 +1144,39 @@ impl Drawable for Cube {
         normals[normal_increment()] = fc2[0];
         normals[normal_increment()] = fc2[1];
         normals[normal_increment()] = fc2[2];
+
+        // ruf, rdf, fc
+        let f31 = Vec3::new(ruf[0] - fc[0], ruf[1] - fc[1], ruf[2] - fc[2]);
+        let f32 = Vec3::new(rdf[0] - fc[0], rdf[1] - fc[1], rdf[2] - fc[2]);
+        let fc3 = f31.cross(&f32);
+        normals[normal_increment()] = fc3[0];
+        normals[normal_increment()] = fc3[1];
+        normals[normal_increment()] = fc3[2];
+        normals[normal_increment()] = fc3[0];
+        normals[normal_increment()] = fc3[1];
+        normals[normal_increment()] = fc3[2];
+        normals[normal_increment()] = fc3[0];
+        normals[normal_increment()] = fc3[1];
+        normals[normal_increment()] = fc3[2];
+
+        // rdf, ldf, fc
+        let f41 = Vec3::new(rdf[0] - fc[0], rdf[1] - fc[1], rdf[2] - fc[2]);
+        let f42 = Vec3::new(ldf[0] - fc[0], ldf[1] - fc[1], ldf[2] - fc[2]);
+        let fc4 = f41.cross(&f42);
+        normals[normal_increment()] = fc4[0];
+        normals[normal_increment()] = fc4[1];
+        normals[normal_increment()] = fc4[2];
+        normals[normal_increment()] = fc4[0];
+        normals[normal_increment()] = fc4[1];
+        normals[normal_increment()] = fc4[2];
+        normals[normal_increment()] = fc4[0];
+        normals[normal_increment()] = fc4[1];
+        normals[normal_increment()] = fc4[2];
+
         // Top
-        // luf, lub, rub
-        let t11 = Vec3::new(lub[0] - luf[0], lub[1] - luf[1], lub[2] - luf[2]);
-        let t12 = Vec3::new(rub[0] - luf[0], rub[1] - luf[1], rub[2] - luf[2]);
+        // luf, lub, uc
+        let t11 = Vec3::new(luf[0] - uc[0], luf[1] - uc[1], luf[2] - uc[2]);
+        let t12 = Vec3::new(lub[0] - uc[0], lub[1] - uc[1], lub[2] - uc[2]);
         let tc1 = t11.cross(&t12);
         normals[normal_increment()] = tc1[0];
         normals[normal_increment()] = tc1[1];
@@ -730,9 +1187,10 @@ impl Drawable for Cube {
         normals[normal_increment()] = tc1[0];
         normals[normal_increment()] = tc1[1];
         normals[normal_increment()] = tc1[2];
-        // luf, rub, ruf
-        let t21 = Vec3::new(rub[0] - luf[0], rub[1] - luf[1], rub[2] - luf[2]);
-        let t22 = Vec3::new(ruf[0] - luf[0], ruf[1] - luf[1], ruf[2] - luf[2]);
+
+        // lub, rub, uc
+        let t21 = Vec3::new(lub[0] - uc[0], lub[1] - uc[1], lub[2] - uc[2]);
+        let t22 = Vec3::new(rub[0] - uc[0], rub[1] - uc[1], rub[2] - uc[2]);
         let tc2 = t21.cross(&t22);
         normals[normal_increment()] = tc2[0];
         normals[normal_increment()] = tc2[1];
@@ -744,12 +1202,40 @@ impl Drawable for Cube {
         normals[normal_increment()] = tc2[1];
         normals[normal_increment()] = tc2[2];
 
-        let bottom = &normals[0..18];
-        let left = &normals[18..36];
-        let right = &normals[36..54];
-        let front = &normals[54..72];
-        let back = &normals[72..90];
-        let top = &normals[90..108];
+        // rub, ruf, uc
+        let t31 = Vec3::new(rub[0] - uc[0], rub[1] - uc[1], rub[2] - uc[2]);
+        let t32 = Vec3::new(ruf[0] - uc[0], ruf[1] - uc[1], ruf[2] - uc[2]);
+        let tc3 = t31.cross(&t32);
+        normals[normal_increment()] = tc3[0];
+        normals[normal_increment()] = tc3[1];
+        normals[normal_increment()] = tc3[2];
+        normals[normal_increment()] = tc3[0];
+        normals[normal_increment()] = tc3[1];
+        normals[normal_increment()] = tc3[2];
+        normals[normal_increment()] = tc3[0];
+        normals[normal_increment()] = tc3[1];
+        normals[normal_increment()] = tc3[2];
+
+        // ruf, luf, uc
+        let t41 = Vec3::new(ruf[0] - uc[0], ruf[1] - uc[1], ruf[2] - uc[2]);
+        let t42 = Vec3::new(luf[0] - uc[0], luf[1] - uc[1], luf[2] - uc[2]);
+        let tc4 = t41.cross(&t42);
+        normals[normal_increment()] = tc4[0];
+        normals[normal_increment()] = tc4[1];
+        normals[normal_increment()] = tc4[2];
+        normals[normal_increment()] = tc4[0];
+        normals[normal_increment()] = tc4[1];
+        normals[normal_increment()] = tc4[2];
+        normals[normal_increment()] = tc4[0];
+        normals[normal_increment()] = tc4[1];
+        normals[normal_increment()] = tc4[2];
+
+        let bottom = &normals[0..36];
+        let left = &normals[36..72];
+        let right = &normals[72..108];
+        let front = &normals[108..144];
+        let back = &normals[144..180];
+        let top = &normals[180..216];
         let mut valid = vec![];
 
         if !self.bottom_occluded {
