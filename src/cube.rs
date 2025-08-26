@@ -118,6 +118,7 @@ impl Drawable for Cube {
         // Start by calcuting the points.
         // naming is l/r u/d f/b
         // which is -x/+x -y/+y / -z/+z
+        let buldge = 0.6;
         let lc = [
             if self.smooth
                 && !self.front_occluded
@@ -126,7 +127,7 @@ impl Drawable for Cube {
                 && !self.back_occluded
                 && !self.top_occluded
             {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
@@ -141,7 +142,7 @@ impl Drawable for Cube {
                 && !self.back_occluded
                 && !self.top_occluded
             {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
@@ -158,7 +159,7 @@ impl Drawable for Cube {
                 && !self.left_occluded
                 && !self.top_occluded
             {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
@@ -173,7 +174,7 @@ impl Drawable for Cube {
                 && !self.left_occluded
                 && !self.top_occluded
             {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
@@ -187,7 +188,7 @@ impl Drawable for Cube {
                 && !self.left_occluded
                 && !self.front_occluded
             {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
@@ -203,7 +204,7 @@ impl Drawable for Cube {
                 && !self.left_occluded
                 && !self.front_occluded
             {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
@@ -212,68 +213,68 @@ impl Drawable for Cube {
 
         let ldf = [
             if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.left_occluded {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
             if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.left_occluded {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
             if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.left_occluded {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
         ];
         let luf = [
             if self.smooth && !self.front_occluded && !self.top_occluded && !self.left_occluded {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
             if self.smooth && !self.front_occluded && !self.top_occluded && !self.left_occluded {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
             if self.smooth && !self.front_occluded && !self.top_occluded && !self.left_occluded {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
         ];
         let ldb = [
             if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.left_occluded {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
             if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.left_occluded {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
             if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.left_occluded {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
         ];
         let lub = [
             if self.smooth && !self.back_occluded && !self.top_occluded && !self.left_occluded {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
             if self.smooth && !self.back_occluded && !self.top_occluded && !self.left_occluded {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
             if self.smooth && !self.back_occluded && !self.top_occluded && !self.left_occluded {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
@@ -281,70 +282,70 @@ impl Drawable for Cube {
         let rdf = [
             if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.right_occluded
             {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
             if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.right_occluded
             {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
             if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.right_occluded
             {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
         ];
         let ruf = [
             if self.smooth && !self.front_occluded && !self.top_occluded && !self.right_occluded {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
             if self.smooth && !self.front_occluded && !self.top_occluded && !self.right_occluded {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
             if self.smooth && !self.front_occluded && !self.top_occluded && !self.right_occluded {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
         ];
         let rdb = [
             if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.right_occluded {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
             if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.right_occluded {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
             if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.right_occluded {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
         ];
         let rub = [
             if self.smooth && !self.back_occluded && !self.top_occluded && !self.right_occluded {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
             if self.smooth && !self.back_occluded && !self.top_occluded && !self.right_occluded {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
             if self.smooth && !self.back_occluded && !self.top_occluded && !self.right_occluded {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
@@ -641,6 +642,7 @@ impl Drawable for Cube {
             normal_result
         };
 
+        let buldge = 0.6;
         let lc = [
             if self.smooth
                 && !self.front_occluded
@@ -649,7 +651,7 @@ impl Drawable for Cube {
                 && !self.back_occluded
                 && !self.top_occluded
             {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
@@ -664,7 +666,7 @@ impl Drawable for Cube {
                 && !self.back_occluded
                 && !self.top_occluded
             {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
@@ -681,7 +683,7 @@ impl Drawable for Cube {
                 && !self.left_occluded
                 && !self.top_occluded
             {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
@@ -696,7 +698,7 @@ impl Drawable for Cube {
                 && !self.left_occluded
                 && !self.top_occluded
             {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
@@ -710,7 +712,7 @@ impl Drawable for Cube {
                 && !self.left_occluded
                 && !self.front_occluded
             {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
@@ -726,7 +728,7 @@ impl Drawable for Cube {
                 && !self.left_occluded
                 && !self.front_occluded
             {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
@@ -735,68 +737,68 @@ impl Drawable for Cube {
 
         let ldf = [
             if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.left_occluded {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
             if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.left_occluded {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
             if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.left_occluded {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
         ];
         let luf = [
             if self.smooth && !self.front_occluded && !self.top_occluded && !self.left_occluded {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
             if self.smooth && !self.front_occluded && !self.top_occluded && !self.left_occluded {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
             if self.smooth && !self.front_occluded && !self.top_occluded && !self.left_occluded {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
         ];
         let ldb = [
             if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.left_occluded {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
             if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.left_occluded {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
             if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.left_occluded {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
         ];
         let lub = [
             if self.smooth && !self.back_occluded && !self.top_occluded && !self.left_occluded {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
             if self.smooth && !self.back_occluded && !self.top_occluded && !self.left_occluded {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
             if self.smooth && !self.back_occluded && !self.top_occluded && !self.left_occluded {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
@@ -804,70 +806,70 @@ impl Drawable for Cube {
         let rdf = [
             if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.right_occluded
             {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
             if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.right_occluded
             {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
             if self.smooth && !self.front_occluded && !self.bottom_occluded && !self.right_occluded
             {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
         ];
         let ruf = [
             if self.smooth && !self.front_occluded && !self.top_occluded && !self.right_occluded {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
             if self.smooth && !self.front_occluded && !self.top_occluded && !self.right_occluded {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
             if self.smooth && !self.front_occluded && !self.top_occluded && !self.right_occluded {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
         ];
         let rdb = [
             if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.right_occluded {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
             if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.right_occluded {
-                self.center
+                self.center - self.center * buldge
             } else {
                 self.floor
             },
             if self.smooth && !self.back_occluded && !self.bottom_occluded && !self.right_occluded {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
         ];
         let rub = [
             if self.smooth && !self.back_occluded && !self.top_occluded && !self.right_occluded {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
             if self.smooth && !self.back_occluded && !self.top_occluded && !self.right_occluded {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
             if self.smooth && !self.back_occluded && !self.top_occluded && !self.right_occluded {
-                self.center
+                self.center + self.center * buldge
             } else {
                 self.scale
             },
