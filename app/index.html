@@ -103,7 +103,9 @@
             />
         </div>
         <button id="flat" class="widget" title="Flat" style="position: absolute; left: 10px; top: 130px; border: none">
-            <span style="background: white; width: 30px; height: 30px; display: inline-block; border-radius: 50%;"></i>
+            <span
+                style="background: white; width: 30px; height: 30px; display: inline-block; border-radius: 50%"
+            ></span>
         </button>
         <button
             id="noise"
@@ -111,21 +113,27 @@
             title="Random Noise"
             style="position: absolute; left: 10px; top: 130px; border: none; display: none"
         >
-            <svg style="width: 30px; height: 30px; border-radius: 50%;"
-                viewBox="0 0 30 30" xmlns='http://www.w3.org/2000/svg'>
-              <filter id='noiseFilter'>
-                <feTurbulence
-                  type='fractalNoise'
-                  baseFrequency='0.65'
-                  numOctaves='3'
-                  stitchTiles='stitch' />
-              </filter>
+            <svg
+                style="width: 30px; height: 30px; border-radius: 50%"
+                viewBox="0 0 30 30"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <filter id="noiseFilter">
+                    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+                </filter>
 
-              <rect width='100%' height='100%' filter='url(#noiseFilter)' />
+                <rect width="100%" height="100%" filter="url(#noiseFilter)" />
             </svg>
         </button>
-        <button id="solid" title="Solid material" class="widget" style="position: absolute; left: 10px; top: 190px; border: none">
-            <span style="border: 2px solid white; width: 26px; height: 26px; display: inline-block; border-radius: 50%;"></i>
+        <button
+            id="solid"
+            title="Solid material"
+            class="widget"
+            style="position: absolute; left: 10px; top: 190px; border: none"
+        >
+            <span
+                style="border: 2px solid white; width: 26px; height: 26px; display: inline-block; border-radius: 50%"
+            ></span>
         </button>
         <button
             id="fluid"
@@ -133,43 +141,53 @@
             class="widget"
             style="position: absolute; left: 10px; top: 190px; border: none; display: none"
         >
-            <svg class="ripple" style="width: 30px; height: 30px; border-radius: 50%;"
-                viewBox="0 0 30 30" xmlns='http://www.w3.org/2000/svg'>
+            <svg
+                class="ripple"
+                style="width: 30px; height: 30px; border-radius: 50%"
+                viewBox="0 0 30 30"
+                xmlns="http://www.w3.org/2000/svg"
+            >
                 <circle cx="15" cy="15" r="14" fill="none" stroke="#fff" stroke-width="2" />
                 <circle cx="15" cy="15" r="14" fill="none" stroke="#fff" stroke-width="2" />
                 <circle cx="15" cy="15" r="14" fill="none" stroke="#fff" stroke-width="2" />
-              </svg>
-              <style>
-              .ripple circle {
-                transform-origin: center;
-                animation: ripple 2s infinite cubic-bezier(0.23, 1, 0.32, 1);
-                transform: scale(1);
-                opacity: 0;
-              }
-
-              .ripple circle:nth-child(2) {
-                animation-delay: 0.5s;
-                transform: scale(1);
-                opacity: 0;
-              }
-              .ripple circle:nth-child(3) {
-                animation-delay: 1s;
-                transform: scale(1);
-                opacity: 0;
-              }
-
-              @keyframes ripple {
-                0% {
-                  transform: scale(0);
-                  opacity: 1;
+            </svg>
+            <style>
+                .ripple circle {
+                    transform-origin: center;
+                    animation: ripple 2s infinite cubic-bezier(0.23, 1, 0.32, 1);
+                    transform: scale(1);
+                    opacity: 0;
                 }
-                100% {
-                  transform: scale(1);
-                  opacity: 0;
+
+                .ripple circle:nth-child(2) {
+                    animation-delay: 0.5s;
+                    transform: scale(1);
+                    opacity: 0;
                 }
-              }</style>
+                .ripple circle:nth-child(3) {
+                    animation-delay: 1s;
+                    transform: scale(1);
+                    opacity: 0;
+                }
+
+                @keyframes ripple {
+                    0% {
+                        transform: scale(0);
+                        opacity: 1;
+                    }
+                    100% {
+                        transform: scale(1);
+                        opacity: 0;
+                    }
+                }
+            </style>
         </button>
-        <button id="sphere" title="Sphere" class="widget" style="position: absolute; left: 10px; top: 250px; border: none">
+        <button
+            id="sphere"
+            title="Sphere"
+            class="widget"
+            style="position: absolute; left: 10px; top: 250px; border: none"
+        >
             <i class="bi-globe"></i>
         </button>
         <button
@@ -186,7 +204,7 @@
             class="widget"
             style="position: absolute; left: 10px; top: 250px; border: none; display: none"
         >
-            <span style="background: white; width: 32px; height: 12px; margin-top: 20px; display: inline-block;"></i>
+            <span style="background: white; width: 32px; height: 12px; margin-top: 20px; display: inline-block"></span>
         </button>
         <button
             id="square-xy"
@@ -194,7 +212,9 @@
             class="widget"
             style="position: absolute; left: 10px; top: 250px; border: none; display: none"
         >
-            <span style="background: white; width: 12px; height: 32px; margin-right: 20px; display: inline-block;"></i>
+            <span
+                style="background: white; width: 12px; height: 32px; margin-right: 20px; display: inline-block"
+            ></span>
         </button>
         <button
             id="square-yz"
@@ -202,7 +222,7 @@
             class="widget"
             style="position: absolute; left: 10px; top: 250px; border: none; display: none"
         >
-            <span style="background: white; width: 12px; height: 32px; margin-left: 20px; display: inline-block;"></i>
+            <span style="background: white; width: 12px; height: 32px; margin-left: 20px; display: inline-block"></span>
         </button>
         <button
             id="circle-xz"
@@ -210,7 +230,16 @@
             class="widget"
             style="position: absolute; left: 10px; top: 250px; border: none; display: none"
         >
-            <span style="background: white; width: 32px; height: 12px; margin-top: 20px; display: inline-block; border-radius: 50%;"></i>
+            <span
+                style="
+                    background: white;
+                    width: 32px;
+                    height: 12px;
+                    margin-top: 20px;
+                    display: inline-block;
+                    border-radius: 50%;
+                "
+            ></span>
         </button>
         <button
             id="circle-xy"
@@ -218,7 +247,16 @@
             class="widget"
             style="position: absolute; left: 10px; top: 250px; border: none; display: none"
         >
-            <span style="background: white; width: 12px; height: 32px; margin-right: 20px; display: inline-block; border-radius: 50%;"></i>
+            <span
+                style="
+                    background: white;
+                    width: 12px;
+                    height: 32px;
+                    margin-right: 20px;
+                    display: inline-block;
+                    border-radius: 50%;
+                "
+            ></span>
         </button>
         <button
             id="circle-yz"
@@ -226,23 +264,52 @@
             class="widget"
             style="position: absolute; left: 10px; top: 250px; border: none; display: none"
         >
-            <span style="background: white; width: 12px; height: 32px; margin-left: 20px; display: inline-block; border-radius: 50%;"></i>
+            <span
+                style="
+                    background: white;
+                    width: 12px;
+                    height: 32px;
+                    margin-left: 20px;
+                    display: inline-block;
+                    border-radius: 50%;
+                "
+            ></span>
         </button>
 
-        <button id="grid-visible" title="Grid visible" class="widget" style="position: absolute; left: 10px; top: 310px; border: none">
+        <button
+            id="grid-visible"
+            title="Grid visible"
+            class="widget"
+            style="position: absolute; left: 10px; top: 310px; border: none"
+        >
             <i class="bi-grid-3x3"></i>
         </button>
-        <button id="grid-hidden" title="Grid hidden" class="widget" style="position: absolute; display: none; left: 10px; top: 310px; border: none">
+        <button
+            id="grid-hidden"
+            title="Grid hidden"
+            class="widget"
+            style="position: absolute; display: none; left: 10px; top: 310px; border: none"
+        >
             <i class="bi-app"></i>
         </button>
 
-        <button id="load" title="Load..." class="widget" style="position: absolute; left: 10px; top: 370px; border: none">
+        <button
+            id="load"
+            title="Load..."
+            class="widget"
+            style="position: absolute; left: 10px; top: 370px; border: none"
+        >
             <i class="bi-arrow-clockwise"></i>
         </button>
         <button id="save" title="Save" class="widget" style="position: absolute; left: 10px; top: 430px; border: none">
             <i class="bi-floppy"></i>
         </button>
-        <button id="delete" title="Delete" class="widget" style="position: absolute; left: 10px; top: 490px; border: none">
+        <button
+            id="delete"
+            title="Delete"
+            class="widget"
+            style="position: absolute; left: 10px; top: 490px; border: none"
+        >
             <i class="bi-trash"></i>
         </button>
         <button
