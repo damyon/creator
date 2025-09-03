@@ -30,6 +30,8 @@ const ALPHA_ID = "alpha";
 const GRID_VISIBLE_ID = "grid-visible";
 const GRID_HIDDEN_ID = "grid-hidden";
 const SCENE_LIST_ID = "scene-list";
+const CONTROLS_ID = "controls";
+const SLIDE_ID = "slide";
 
 const SPHERE_ID = "sphere";
 const CUBE_ID = "cube";
@@ -44,6 +46,7 @@ var selection_shape = SPHERE_ID;
 var show_grid = true;
 var fluid_enabled = false;
 var noise_enabled = false;
+var slide_in = false;
 
 function get_next_grid_toggle() {
   return !show_grid;
@@ -82,6 +85,15 @@ document.getElementById(DELETE_ID).onclick = function () {
   delete_scene();
   load_scene_names();
   processing = false;
+};
+
+document.getElementById(SLIDE_ID).onclick = function () {
+  if (slide_in) {
+    document.getElementById(CONTROLS_ID).style.transform = "translate(0px, 0px)";
+  } else {
+    document.getElementById(CONTROLS_ID).style.transform = "translate(-480px, 0px)";
+  }
+  slide_in = !slide_in;
 };
 
 function load_deferred() {
