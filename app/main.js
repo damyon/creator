@@ -14,6 +14,7 @@ import init, {
   toggle_fluid,
   toggle_show_grid,
   toggle_hide_grid,
+  set_target_fps,
 } from "./creator.js";
 
 const CANVAS_ID = "scene";
@@ -41,6 +42,8 @@ const SQUARE_YZ_ID = "square-yz";
 const CIRCLE_XZ_ID = "circle-xz";
 const CIRCLE_XY_ID = "circle-xy";
 const CIRCLE_YZ_ID = "circle-yz";
+const SLOW_FPS_ID = "slow-fps";
+const FAST_FPS_ID = "fast-fps";
 
 var selection_shape = SPHERE_ID;
 var show_grid = true;
@@ -85,6 +88,24 @@ document.getElementById(DELETE_ID).onclick = function () {
   delete_scene();
   load_scene_names();
   processing = false;
+};
+
+document.getElementById(FAST_FPS_ID).onclick = function () {
+  processing = true;
+  set_target_fps(1);
+  processing = false;
+  document.getElementById(FAST_FPS_ID).style.display = "none";
+  document.getElementById(SLOW_FPS_ID).style.display = "block";
+  document.getElementById(CANVAS_ID).focus();
+};
+
+document.getElementById(SLOW_FPS_ID).onclick = function () {
+  processing = true;
+  set_target_fps(10);
+  processing = false;
+  document.getElementById(SLOW_FPS_ID).style.display = "none";
+  document.getElementById(FAST_FPS_ID).style.display = "block";
+  document.getElementById(CANVAS_ID).focus();
 };
 
 document.getElementById(SLIDE_ID).onclick = function () {

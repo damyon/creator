@@ -73,6 +73,8 @@ pub struct Scene {
     elapsed: f32,
     /// Render the grid
     grid_visible: bool,
+    /// Speed of re-drawing when screen is idle.
+    target_fps: u32,
 }
 
 impl Scene {
@@ -117,6 +119,7 @@ impl Scene {
             elapsed: 0.0,
             last_draw: None,
             grid_visible: true,
+            target_fps: 1,
         });
         GLOBSTATE.lock().unwrap()
     }
@@ -499,14 +502,13 @@ impl Scene {
         scene.throttle = 2;
 
         let now = Instant::now();
-        let target_fps = 10;
-        let target_delay = Duration::from_millis(1000 / target_fps);
-        let last = scene
-            .last_draw
-            .or(Instant::now().checked_sub(target_delay))
-            .expect("last render frame");
-        if now.duration_since(last).cmp(&target_delay).is_lt() {
-            return true;
+        let target_fps = scene.target_fps;
+        let target_delay = Duration::from_millis(1000 / target_fps as u64);
+        if scene.last_draw.is_some() {
+            let last = scene.last_draw.expect("last_draw is None");
+            if now.duration_since(last).cmp(&target_delay).is_lt() {
+                return true;
+            }
         }
         scene.last_draw = Some(now);
         false
@@ -616,6 +618,11 @@ impl Scene {
         let mut scene = Self::access();
         log::error!("Fluid goes on");
         scene.fluid = 1;
+    }
+
+    pub async fn set_target_fps(fps: u32) {
+        let mut scene = Self::access();
+        scene.target_fps = fps;
     }
 
     /// Load the default scene.

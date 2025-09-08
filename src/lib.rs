@@ -81,6 +81,13 @@ pub async fn toggle_show_grid() -> Result<bool, JsValue> {
     Ok(true)
 }
 
+/// Set the target FPS.
+#[wasm_bindgen]
+pub async fn set_target_fps(fps: u32) -> Result<bool, JsValue> {
+    Scene::set_target_fps(fps).await;
+    Ok(true)
+}
+
 /// Do not display the grid.
 #[wasm_bindgen]
 pub async fn toggle_hide_grid() -> Result<bool, JsValue> {
